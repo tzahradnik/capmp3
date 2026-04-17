@@ -6,8 +6,10 @@ Spuštění: streamlit run app.py
 import gc
 import os
 import re
+import time
 import tempfile
 import subprocess
+from collections import defaultdict
 from urllib.parse import urlparse
 
 import requests
@@ -20,6 +22,46 @@ import streamlit as st
 MAX_VIDEO_MB = 400          # Maximální velikost videa ke stažení
 FREE_DOWNLOAD_LIMIT = 1     # Počet bezplatných stažení
 STRIPE_PAYMENT_URL = "https://buy.stripe.com/REPLACE_ME"  # TODO: doplnit Stripe Checkout URL
+
+RATE_LIMIT_REQUESTS = 5     # Max požadavků na IP za okno
+RATE_LIMIT_WINDOW = 60      # Okno v sekundách
+
+# ---------------------------------------------------------------------------
+# Rate limiting – ochrana před útoky / zneužitím
+# ---------------------------------------------------------------------------
+
+# Globální in-memory log: {ip: [timestamp, ...]}
+# Sdílený přes všechny Streamlit sessions na jednom workeru.
+_request_log: dict = defaultdict(list)
+
+
+def _get_client_ip() -> str:
+    """Vrátí IP klienta z X-Forwarded-For (Railway proxy) nebo 'unknown'."""
+    try:
+        forwarded = st.context.headers.get("X-Forwarded-For", "")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+    except Exception:
+        pass
+    return "unknown"
+
+
+def _is_rate_limited() -> bool:
+    """
+    Vrátí True pokud IP překročila RATE_LIMIT_REQUESTS za RATE_LIMIT_WINDOW sekund.
+    Automaticky čistí staré záznamy (žádný memory leak).
+    """
+    ip = _get_client_ip()
+    now = time.time()
+
+    # Vymaž záznamy mimo aktuální okno
+    _request_log[ip] = [t for t in _request_log[ip] if now - t < RATE_LIMIT_WINDOW]
+
+    if len(_request_log[ip]) >= RATE_LIMIT_REQUESTS:
+        return True
+
+    _request_log[ip].append(now)
+    return False
 
 # ---------------------------------------------------------------------------
 # ffmpeg – systémový nebo bundlovaný přes imageio-ffmpeg
@@ -363,6 +405,13 @@ elif st.button("⬇️ Stáhnout MP3", type="primary"):
         st.stop()
     if not url.startswith(("http://", "https://")):
         st.error("Zadej platnou URL adresu začínající http:// nebo https://")
+        st.stop()
+    if _is_rate_limited():
+        st.error(
+            f"⛔ Příliš mnoho požadavků. "
+            f"Max {RATE_LIMIT_REQUESTS} stažení za {RATE_LIMIT_WINDOW} sekund. "
+            "Zkus to za chvíli."
+        )
         st.stop()
 
     with tempfile.TemporaryDirectory() as tmpdir:
