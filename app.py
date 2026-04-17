@@ -1,6 +1,6 @@
 """
-CapMP3 - Extraktor zvuku z cap.so / cap.link
-Spuštění: streamlit run app.py
+CapMP3 - Audio extractor for cap.so / cap.link
+Run: streamlit run app.py
 """
 
 import gc
@@ -16,18 +16,18 @@ import requests
 import streamlit as st
 
 # ---------------------------------------------------------------------------
-# Konfigurace
+# Config
 # ---------------------------------------------------------------------------
 
 MAX_VIDEO_MB = 400
-FREE_CREDITS = 1          # Kreditů zdarma při registraci
+FREE_CREDITS = 1          # Credits awarded on registration
 
-# Stripe Payment Links – TODO: nahradit skutečnými URL po vytvoření produktů
-STRIPE_BASIC_URL  = "https://buy.stripe.com/REPLACE_BASIC"   # Basic Pack  $4.99 / 10 kreditů
-STRIPE_PRO_URL    = "https://buy.stripe.com/REPLACE_PRO"     # Pro Pack    $9.99 / 30 kreditů
+# Stripe Payment Links – TODO: replace with real URLs after creating products
+STRIPE_BASIC_URL  = "https://buy.stripe.com/REPLACE_BASIC"   # Basic Pack  $4.99 / 10 credits
+STRIPE_PRO_URL    = "https://buy.stripe.com/REPLACE_PRO"     # Pro Pack    $9.99 / 30 credits
 CONTACT_EMAIL     = "info@tomaszahradnik.com"
 
-# TODO: Supabase – po autentikaci přes `claude /mcp` doplnit URL + anon key
+# TODO: Supabase – add SUPABASE_URL + SUPABASE_ANON_KEY env vars after MCP auth
 # SUPABASE_URL      = os.getenv("SUPABASE_URL", "")
 # SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 
@@ -37,6 +37,7 @@ RATE_LIMIT_WINDOW   = 60
 # ---------------------------------------------------------------------------
 # Rate limiting
 # ---------------------------------------------------------------------------
+
 
 _request_log: dict = defaultdict(list)
 
@@ -118,7 +119,7 @@ def _check_video_size(url: str) -> None:
         size = int(head.headers.get("content-length", 0))
         if size > MAX_VIDEO_MB * 1024 * 1024:
             raise ValueError(
-                f"Video je příliš velké ({size // 1024 // 1024} MB). Max {MAX_VIDEO_MB} MB."
+                f"File is too large ({size // 1024 // 1024} MB). Maximum allowed: {MAX_VIDEO_MB} MB."
             )
     except requests.RequestException:
         pass
@@ -131,7 +132,7 @@ def get_cap_video_url(page_url: str) -> tuple[str, bool]:
 
     video_id = _extract_video_id(final_url)
     if not video_id:
-        raise ValueError(f"Nepodařilo se extrahovat videoId z URL: {final_url}")
+        raise ValueError(f"Could not extract a video ID from the URL: {final_url}")
 
     for vtype in ("audio", "segments-audio"):
         url = _cap_api_redirect(video_id, final_url, vtype)
@@ -149,7 +150,7 @@ def get_cap_video_url(page_url: str) -> tuple[str, bool]:
     if url:
         return url, False
 
-    raise ValueError("cap.so API nevrátilo platnou URL. Video může být soukromé.")
+    raise ValueError("cap.so API did not return a valid URL. The video may be private or unavailable.")
 
 
 def get_video_url_generic(page_url: str) -> str:
@@ -161,8 +162,8 @@ def get_video_url_generic(page_url: str) -> str:
             if info and info.get("url"):
                 return info["url"]
     except Exception as e:
-        raise ValueError(f"yt-dlp nepodporuje tuto platformu: {e}") from e
-    raise ValueError("yt-dlp nenašel video URL.")
+        raise ValueError(f"yt-dlp does not support this platform: {e}") from e
+    raise ValueError("yt-dlp could not find a video URL.")
 
 
 def find_video_url(url: str) -> tuple[str, str, bool]:
@@ -170,7 +171,7 @@ def find_video_url(url: str) -> tuple[str, str, bool]:
     is_cap = any(h in parsed.netloc for h in ["cap.so", "cap.link"])
     if is_cap:
         video_url, audio_only = get_cap_video_url(url)
-        return video_url, "cap.so API (audio)" if audio_only else "cap.so API (video)", audio_only
+        return video_url, "cap.so API (audio track)" if audio_only else "cap.so API (video)", audio_only
     video_url = get_video_url_generic(url)
     return video_url, "yt-dlp", False
 
@@ -186,7 +187,7 @@ def download_to_file(source_url: str, dest_path: str, bar, label: str) -> None:
     total = int(resp.headers.get("Content-Length", 0))
     if total > MAX_VIDEO_MB * 1024 * 1024:
         resp.close()
-        raise ValueError(f"Soubor je příliš velký ({total // 1024 // 1024} MB). Max {MAX_VIDEO_MB} MB.")
+        raise ValueError(f"File is too large ({total // 1024 // 1024} MB). Maximum allowed: {MAX_VIDEO_MB} MB.")
     downloaded = 0
     with open(dest_path, "wb") as f:
         for chunk in resp.iter_content(chunk_size=512 * 1024):
@@ -198,7 +199,7 @@ def download_to_file(source_url: str, dest_path: str, bar, label: str) -> None:
                                  f"{label} {downloaded/1024/1024:.1f} / {total/1024/1024:.0f} MB")
                 else:
                     bar.progress(0.5, f"{label} {downloaded/1024/1024:.1f} MB…")
-    bar.progress(1.0, f"{label} dokončeno.")
+    bar.progress(1.0, f"{label} done.")
 
 
 def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
@@ -208,10 +209,10 @@ def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     except subprocess.TimeoutExpired:
-        raise RuntimeError("Konverze trvala příliš dlouho (> 5 min).")
+        raise RuntimeError("Conversion took too long (> 5 min). Please try again.")
     if result.returncode != 0:
-        raise RuntimeError(f"ffmpeg chyba:\n{result.stderr[-600:]}")
-    bar.progress(1.0, f"{label} dokončena.")
+        raise RuntimeError(f"ffmpeg error:\n{result.stderr[-600:]}")
+    bar.progress(1.0, f"{label} complete.")
 
 
 def check_ffmpeg() -> bool:
@@ -246,9 +247,9 @@ def _deduct_credit() -> None:
 
 
 def _add_credits(amount: int) -> None:
-    # TODO: Stripe Webhook validace – před voláním této funkce ověřit
-    # platbu přes `stripe.Webhook.construct_event(payload, sig, secret)`
-    # nebo unikátní kód z Stripe redirect URL (?session_id=...)
+    # TODO: Validate Stripe Webhook before calling this —
+    # use `stripe.Webhook.construct_event(payload, sig, secret)`
+    # or verify the unique session_id from the Stripe redirect URL.
     st.session_state.credits += amount
 
 
@@ -258,14 +259,13 @@ def _add_credits(amount: int) -> None:
 
 def _save_email_to_supabase(email: str) -> None:
     """
-    TODO: Po nastavení Supabase MCP (`claude /mcp` → supabase → Authenticate)
-    doplnit uložení emailu do tabulky `subscribers`:
+    TODO: After Supabase MCP auth, persist email to `subscribers` table:
         CREATE TABLE subscribers (
             id         uuid DEFAULT gen_random_uuid() PRIMARY KEY,
             email      text UNIQUE NOT NULL,
             created_at timestamptz DEFAULT now()
         );
-    Pak sem přidat:
+    Then add:
         supabase.table("subscribers").upsert({"email": email}).execute()
     """
     pass  # placeholder
@@ -273,8 +273,8 @@ def _save_email_to_supabase(email: str) -> None:
 
 def _load_credits_from_supabase(email: str) -> int | None:
     """
-    TODO: Po nastavení Supabase načíst zůstatek kreditů pro daný email.
-    Vrátí None pokud uživatel v DB neexistuje.
+    TODO: After Supabase setup, load the credit balance for a given email.
+    Returns None if the user does not exist in the database.
     """
     return None  # placeholder
 
@@ -288,21 +288,21 @@ def _render_registration() -> None:
         """
         <div class="reg-card">
             <div class="reg-icon">🎁</div>
-            <h3 class="reg-title">Začni zdarma</h3>
-            <p class="reg-sub">Zadej e-mail a získej <strong>1 kredit zdarma</strong>.<br>
-            Použijeme ho pouze pro novinky o CapMP3.</p>
+            <h3 class="reg-title">Get started for free</h3>
+            <p class="reg-sub">Enter your email and claim your <strong>free credit</strong>.<br>
+            We'll only use it for occasional CapMP3 updates — no spam, ever.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
     with st.form("registration_form", clear_on_submit=True):
-        email = st.text_input("", placeholder="jmeno@example.com", label_visibility="collapsed")
-        submitted = st.form_submit_button("Získat kredit zdarma →", type="primary", use_container_width=True)
+        email = st.text_input("", placeholder="you@example.com", label_visibility="collapsed")
+        submitted = st.form_submit_button("Claim my free credit →", type="primary", use_container_width=True)
 
     if submitted:
         email = email.strip().lower()
         if not email or "@" not in email or "." not in email.split("@")[-1]:
-            st.error("Zadej platnou e-mailovou adresu.")
+            st.error("Please enter a valid email address.")
             return
 
         st.session_state.email      = email
@@ -326,9 +326,9 @@ def _render_pricing() -> None:
     st.markdown(
         """
         <div style="margin: 48px 0 24px;">
-            <p class="section-label">CENÍK</p>
-            <h2 class="section-title">Doplnit kredity</h2>
-            <p class="section-sub">Jednorázový nákup · Kredity nevyprší · Platba přes Stripe</p>
+            <p class="section-label">PRICING</p>
+            <h2 class="section-title">Top up your credits</h2>
+            <p class="section-sub">One-time purchase · Credits never expire · Secure checkout via Stripe</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -342,60 +342,60 @@ def _render_pricing() -> None:
             <div class="pricing-card">
                 <p class="plan-name">Basic</p>
                 <p class="plan-price">$4.99</p>
-                <p class="plan-credits">10 kreditů</p>
-                <p class="plan-unit">= $0.50 / stažení</p>
+                <p class="plan-credits">10 credits</p>
+                <p class="plan-unit">= $0.50 per download</p>
                 <ul class="plan-features">
-                    <li>✓ 10 MP3 stažení</li>
-                    <li>✓ Plná kvalita 190 kbps</li>
+                    <li>✓ 10 MP3 downloads</li>
+                    <li>✓ Full quality 190 kbps</li>
                     <li>✓ cap.so & cap.link</li>
                 </ul>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        st.link_button("Koupit Basic", url=STRIPE_BASIC_URL, use_container_width=True)
+        st.link_button("Get Basic", url=STRIPE_BASIC_URL, use_container_width=True)
 
     with col2:
         st.markdown(
             """
             <div class="pricing-card pricing-card--featured">
-                <span class="plan-badge">NEJOBLÍBENĚJŠÍ</span>
+                <span class="plan-badge">MOST POPULAR</span>
                 <p class="plan-name">Pro</p>
                 <p class="plan-price">$9.99</p>
-                <p class="plan-credits">30 kreditů</p>
-                <p class="plan-unit">= $0.33 / stažení</p>
+                <p class="plan-credits">30 credits</p>
+                <p class="plan-unit">= $0.33 per download</p>
                 <ul class="plan-features">
-                    <li>✓ 30 MP3 stažení</li>
-                    <li>✓ Plná kvalita 190 kbps</li>
+                    <li>✓ 30 MP3 downloads</li>
+                    <li>✓ Full quality 190 kbps</li>
                     <li>✓ cap.so & cap.link</li>
-                    <li>✓ Prioritní zpracování</li>
+                    <li>✓ Priority processing</li>
                 </ul>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        st.link_button("Koupit Pro", url=STRIPE_PRO_URL, use_container_width=True, type="primary")
+        st.link_button("Get Pro", url=STRIPE_PRO_URL, use_container_width=True, type="primary")
 
     with col3:
         st.markdown(
             """
             <div class="pricing-card">
                 <p class="plan-name">Enterprise</p>
-                <p class="plan-price" style="font-size:22px; padding-top:8px;">Na míru</p>
+                <p class="plan-price" style="font-size:22px; padding-top:8px;">Custom</p>
                 <p class="plan-credits"> </p>
-                <p class="plan-unit">Individuální řešení pro týmy</p>
+                <p class="plan-unit">Tailored plans for teams</p>
                 <ul class="plan-features">
-                    <li>✓ Neomezené stahování</li>
-                    <li>✓ API přístup</li>
-                    <li>✓ Dedikovaná podpora</li>
-                    <li>✓ SLA garance</li>
+                    <li>✓ Unlimited downloads</li>
+                    <li>✓ API access</li>
+                    <li>✓ Dedicated support</li>
+                    <li>✓ SLA guarantee</li>
                 </ul>
             </div>
             """,
             unsafe_allow_html=True,
         )
         st.link_button(
-            "Kontaktovat nás",
+            "Contact us",
             url=f"mailto:{CONTACT_EMAIL}?subject=CapMP3%20Enterprise",
             use_container_width=True,
         )
@@ -652,18 +652,18 @@ def _render_sidebar() -> None:
             """
             <div style="padding: 8px 0 16px;">
                 <span style="font-size:22px; font-weight:800; color:#F1F5F9;">🎵 CapMP3</span><br>
-                <span style="font-size:12px; color:#334155;">Extraktor zvuku z cap.so</span>
+                <span style="font-size:12px; color:#334155;">Audio extractor for cap.so</span>
             </div>
             """,
             unsafe_allow_html=True,
         )
         st.divider()
 
-        # Zůstatek kreditů
+        # Credit balance
         if st.session_state.registered:
             credits = _credits()
             cls = "" if credits > 0 else "empty"
-            label = "kredit" if credits == 1 else "kredity" if credits < 5 else "kreditů"
+            label = "credit" if credits == 1 else "credits"
             st.markdown(
                 f"""
                 <div class="credit-badge {cls}">
@@ -676,9 +676,9 @@ def _render_sidebar() -> None:
             )
             st.divider()
 
-        # Sponzorský banner
+        # Sponsor banner
         st.markdown(
-            "<p style='font-size:11px; font-weight:700; letter-spacing:.1em; color:#1E3A5F; margin:0 0 10px;'>PARTNER PROJEKTU</p>",
+            "<p style='font-size:11px; font-weight:700; letter-spacing:.1em; color:#1E3A5F; margin:0 0 10px;'>SPONSOR</p>",
             unsafe_allow_html=True,
         )
         st.markdown(
@@ -691,7 +691,7 @@ def _render_sidebar() -> None:
                     padding: 18px;
                     text-align: center;
                 ">
-                    <p style="color:#3B82F6; font-weight:700; font-size:13px; margin:0 0 4px;">📢 Tvoje reklama zde</p>
+                    <p style="color:#3B82F6; font-weight:700; font-size:13px; margin:0 0 4px;">📢 Your ad here</p>
                     <p style="color:#334155; font-size:11px; margin:0;">info@example.com</p>
                 </div>
             </a>
@@ -705,7 +705,7 @@ def _render_sidebar() -> None:
 # ---------------------------------------------------------------------------
 
 st.set_page_config(
-    page_title="CapMP3 – Audio Extractor",
+    page_title="CapMP3 – cap.so Audio Extractor",
     page_icon="🎵",
     layout="centered",
 )
@@ -719,12 +719,12 @@ st.markdown(
     <div style="text-align:center; padding: 48px 0 32px;">
         <div class="hero-badge">🎵 cap.so · cap.link Audio Extractor</div>
         <h1 class="hero-title">
-            Extrahuj zvuk jako<br>
-            <span class="hero-gradient">MP3 za vteřiny</span>
+            Extract audio as<br>
+            <span class="hero-gradient">MP3 in seconds</span>
         </h1>
         <p class="hero-sub">
-            Vlož odkaz na záznam z cap.so nebo cap.link.<br>
-            Stáhneme audio, převedeme do MP3 a podáme ti ke stažení.
+            Paste a cap.so or cap.link recording URL.<br>
+            We'll grab the audio, convert it to MP3, and hand it straight to you.
         </p>
     </div>
     """,
@@ -733,54 +733,54 @@ st.markdown(
 
 if not check_ffmpeg():
     st.error(
-        "⚠️ **ffmpeg nenalezen.**\n\n"
+        "⚠️ **ffmpeg not found.**\n\n"
         "- **macOS:** `brew install ffmpeg`\n"
         "- **Ubuntu/Debian:** `sudo apt install ffmpeg`\n"
-        "- **Windows:** stáhnout z [ffmpeg.org](https://ffmpeg.org/download.html)"
+        "- **Windows:** download from [ffmpeg.org](https://ffmpeg.org/download.html)"
     )
     st.stop()
 
-# ── Registrace ───────────────────────────────────────────────────────────────
+# ── Registration gate ─────────────────────────────────────────────────────────
 if not st.session_state.registered:
     _render_registration()
     _render_pricing()
     st.stop()
 
-# ── Hlavní formulář (jen pro registrované uživatele) ─────────────────────────
+# ── Main form (registered users only) ────────────────────────────────────────
 url_input = st.text_input(
-    "URL záznamu",
-    placeholder="https://cap.link/xxxxxxxx nebo https://cap.so/s/xxxxxxxx",
+    "Recording URL",
+    placeholder="https://cap.link/xxxxxxxx or https://cap.so/s/xxxxxxxx",
 )
 
 credits = _credits()
 
 if credits > 0:
-    label = "kredit" if credits == 1 else "kredity" if credits < 5 else "kreditů"
+    label = "credit" if credits == 1 else "credits"
     st.markdown(
-        f'<div class="credit-badge">💎 &nbsp;Váš zůstatek: <span class="credit-num">&nbsp;{credits}</span>&nbsp;{label}</div>',
+        f'<div class="credit-badge">💎 &nbsp;Balance: <span class="credit-num">&nbsp;{credits}</span>&nbsp;{label}</div>',
         unsafe_allow_html=True,
     )
 else:
     st.markdown(
-        '<div class="credit-badge empty">⚠️ &nbsp;Váš volný limit byl vyčerpán. Doplňte kredity níže.</div>',
+        '<div class="credit-badge empty">⚠️ &nbsp;You\'ve used all your credits. Top up below to continue.</div>',
         unsafe_allow_html=True,
     )
     _render_pricing()
     st.stop()
 
-if st.button("⬇️ Stáhnout MP3", type="primary", disabled=(credits == 0)):
+if st.button("⬇️ Download MP3", type="primary", disabled=(credits == 0)):
     url = url_input.strip()
 
     if not url:
-        st.warning("Zadej URL záznamu.")
+        st.warning("Please enter a recording URL.")
         st.stop()
     if not url.startswith(("http://", "https://")):
-        st.error("Zadej platnou URL adresu začínající http:// nebo https://")
+        st.error("Please enter a valid URL starting with http:// or https://")
         st.stop()
     if _is_rate_limited():
         st.error(
-            f"⛔ Příliš mnoho požadavků. "
-            f"Max {RATE_LIMIT_REQUESTS} za {RATE_LIMIT_WINDOW} s. Zkus to za chvíli."
+            f"⛔ Too many requests. "
+            f"Limit: {RATE_LIMIT_REQUESTS} per {RATE_LIMIT_WINDOW}s. Please wait a moment and try again."
         )
         st.stop()
 
@@ -790,26 +790,26 @@ if st.button("⬇️ Stáhnout MP3", type="primary", disabled=(credits == 0)):
         audio_bytes = None
 
         try:
-            with st.status("Hledám URL videa…", expanded=True) as status:
+            with st.status("Locating video URL…", expanded=True) as status:
                 video_url, method, audio_only = find_video_url(url)
-                st.caption(f"✓ Nalezeno přes: **{method}**")
-                status.update(label="URL videa nalezena ✓", state="complete")
+                st.caption(f"✓ Found via: **{method}**")
+                status.update(label="Video URL found ✓", state="complete")
 
-            dl_bar = st.progress(0, "Připravuji stahování…")
+            dl_bar = st.progress(0, "Preparing download…")
             download_to_file(
                 video_url, src_path, dl_bar,
-                "⬇️ Stahování audio stopy z CDN" if audio_only else "⬇️ Stahování videa z CDN",
+                "⬇️ Downloading audio track from CDN" if audio_only else "⬇️ Downloading video from CDN",
             )
 
-            conv_bar = st.progress(0, "Připravuji konverzi…")
-            convert_to_mp3(src_path, audio_path, conv_bar, "🔄 Konverze na MP3")
+            conv_bar = st.progress(0, "Starting conversion…")
+            convert_to_mp3(src_path, audio_path, conv_bar, "🔄 Converting to MP3")
 
-            st.success("✅ MP3 je připraveno ke stažení!")
+            st.success("✅ Your MP3 is ready!")
             with open(audio_path, "rb") as f:
                 audio_bytes = f.read()
 
         except requests.HTTPError as e:
-            st.error(f"HTTP chyba: {e}")
+            st.error(f"HTTP error: {e}")
             st.stop()
         except ValueError as e:
             st.error(str(e))
@@ -818,14 +818,14 @@ if st.button("⬇️ Stáhnout MP3", type="primary", disabled=(credits == 0)):
             st.error(str(e))
             st.stop()
         except Exception as e:
-            st.error(f"Neočekávaná chyba: {e}")
+            st.error(f"Unexpected error: {e}")
             st.stop()
 
-    # Kredit se odečte až po úspěšném stažení
+    # Credit is deducted only after a successful conversion
     if audio_bytes:
         _deduct_credit()
         st.download_button(
-            label="💾 Stáhnout MP3",
+            label="💾 Save MP3",
             data=audio_bytes,
             file_name="cap_audio.mp3",
             mime="audio/mpeg",
@@ -838,8 +838,8 @@ st.markdown(
     <div style="text-align:center; padding: 40px 0 16px;">
         <hr style="border-color:#1E293B; margin-bottom:24px;">
         <p style="font-size:13px; color:#1E3A5F; margin:0;">
-            cap.so &nbsp;·&nbsp; cap.link &nbsp;·&nbsp; Dočasné soubory jsou automaticky mazány
-            &nbsp;·&nbsp; <a href="mailto:info@tomaszahradnik.com" style="color:#1E3A5F; text-decoration:none;">Kontakt</a>
+            cap.so &nbsp;·&nbsp; cap.link &nbsp;·&nbsp; Temporary files are deleted automatically
+            &nbsp;·&nbsp; <a href="mailto:info@tomaszahradnik.com" style="color:#1E3A5F; text-decoration:none;">Contact</a>
         </p>
     </div>
     """,
