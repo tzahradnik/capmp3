@@ -284,14 +284,20 @@ def _load_credits_from_supabase(email: str) -> int | None:
 # ---------------------------------------------------------------------------
 
 def _render_registration() -> None:
-    st.markdown("### 👋 Začni zdarma")
     st.markdown(
-        "Zadej e-mail a získej **1 kredit zdarma**. "
-        "E-mail použijeme pouze pro zasílání novinek o CapMP3."
+        """
+        <div class="reg-card">
+            <div class="reg-icon">🎁</div>
+            <h3 class="reg-title">Začni zdarma</h3>
+            <p class="reg-sub">Zadej e-mail a získej <strong>1 kredit zdarma</strong>.<br>
+            Použijeme ho pouze pro novinky o CapMP3.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
     with st.form("registration_form", clear_on_submit=True):
-        email = st.text_input("Tvůj e-mail", placeholder="jmeno@example.com")
-        submitted = st.form_submit_button("🎁 Získat kredit zdarma", type="primary")
+        email = st.text_input("", placeholder="jmeno@example.com", label_visibility="collapsed")
+        submitted = st.form_submit_button("Získat kredit zdarma →", type="primary", use_container_width=True)
 
     if submitted:
         email = email.strip().lower()
@@ -299,16 +305,13 @@ def _render_registration() -> None:
             st.error("Zadej platnou e-mailovou adresu.")
             return
 
-        # Ulož email (session + Supabase hook)
         st.session_state.email      = email
         st.session_state.registered = True
 
-        # Zkus načíst kredity z DB (budoucí implementace)
         db_credits = _load_credits_from_supabase(email)
         if db_credits is not None:
             st.session_state.credits = db_credits
         else:
-            # Nový uživatel → FREE_CREDITS zdarma
             st.session_state.credits = FREE_CREDITS
 
         _save_email_to_supabase(email)
@@ -320,19 +323,32 @@ def _render_registration() -> None:
 # ---------------------------------------------------------------------------
 
 def _render_pricing() -> None:
-    st.markdown("---")
-    st.markdown("## 💳 Doplnit kredity")
+    st.markdown(
+        """
+        <div style="margin: 48px 0 24px;">
+            <p class="section-label">CENÍK</p>
+            <h2 class="section-title">Doplnit kredity</h2>
+            <p class="section-sub">Jednorázový nákup · Kredity nevyprší · Platba přes Stripe</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3, gap="medium")
 
     with col1:
         st.markdown(
             """
-            <div style="border:1px solid #333; border-radius:10px; padding:20px; text-align:center; height:200px;">
-                <h3 style="margin:0">Basic</h3>
-                <p style="font-size:28px; font-weight:bold; margin:8px 0">$4.99</p>
-                <p style="color:#aaa; margin:0">10 kreditů</p>
-                <p style="color:#aaa; font-size:12px">= $0.50 / stažení</p>
+            <div class="pricing-card">
+                <p class="plan-name">Basic</p>
+                <p class="plan-price">$4.99</p>
+                <p class="plan-credits">10 kreditů</p>
+                <p class="plan-unit">= $0.50 / stažení</p>
+                <ul class="plan-features">
+                    <li>✓ 10 MP3 stažení</li>
+                    <li>✓ Plná kvalita 190 kbps</li>
+                    <li>✓ cap.so & cap.link</li>
+                </ul>
             </div>
             """,
             unsafe_allow_html=True,
@@ -342,12 +358,18 @@ def _render_pricing() -> None:
     with col2:
         st.markdown(
             """
-            <div style="border:2px solid #7c3aed; border-radius:10px; padding:20px; text-align:center; height:200px; background: #1a0a2e;">
-                <p style="color:#a78bfa; font-size:11px; margin:0">NEJOBLÍBENĚJŠÍ</p>
-                <h3 style="margin:4px 0">Pro</h3>
-                <p style="font-size:28px; font-weight:bold; margin:8px 0">$9.99</p>
-                <p style="color:#aaa; margin:0">30 kreditů</p>
-                <p style="color:#aaa; font-size:12px">= $0.33 / stažení</p>
+            <div class="pricing-card pricing-card--featured">
+                <span class="plan-badge">NEJOBLÍBENĚJŠÍ</span>
+                <p class="plan-name">Pro</p>
+                <p class="plan-price">$9.99</p>
+                <p class="plan-credits">30 kreditů</p>
+                <p class="plan-unit">= $0.33 / stažení</p>
+                <ul class="plan-features">
+                    <li>✓ 30 MP3 stažení</li>
+                    <li>✓ Plná kvalita 190 kbps</li>
+                    <li>✓ cap.so & cap.link</li>
+                    <li>✓ Prioritní zpracování</li>
+                </ul>
             </div>
             """,
             unsafe_allow_html=True,
@@ -357,65 +379,320 @@ def _render_pricing() -> None:
     with col3:
         st.markdown(
             """
-            <div style="border:1px solid #333; border-radius:10px; padding:20px; text-align:center; height:200px;">
-                <h3 style="margin:0">Enterprise</h3>
-                <p style="font-size:18px; font-weight:bold; margin:8px 0">Na míru</p>
-                <p style="color:#aaa; margin:0">Neomezené stahování</p>
-                <p style="color:#aaa; font-size:12px">Individuální řešení pro týmy</p>
+            <div class="pricing-card">
+                <p class="plan-name">Enterprise</p>
+                <p class="plan-price" style="font-size:22px; padding-top:8px;">Na míru</p>
+                <p class="plan-credits"> </p>
+                <p class="plan-unit">Individuální řešení pro týmy</p>
+                <ul class="plan-features">
+                    <li>✓ Neomezené stahování</li>
+                    <li>✓ API přístup</li>
+                    <li>✓ Dedikovaná podpora</li>
+                    <li>✓ SLA garance</li>
+                </ul>
             </div>
             """,
             unsafe_allow_html=True,
         )
         st.link_button(
             "Kontaktovat nás",
-            url=f"mailto:{CONTACT_EMAIL}?subject=CapMP3 Enterprise",
+            url=f"mailto:{CONTACT_EMAIL}?subject=CapMP3%20Enterprise",
             use_container_width=True,
         )
-
-    st.caption("Platba přes Stripe · SSL · Kredity nevyprší")
 
 
 # ---------------------------------------------------------------------------
 # Sidebar
 # ---------------------------------------------------------------------------
 
+def _inject_css() -> None:
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        /* ── Base ─────────────────────────────────────────── */
+        html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
+        .stApp { background: #030712; }
+
+        /* ── Hero ─────────────────────────────────────────── */
+        .hero-badge {
+            display: inline-block;
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.3);
+            color: #93C5FD;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            padding: 4px 14px;
+            border-radius: 999px;
+            margin-bottom: 20px;
+        }
+        .hero-title {
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 800;
+            line-height: 1.15;
+            color: #F1F5F9;
+            margin: 0 0 16px;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub {
+            font-size: 16px;
+            color: #64748B;
+            margin: 0 0 40px;
+            line-height: 1.6;
+        }
+
+        /* ── Input ────────────────────────────────────────── */
+        .stTextInput > div > div > input {
+            background: #0F172A !important;
+            border: 1px solid #1E3A5F !important;
+            border-radius: 12px !important;
+            color: #F1F5F9 !important;
+            font-size: 15px !important;
+            padding: 14px 18px !important;
+            transition: border-color .2s;
+        }
+        .stTextInput > div > div > input:focus {
+            border-color: #3B82F6 !important;
+            box-shadow: 0 0 0 3px rgba(59,130,246,.15) !important;
+        }
+        .stTextInput > div > div > input::placeholder { color: #334155 !important; }
+
+        /* ── Primary button ───────────────────────────────── */
+        .stButton > button[kind="primary"],
+        .stFormSubmitButton > button[kind="primary"] {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+            padding: 14px 28px !important;
+            transition: opacity .2s, transform .1s !important;
+            box-shadow: 0 4px 24px rgba(59,130,246,.25) !important;
+        }
+        .stButton > button[kind="primary"]:hover,
+        .stFormSubmitButton > button[kind="primary"]:hover {
+            opacity: .9 !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* ── Secondary button ─────────────────────────────── */
+        .stButton > button[kind="secondary"],
+        .stFormSubmitButton > button[kind="secondary"],
+        .stLinkButton > a {
+            background: transparent !important;
+            border: 1px solid #1E3A5F !important;
+            border-radius: 12px !important;
+            color: #94A3B8 !important;
+            font-weight: 500 !important;
+            transition: border-color .2s, color .2s !important;
+        }
+        .stButton > button[kind="secondary"]:hover,
+        .stLinkButton > a:hover {
+            border-color: #3B82F6 !important;
+            color: #3B82F6 !important;
+        }
+
+        /* ── Credit badge ─────────────────────────────────── */
+        .credit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59,130,246,.1);
+            border: 1px solid rgba(59,130,246,.25);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #93C5FD;
+            font-weight: 500;
+        }
+        .credit-badge .credit-num {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3B82F6;
+        }
+        .credit-badge.empty {
+            background: rgba(239,68,68,.1);
+            border-color: rgba(239,68,68,.25);
+            color: #FCA5A5;
+        }
+        .credit-badge.empty .credit-num { color: #EF4444; }
+
+        /* ── Registration card ────────────────────────────── */
+        .reg-card {
+            background: #0F172A;
+            border: 1px solid #1E3A5F;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin: 32px 0 24px;
+        }
+        .reg-icon { font-size: 40px; margin-bottom: 12px; }
+        .reg-title { font-size: 24px; font-weight: 700; color: #F1F5F9; margin: 0 0 8px; }
+        .reg-sub { color: #64748B; font-size: 15px; line-height: 1.6; margin: 0 0 24px; }
+
+        /* ── Section labels ───────────────────────────────── */
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            color: #3B82F6;
+            margin: 0 0 8px;
+        }
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #F1F5F9;
+            margin: 0 0 8px;
+        }
+        .section-sub {
+            color: #64748B;
+            font-size: 14px;
+            margin: 0 0 32px;
+        }
+
+        /* ── Pricing cards ────────────────────────────────── */
+        .pricing-card {
+            background: #0F172A;
+            border: 1px solid #1E3A5F;
+            border-radius: 16px;
+            padding: 28px 24px 24px;
+            height: 100%;
+            position: relative;
+        }
+        .pricing-card--featured {
+            border-color: #3B82F6;
+            background: linear-gradient(160deg, #0F172A 0%, #0D1F3C 100%);
+            box-shadow: 0 0 40px rgba(59,130,246,.12);
+        }
+        .plan-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #2563EB, #7C3AED);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            padding: 3px 12px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .plan-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #94A3B8;
+            margin: 0 0 8px;
+        }
+        .plan-price {
+            font-size: 36px;
+            font-weight: 800;
+            color: #F1F5F9;
+            margin: 0;
+            line-height: 1;
+        }
+        .plan-credits {
+            font-size: 14px;
+            color: #3B82F6;
+            font-weight: 600;
+            margin: 6px 0 2px;
+        }
+        .plan-unit {
+            font-size: 12px;
+            color: #334155;
+            margin: 0 0 20px;
+        }
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px;
+        }
+        .plan-features li {
+            font-size: 13px;
+            color: #64748B;
+            padding: 4px 0;
+        }
+
+        /* ── Status / progress ────────────────────────────── */
+        .stProgress > div > div > div { background: linear-gradient(90deg, #2563EB, #7C3AED) !important; }
+
+        /* ── Alerts ───────────────────────────────────────── */
+        .stAlert { border-radius: 12px !important; }
+
+        /* ── Divider ──────────────────────────────────────── */
+        hr { border-color: #1E293B !important; margin: 40px 0 !important; }
+
+        /* ── Footer caption ───────────────────────────────── */
+        .stCaption { color: #334155 !important; }
+
+        /* ── Sidebar ──────────────────────────────────────── */
+        [data-testid="stSidebar"] {
+            background: #0A0F1E !important;
+            border-right: 1px solid #1E293B !important;
+        }
+        [data-testid="stSidebar"] * { color: #94A3B8; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def _render_sidebar() -> None:
     with st.sidebar:
-        st.markdown("## 🎵 CapMP3")
-        st.caption("Extraktor zvuku z cap.so záznamů")
+        st.markdown(
+            """
+            <div style="padding: 8px 0 16px;">
+                <span style="font-size:22px; font-weight:800; color:#F1F5F9;">🎵 CapMP3</span><br>
+                <span style="font-size:12px; color:#334155;">Extraktor zvuku z cap.so</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         st.divider()
 
         # Zůstatek kreditů
         if st.session_state.registered:
             credits = _credits()
-            color   = "#22c55e" if credits > 0 else "#ef4444"
+            cls = "" if credits > 0 else "empty"
+            label = "kredit" if credits == 1 else "kredity" if credits < 5 else "kreditů"
             st.markdown(
-                f"**👤 {st.session_state.email}**  \n"
-                f"<span style='color:{color}; font-size:18px; font-weight:bold'>"
-                f"💎 {credits} kreditů</span>",
+                f"""
+                <div class="credit-badge {cls}">
+                    <span>💎</span>
+                    <span><span class="credit-num">{credits}</span> {label}</span>
+                </div>
+                <p style="font-size:12px; color:#334155; margin:4px 0 0;">{st.session_state.email}</p>
+                """,
                 unsafe_allow_html=True,
             )
             st.divider()
 
         # Sponzorský banner
-        st.markdown("### 🤝 Partner projektu")
+        st.markdown(
+            "<p style='font-size:11px; font-weight:700; letter-spacing:.1em; color:#1E3A5F; margin:0 0 10px;'>PARTNER PROJEKTU</p>",
+            unsafe_allow_html=True,
+        )
         st.markdown(
             """
-            <a href="https://example.com" target="_blank">
+            <a href="https://example.com" target="_blank" style="text-decoration:none;">
                 <div style="
-                    background: linear-gradient(135deg,#1a1a2e,#16213e);
-                    border: 1px solid #0f3460;
-                    border-radius: 8px;
-                    padding: 16px;
+                    background: linear-gradient(135deg,#0F172A,#0D1F3C);
+                    border: 1px solid #1E3A5F;
+                    border-radius: 12px;
+                    padding: 18px;
                     text-align: center;
-                    color: #e94560;
-                    font-weight: bold;
-                    font-size: 14px;
                 ">
-                    📢 Tvoje reklama zde<br>
-                    <span style="color:#aaa;font-size:11px;font-weight:normal;">
-                        info@example.com
-                    </span>
+                    <p style="color:#3B82F6; font-weight:700; font-size:13px; margin:0 0 4px;">📢 Tvoje reklama zde</p>
+                    <p style="color:#334155; font-size:11px; margin:0;">info@example.com</p>
                 </div>
             </a>
             """,
@@ -428,16 +705,31 @@ def _render_sidebar() -> None:
 # ---------------------------------------------------------------------------
 
 st.set_page_config(
-    page_title="CapMP3 – Extraktor zvuku",
+    page_title="CapMP3 – Audio Extractor",
     page_icon="🎵",
     layout="centered",
 )
 
 _init_session()
+_inject_css()
 _render_sidebar()
 
-st.title("🎵 CapMP3")
-st.markdown("Extrahuj zvuk z libovolného záznamu na **cap.so** nebo **cap.link** jako MP3.")
+st.markdown(
+    """
+    <div style="text-align:center; padding: 48px 0 32px;">
+        <div class="hero-badge">🎵 cap.so · cap.link Audio Extractor</div>
+        <h1 class="hero-title">
+            Extrahuj zvuk jako<br>
+            <span class="hero-gradient">MP3 za vteřiny</span>
+        </h1>
+        <p class="hero-sub">
+            Vlož odkaz na záznam z cap.so nebo cap.link.<br>
+            Stáhneme audio, převedeme do MP3 a podáme ti ke stažení.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 if not check_ffmpeg():
     st.error(
@@ -462,13 +754,16 @@ url_input = st.text_input(
 
 credits = _credits()
 
-# Zůstatek kreditů pod inputem
 if credits > 0:
-    st.caption(f"💎 Váš zůstatek: **{credits} {'kredit' if credits == 1 else 'kredity' if credits < 5 else 'kreditů'}**")
+    label = "kredit" if credits == 1 else "kredity" if credits < 5 else "kreditů"
+    st.markdown(
+        f'<div class="credit-badge">💎 &nbsp;Váš zůstatek: <span class="credit-num">&nbsp;{credits}</span>&nbsp;{label}</div>',
+        unsafe_allow_html=True,
+    )
 else:
-    st.warning(
-        "Váš volný limit byl vyčerpán. "
-        "Pro další stahování si prosím doplňte kredity níže."
+    st.markdown(
+        '<div class="credit-badge empty">⚠️ &nbsp;Váš volný limit byl vyčerpán. Doplňte kredity níže.</div>',
+        unsafe_allow_html=True,
     )
     _render_pricing()
     st.stop()
@@ -538,5 +833,15 @@ if st.button("⬇️ Stáhnout MP3", type="primary", disabled=(credits == 0)):
         del audio_bytes
         gc.collect()
 
-st.divider()
-st.caption("Podporované platformy: cap.so, cap.link · Dočasné soubory jsou automaticky mazány.")
+st.markdown(
+    """
+    <div style="text-align:center; padding: 40px 0 16px;">
+        <hr style="border-color:#1E293B; margin-bottom:24px;">
+        <p style="font-size:13px; color:#1E3A5F; margin:0;">
+            cap.so &nbsp;·&nbsp; cap.link &nbsp;·&nbsp; Dočasné soubory jsou automaticky mazány
+            &nbsp;·&nbsp; <a href="mailto:info@tomaszahradnik.com" style="color:#1E3A5F; text-decoration:none;">Kontakt</a>
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
