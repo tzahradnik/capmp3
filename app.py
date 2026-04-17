@@ -20,16 +20,11 @@ import streamlit as st
 # ---------------------------------------------------------------------------
 
 MAX_VIDEO_MB = 400
-FREE_CREDITS = 1          # Credits awarded on registration
+FREE_CREDITS = 1
 
-# Stripe Payment Links – TODO: replace with real URLs after creating products
-STRIPE_BASIC_URL  = "https://buy.stripe.com/REPLACE_BASIC"   # Basic Pack  $4.99 / 10 credits
-STRIPE_PRO_URL    = "https://buy.stripe.com/REPLACE_PRO"     # Pro Pack    $9.99 / 30 credits
-CONTACT_EMAIL     = "info@tomaszahradnik.com"
-
-# TODO: Supabase – add SUPABASE_URL + SUPABASE_ANON_KEY env vars after MCP auth
-# SUPABASE_URL      = os.getenv("SUPABASE_URL", "")
-# SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+STRIPE_BASIC_URL = "https://buy.stripe.com/REPLACE_BASIC"
+STRIPE_PRO_URL   = "https://buy.stripe.com/REPLACE_PRO"
+CONTACT_EMAIL    = "info@tomaszahradnik.com"
 
 RATE_LIMIT_REQUESTS = 5
 RATE_LIMIT_WINDOW   = 60
@@ -37,7 +32,6 @@ RATE_LIMIT_WINDOW   = 60
 # ---------------------------------------------------------------------------
 # Rate limiting
 # ---------------------------------------------------------------------------
-
 
 _request_log: dict = defaultdict(list)
 
@@ -77,6 +71,7 @@ def _get_ffmpeg() -> str:
     except ImportError:
         return "ffmpeg"
 
+
 FFMPEG = _get_ffmpeg()
 
 HEADERS = {
@@ -89,7 +84,7 @@ HEADERS = {
 }
 
 # ---------------------------------------------------------------------------
-# cap.so API – extrakce URL videa
+# cap.so API
 # ---------------------------------------------------------------------------
 
 def _extract_video_id(url: str) -> str | None:
@@ -177,7 +172,7 @@ def find_video_url(url: str) -> tuple[str, str, bool]:
 
 
 # ---------------------------------------------------------------------------
-# Stahování a konverze
+# Download & conversion
 # ---------------------------------------------------------------------------
 
 def download_to_file(source_url: str, dest_path: str, bar, label: str) -> None:
@@ -196,10 +191,10 @@ def download_to_file(source_url: str, dest_path: str, bar, label: str) -> None:
                 downloaded += len(chunk)
                 if total:
                     bar.progress(min(downloaded / total, 1.0),
-                                 f"{label} {downloaded/1024/1024:.1f} / {total/1024/1024:.0f} MB")
+                                 f"{label} — {downloaded/1024/1024:.1f} / {total/1024/1024:.0f} MB")
                 else:
-                    bar.progress(0.5, f"{label} {downloaded/1024/1024:.1f} MB…")
-    bar.progress(1.0, f"{label} done.")
+                    bar.progress(0.5, f"{label} — {downloaded/1024/1024:.1f} MB…")
+    bar.progress(1.0, f"{label} — done.")
 
 
 def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
@@ -212,7 +207,7 @@ def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
         raise RuntimeError("Conversion took too long (> 5 min). Please try again.")
     if result.returncode != 0:
         raise RuntimeError(f"ffmpeg error:\n{result.stderr[-600:]}")
-    bar.progress(1.0, f"{label} complete.")
+    bar.progress(1.0, f"{label} — complete.")
 
 
 def check_ffmpeg() -> bool:
@@ -224,14 +219,17 @@ def check_ffmpeg() -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Session state – kredity
+# Session state
 # ---------------------------------------------------------------------------
 
 def _init_session() -> None:
     defaults = {
-        "registered": False,
-        "email":      "",
-        "credits":    0,
+        "registered":      False,
+        "email":           "",
+        "credits":         0,
+        "show_gate":       False,
+        "pending_url":     "",
+        "do_convert":      False,
     }
     for key, val in defaults.items():
         if key not in st.session_state:
@@ -247,14 +245,13 @@ def _deduct_credit() -> None:
 
 
 def _add_credits(amount: int) -> None:
-    # TODO: Validate Stripe Webhook before calling this —
-    # use `stripe.Webhook.construct_event(payload, sig, secret)`
-    # or verify the unique session_id from the Stripe redirect URL.
+    # TODO: Validate Stripe Webhook before calling —
+    # use stripe.Webhook.construct_event(payload, sig, secret)
     st.session_state.credits += amount
 
 
 # ---------------------------------------------------------------------------
-# Supabase hooks (připraveno pro budoucí implementaci)
+# Supabase stubs
 # ---------------------------------------------------------------------------
 
 def _save_email_to_supabase(email: str) -> None:
@@ -265,108 +262,376 @@ def _save_email_to_supabase(email: str) -> None:
             email      text UNIQUE NOT NULL,
             created_at timestamptz DEFAULT now()
         );
-    Then add:
-        supabase.table("subscribers").upsert({"email": email}).execute()
     """
-    pass  # placeholder
+    pass
 
 
 def _load_credits_from_supabase(email: str) -> int | None:
-    """
-    TODO: After Supabase setup, load the credit balance for a given email.
-    Returns None if the user does not exist in the database.
-    """
-    return None  # placeholder
+    """TODO: Load credit balance for email. Returns None if not found."""
+    return None
 
 
 # ---------------------------------------------------------------------------
-# Registrační formulář
+# CSS — clean, minimal, trustworthy
 # ---------------------------------------------------------------------------
 
-def _render_registration() -> None:
+def _inject_css() -> None:
     st.markdown(
         """
-        <div class="reg-card">
-            <div class="reg-icon">🎁</div>
-            <h3 class="reg-title">Get started for free</h3>
-            <p class="reg-sub">Enter your email and claim your <strong>free credit</strong>.<br>
-            We'll only use it for occasional CapMP3 updates — no spam, ever.</p>
-        </div>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        /* ── Reset & base ─────────────────────────────────── */
+        html, body, [class*="css"] {
+            font-family: 'Inter', sans-serif !important;
+        }
+        .stApp { background: #0A0F1C !important; }
+
+        /* ── Hide sidebar & header clutter ───────────────── */
+        [data-testid="stSidebar"],
+        [data-testid="collapsedControl"],
+        header[data-testid="stHeader"] { display: none !important; }
+
+        /* ── Page wrapper: center & constrain width ──────── */
+        .block-container {
+            max-width: 560px !important;
+            padding: 48px 24px 64px !important;
+            margin: 0 auto !important;
+        }
+
+        /* ── Logo ─────────────────────────────────────────── */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 48px;
+        }
+        .logo-mark {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #2563EB, #7C3AED);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .logo-text {
+            font-size: 17px;
+            font-weight: 700;
+            color: #F1F5F9;
+            letter-spacing: -.02em;
+        }
+
+        /* ── Hero ─────────────────────────────────────────── */
+        .hero-title {
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 800;
+            line-height: 1.15;
+            color: #F1F5F9;
+            margin: 0 0 12px;
+            letter-spacing: -.02em;
+        }
+        .grad {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub {
+            font-size: 16px;
+            color: #64748B;
+            margin: 0 0 32px;
+            line-height: 1.6;
+        }
+
+        /* ── Converter card ───────────────────────────────── */
+        .converter-card {
+            background: #0F172A;
+            border: 1px solid #1E293B;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        /* ── Input ────────────────────────────────────────── */
+        .stTextInput > div > div > input {
+            background: #020917 !important;
+            border: 1.5px solid #1E293B !important;
+            border-radius: 10px !important;
+            color: #F1F5F9 !important;
+            font-size: 15px !important;
+            padding: 13px 16px !important;
+            transition: border-color .15s, box-shadow .15s;
+            font-family: 'Inter', sans-serif !important;
+        }
+        .stTextInput > div > div > input:focus {
+            border-color: #3B82F6 !important;
+            box-shadow: 0 0 0 3px rgba(59,130,246,.12) !important;
+            outline: none !important;
+        }
+        .stTextInput > div > div > input::placeholder {
+            color: #334155 !important;
+        }
+        /* Remove input label space */
+        .stTextInput label { display: none !important; }
+
+        /* ── Primary button ───────────────────────────────── */
+        .stButton > button[kind="primary"],
+        .stFormSubmitButton > button[kind="primary"] {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
+            border: none !important;
+            border-radius: 10px !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+            padding: 13px 24px !important;
+            letter-spacing: -.01em !important;
+            transition: opacity .15s, transform .1s, box-shadow .15s !important;
+            box-shadow: 0 2px 16px rgba(59,130,246,.2) !important;
+        }
+        .stButton > button[kind="primary"]:hover,
+        .stFormSubmitButton > button[kind="primary"]:hover {
+            opacity: .92 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 24px rgba(59,130,246,.35) !important;
+        }
+        .stButton > button[kind="primary"]:active,
+        .stFormSubmitButton > button[kind="primary"]:active {
+            transform: translateY(0) !important;
+        }
+
+        /* ── Secondary / link buttons ─────────────────────── */
+        .stButton > button[kind="secondary"],
+        .stFormSubmitButton > button[kind="secondary"],
+        .stLinkButton > a {
+            background: transparent !important;
+            border: 1.5px solid #1E293B !important;
+            border-radius: 10px !important;
+            color: #94A3B8 !important;
+            font-weight: 500 !important;
+            transition: border-color .15s, color .15s !important;
+        }
+        .stLinkButton > a[data-featured="true"] {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
+            border: none !important;
+            color: #fff !important;
+        }
+
+        /* ── Trust bar ────────────────────────────────────── */
+        .trust-bar {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin: 20px 0 0;
+        }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #475569;
+            font-weight: 500;
+        }
+        .trust-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: #1E3A5F;
+        }
+
+        /* ── Email gate ───────────────────────────────────── */
+        .gate-card {
+            background: #0F172A;
+            border: 1px solid #1E293B;
+            border-radius: 16px;
+            padding: 28px 24px 8px;
+            margin-bottom: 4px;
+        }
+        .gate-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #F1F5F9;
+            margin: 0 0 6px;
+            letter-spacing: -.02em;
+        }
+        .gate-sub {
+            font-size: 14px;
+            color: #64748B;
+            margin: 0 0 20px;
+            line-height: 1.5;
+        }
+        .privacy-note {
+            text-align: center;
+            font-size: 12px;
+            color: #334155;
+            margin: 8px 0 0;
+        }
+
+        /* ── Credit pill ──────────────────────────────────── */
+        .credit-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(59,130,246,.08);
+            border: 1px solid rgba(59,130,246,.18);
+            border-radius: 999px;
+            padding: 5px 12px;
+            font-size: 12px;
+            color: #93C5FD;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        .credit-pill.empty {
+            background: rgba(239,68,68,.08);
+            border-color: rgba(239,68,68,.2);
+            color: #FCA5A5;
+        }
+
+        /* ── Pricing ──────────────────────────────────────── */
+        .pricing-header {
+            margin: 40px 0 24px;
+            text-align: center;
+        }
+        .pricing-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            color: #3B82F6;
+            margin: 0 0 6px;
+        }
+        .pricing-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #F1F5F9;
+            margin: 0 0 6px;
+            letter-spacing: -.02em;
+        }
+        .pricing-sub {
+            font-size: 13px;
+            color: #475569;
+            margin: 0;
+        }
+        .pricing-card {
+            background: #0F172A;
+            border: 1px solid #1E293B;
+            border-radius: 14px;
+            padding: 24px 20px 20px;
+            position: relative;
+        }
+        .pricing-card--featured {
+            border-color: #2563EB;
+            background: linear-gradient(160deg, #0F172A 0%, #0D1F3C 100%);
+            box-shadow: 0 0 32px rgba(37,99,235,.1);
+        }
+        .plan-badge {
+            position: absolute;
+            top: -11px; left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #2563EB, #7C3AED);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            padding: 3px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .plan-name  { font-size: 13px; font-weight: 600; color: #64748B; margin: 0 0 8px; }
+        .plan-price { font-size: 32px; font-weight: 800; color: #F1F5F9; margin: 0; line-height: 1; letter-spacing: -.03em; }
+        .plan-credits { font-size: 13px; color: #3B82F6; font-weight: 600; margin: 5px 0 2px; }
+        .plan-unit  { font-size: 11px; color: #334155; margin: 0 0 16px; }
+        .plan-features { list-style: none; padding: 0; margin: 0 0 20px; }
+        .plan-features li { font-size: 12px; color: #475569; padding: 3px 0; }
+
+        /* ── Progress bar ─────────────────────────────────── */
+        .stProgress > div > div > div {
+            background: linear-gradient(90deg, #2563EB, #7C3AED) !important;
+        }
+
+        /* ── Alerts ───────────────────────────────────────── */
+        .stAlert { border-radius: 10px !important; font-size: 14px !important; }
+
+        /* ── Status box ───────────────────────────────────── */
+        [data-testid="stStatusWidget"] { border-radius: 10px !important; }
+
+        /* ── Download button ──────────────────────────────── */
+        [data-testid="stDownloadButton"] > button {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
+            border: none !important;
+            border-radius: 10px !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+            padding: 13px 24px !important;
+            box-shadow: 0 2px 16px rgba(59,130,246,.2) !important;
+            width: 100% !important;
+        }
+
+        /* ── Footer ───────────────────────────────────────── */
+        .footer {
+            text-align: center;
+            padding: 48px 0 0;
+            font-size: 12px;
+            color: #1E3A5F;
+        }
+        .footer a { color: #1E3A5F; text-decoration: none; }
+        .footer a:hover { color: #3B82F6; }
+
+        /* ── Divider ──────────────────────────────────────── */
+        hr { border-color: #0F172A !important; margin: 32px 0 !important; }
+        </style>
         """,
         unsafe_allow_html=True,
     )
-    with st.form("registration_form", clear_on_submit=True):
-        email = st.text_input("", placeholder="you@example.com", label_visibility="collapsed")
-        submitted = st.form_submit_button("Claim my free credit →", type="primary", use_container_width=True)
-
-    if submitted:
-        email = email.strip().lower()
-        if not email or "@" not in email or "." not in email.split("@")[-1]:
-            st.error("Please enter a valid email address.")
-            return
-
-        st.session_state.email      = email
-        st.session_state.registered = True
-
-        db_credits = _load_credits_from_supabase(email)
-        if db_credits is not None:
-            st.session_state.credits = db_credits
-        else:
-            st.session_state.credits = FREE_CREDITS
-
-        _save_email_to_supabase(email)
-        st.rerun()
 
 
 # ---------------------------------------------------------------------------
-# Pricing sekce
+# Pricing section
 # ---------------------------------------------------------------------------
 
 def _render_pricing() -> None:
     st.markdown(
         """
-        <div style="margin: 48px 0 24px;">
-            <p class="section-label">PRICING</p>
-            <h2 class="section-title">Top up your credits</h2>
-            <p class="section-sub">One-time purchase · Credits never expire · Secure checkout via Stripe</p>
+        <div class="pricing-header">
+            <p class="pricing-label">PRICING</p>
+            <h2 class="pricing-title">Top up your credits</h2>
+            <p class="pricing-sub">One-time · Credits never expire · Stripe checkout</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    col1, col2, col3 = st.columns(3, gap="medium")
+    col1, col2, col3 = st.columns(3, gap="small")
 
     with col1:
         st.markdown(
             """
             <div class="pricing-card">
-                <p class="plan-name">Basic</p>
+                <p class="plan-name">Starter</p>
                 <p class="plan-price">$4.99</p>
                 <p class="plan-credits">10 credits</p>
-                <p class="plan-unit">= $0.50 per download</p>
+                <p class="plan-unit">$0.50 / download</p>
                 <ul class="plan-features">
                     <li>✓ 10 MP3 downloads</li>
-                    <li>✓ Full quality 190 kbps</li>
+                    <li>✓ 190 kbps quality</li>
                     <li>✓ cap.so & cap.link</li>
                 </ul>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        st.link_button("Get Basic", url=STRIPE_BASIC_URL, use_container_width=True)
+        st.link_button("Get Starter", url=STRIPE_BASIC_URL, use_container_width=True)
 
     with col2:
         st.markdown(
             """
             <div class="pricing-card pricing-card--featured">
-                <span class="plan-badge">MOST POPULAR</span>
+                <span class="plan-badge">BEST VALUE</span>
                 <p class="plan-name">Pro</p>
                 <p class="plan-price">$9.99</p>
                 <p class="plan-credits">30 credits</p>
-                <p class="plan-unit">= $0.33 per download</p>
+                <p class="plan-unit">$0.33 / download</p>
                 <ul class="plan-features">
                     <li>✓ 30 MP3 downloads</li>
-                    <li>✓ Full quality 190 kbps</li>
+                    <li>✓ 190 kbps quality</li>
                     <li>✓ cap.so & cap.link</li>
                     <li>✓ Priority processing</li>
                 </ul>
@@ -380,15 +645,15 @@ def _render_pricing() -> None:
         st.markdown(
             """
             <div class="pricing-card">
-                <p class="plan-name">Enterprise</p>
-                <p class="plan-price" style="font-size:22px; padding-top:8px;">Custom</p>
-                <p class="plan-credits"> </p>
-                <p class="plan-unit">Tailored plans for teams</p>
+                <p class="plan-name">Teams</p>
+                <p class="plan-price" style="font-size:20px;padding-top:6px;">Custom</p>
+                <p class="plan-credits">&nbsp;</p>
+                <p class="plan-unit">For teams & power users</p>
                 <ul class="plan-features">
                     <li>✓ Unlimited downloads</li>
                     <li>✓ API access</li>
                     <li>✓ Dedicated support</li>
-                    <li>✓ SLA guarantee</li>
+                    <li>✓ SLA</li>
                 </ul>
             </div>
             """,
@@ -396,393 +661,24 @@ def _render_pricing() -> None:
         )
         st.link_button(
             "Contact us",
-            url=f"mailto:{CONTACT_EMAIL}?subject=CapMP3%20Enterprise",
+            url=f"mailto:{CONTACT_EMAIL}?subject=CapMP3%20Teams",
             use_container_width=True,
         )
 
 
 # ---------------------------------------------------------------------------
-# Sidebar
+# Conversion logic
 # ---------------------------------------------------------------------------
 
-def _inject_css() -> None:
-    st.markdown(
-        """
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+def _run_conversion(url: str) -> None:
+    """Execute the full download + convert pipeline and render result."""
 
-        /* ── Base ─────────────────────────────────────────── */
-        html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
-        .stApp { background: #030712; }
-
-        /* ── Hero ─────────────────────────────────────────── */
-        .hero-badge {
-            display: inline-block;
-            background: rgba(59,130,246,0.12);
-            border: 1px solid rgba(59,130,246,0.3);
-            color: #93C5FD;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .08em;
-            padding: 4px 14px;
-            border-radius: 999px;
-            margin-bottom: 20px;
-        }
-        .hero-title {
-            font-size: clamp(32px, 5vw, 52px);
-            font-weight: 800;
-            line-height: 1.15;
-            color: #F1F5F9;
-            margin: 0 0 16px;
-        }
-        .hero-gradient {
-            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .hero-sub {
-            font-size: 16px;
-            color: #64748B;
-            margin: 0 0 40px;
-            line-height: 1.6;
-        }
-
-        /* ── Input ────────────────────────────────────────── */
-        .stTextInput > div > div > input {
-            background: #0F172A !important;
-            border: 1px solid #1E3A5F !important;
-            border-radius: 12px !important;
-            color: #F1F5F9 !important;
-            font-size: 15px !important;
-            padding: 14px 18px !important;
-            transition: border-color .2s;
-        }
-        .stTextInput > div > div > input:focus {
-            border-color: #3B82F6 !important;
-            box-shadow: 0 0 0 3px rgba(59,130,246,.15) !important;
-        }
-        .stTextInput > div > div > input::placeholder { color: #334155 !important; }
-
-        /* ── Primary button ───────────────────────────────── */
-        .stButton > button[kind="primary"],
-        .stFormSubmitButton > button[kind="primary"] {
-            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
-            border: none !important;
-            border-radius: 12px !important;
-            color: #fff !important;
-            font-weight: 600 !important;
-            font-size: 15px !important;
-            padding: 14px 28px !important;
-            transition: opacity .2s, transform .1s !important;
-            box-shadow: 0 4px 24px rgba(59,130,246,.25) !important;
-        }
-        .stButton > button[kind="primary"]:hover,
-        .stFormSubmitButton > button[kind="primary"]:hover {
-            opacity: .9 !important;
-            transform: translateY(-1px) !important;
-        }
-
-        /* ── Secondary button ─────────────────────────────── */
-        .stButton > button[kind="secondary"],
-        .stFormSubmitButton > button[kind="secondary"],
-        .stLinkButton > a {
-            background: transparent !important;
-            border: 1px solid #1E3A5F !important;
-            border-radius: 12px !important;
-            color: #94A3B8 !important;
-            font-weight: 500 !important;
-            transition: border-color .2s, color .2s !important;
-        }
-        .stButton > button[kind="secondary"]:hover,
-        .stLinkButton > a:hover {
-            border-color: #3B82F6 !important;
-            color: #3B82F6 !important;
-        }
-
-        /* ── Credit badge ─────────────────────────────────── */
-        .credit-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(59,130,246,.1);
-            border: 1px solid rgba(59,130,246,.25);
-            border-radius: 10px;
-            padding: 10px 16px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #93C5FD;
-            font-weight: 500;
-        }
-        .credit-badge .credit-num {
-            font-size: 20px;
-            font-weight: 700;
-            color: #3B82F6;
-        }
-        .credit-badge.empty {
-            background: rgba(239,68,68,.1);
-            border-color: rgba(239,68,68,.25);
-            color: #FCA5A5;
-        }
-        .credit-badge.empty .credit-num { color: #EF4444; }
-
-        /* ── Registration card ────────────────────────────── */
-        .reg-card {
-            background: #0F172A;
-            border: 1px solid #1E3A5F;
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            margin: 32px 0 24px;
-        }
-        .reg-icon { font-size: 40px; margin-bottom: 12px; }
-        .reg-title { font-size: 24px; font-weight: 700; color: #F1F5F9; margin: 0 0 8px; }
-        .reg-sub { color: #64748B; font-size: 15px; line-height: 1.6; margin: 0 0 24px; }
-
-        /* ── Section labels ───────────────────────────────── */
-        .section-label {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: .12em;
-            color: #3B82F6;
-            margin: 0 0 8px;
-        }
-        .section-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #F1F5F9;
-            margin: 0 0 8px;
-        }
-        .section-sub {
-            color: #64748B;
-            font-size: 14px;
-            margin: 0 0 32px;
-        }
-
-        /* ── Pricing cards ────────────────────────────────── */
-        .pricing-card {
-            background: #0F172A;
-            border: 1px solid #1E3A5F;
-            border-radius: 16px;
-            padding: 28px 24px 24px;
-            height: 100%;
-            position: relative;
-        }
-        .pricing-card--featured {
-            border-color: #3B82F6;
-            background: linear-gradient(160deg, #0F172A 0%, #0D1F3C 100%);
-            box-shadow: 0 0 40px rgba(59,130,246,.12);
-        }
-        .plan-badge {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #2563EB, #7C3AED);
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: .1em;
-            padding: 3px 12px;
-            border-radius: 999px;
-            white-space: nowrap;
-        }
-        .plan-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #94A3B8;
-            margin: 0 0 8px;
-        }
-        .plan-price {
-            font-size: 36px;
-            font-weight: 800;
-            color: #F1F5F9;
-            margin: 0;
-            line-height: 1;
-        }
-        .plan-credits {
-            font-size: 14px;
-            color: #3B82F6;
-            font-weight: 600;
-            margin: 6px 0 2px;
-        }
-        .plan-unit {
-            font-size: 12px;
-            color: #334155;
-            margin: 0 0 20px;
-        }
-        .plan-features {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 24px;
-        }
-        .plan-features li {
-            font-size: 13px;
-            color: #64748B;
-            padding: 4px 0;
-        }
-
-        /* ── Status / progress ────────────────────────────── */
-        .stProgress > div > div > div { background: linear-gradient(90deg, #2563EB, #7C3AED) !important; }
-
-        /* ── Alerts ───────────────────────────────────────── */
-        .stAlert { border-radius: 12px !important; }
-
-        /* ── Divider ──────────────────────────────────────── */
-        hr { border-color: #1E293B !important; margin: 40px 0 !important; }
-
-        /* ── Footer caption ───────────────────────────────── */
-        .stCaption { color: #334155 !important; }
-
-        /* ── Sidebar ──────────────────────────────────────── */
-        [data-testid="stSidebar"] {
-            background: #0A0F1E !important;
-            border-right: 1px solid #1E293B !important;
-        }
-        [data-testid="stSidebar"] * { color: #94A3B8; }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def _render_sidebar() -> None:
-    with st.sidebar:
-        st.markdown(
-            """
-            <div style="padding: 8px 0 16px;">
-                <span style="font-size:22px; font-weight:800; color:#F1F5F9;">🎵 CapMP3</span><br>
-                <span style="font-size:12px; color:#334155;">Audio extractor for cap.so</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.divider()
-
-        # Credit balance
-        if st.session_state.registered:
-            credits = _credits()
-            cls = "" if credits > 0 else "empty"
-            label = "credit" if credits == 1 else "credits"
-            st.markdown(
-                f"""
-                <div class="credit-badge {cls}">
-                    <span>💎</span>
-                    <span><span class="credit-num">{credits}</span> {label}</span>
-                </div>
-                <p style="font-size:12px; color:#334155; margin:4px 0 0;">{st.session_state.email}</p>
-                """,
-                unsafe_allow_html=True,
-            )
-            st.divider()
-
-        # Sponsor banner
-        st.markdown(
-            "<p style='font-size:11px; font-weight:700; letter-spacing:.1em; color:#1E3A5F; margin:0 0 10px;'>SPONSOR</p>",
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            """
-            <a href="https://example.com" target="_blank" style="text-decoration:none;">
-                <div style="
-                    background: linear-gradient(135deg,#0F172A,#0D1F3C);
-                    border: 1px solid #1E3A5F;
-                    border-radius: 12px;
-                    padding: 18px;
-                    text-align: center;
-                ">
-                    <p style="color:#3B82F6; font-weight:700; font-size:13px; margin:0 0 4px;">📢 Your ad here</p>
-                    <p style="color:#334155; font-size:11px; margin:0;">info@example.com</p>
-                </div>
-            </a>
-            """,
-            unsafe_allow_html=True,
-        )
-
-
-# ---------------------------------------------------------------------------
-# Streamlit UI
-# ---------------------------------------------------------------------------
-
-st.set_page_config(
-    page_title="CapMP3 – cap.so Audio Extractor",
-    page_icon="🎵",
-    layout="centered",
-)
-
-_init_session()
-_inject_css()
-_render_sidebar()
-
-st.markdown(
-    """
-    <div style="text-align:center; padding: 48px 0 32px;">
-        <div class="hero-badge">🎵 cap.so · cap.link Audio Extractor</div>
-        <h1 class="hero-title">
-            Extract audio as<br>
-            <span class="hero-gradient">MP3 in seconds</span>
-        </h1>
-        <p class="hero-sub">
-            Paste a cap.so or cap.link recording URL.<br>
-            We'll grab the audio, convert it to MP3, and hand it straight to you.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-if not check_ffmpeg():
-    st.error(
-        "⚠️ **ffmpeg not found.**\n\n"
-        "- **macOS:** `brew install ffmpeg`\n"
-        "- **Ubuntu/Debian:** `sudo apt install ffmpeg`\n"
-        "- **Windows:** download from [ffmpeg.org](https://ffmpeg.org/download.html)"
-    )
-    st.stop()
-
-# ── Registration gate ─────────────────────────────────────────────────────────
-if not st.session_state.registered:
-    _render_registration()
-    _render_pricing()
-    st.stop()
-
-# ── Main form (registered users only) ────────────────────────────────────────
-url_input = st.text_input(
-    "Recording URL",
-    placeholder="https://cap.link/xxxxxxxx or https://cap.so/s/xxxxxxxx",
-)
-
-credits = _credits()
-
-if credits > 0:
-    label = "credit" if credits == 1 else "credits"
-    st.markdown(
-        f'<div class="credit-badge">💎 &nbsp;Balance: <span class="credit-num">&nbsp;{credits}</span>&nbsp;{label}</div>',
-        unsafe_allow_html=True,
-    )
-else:
-    st.markdown(
-        '<div class="credit-badge empty">⚠️ &nbsp;You\'ve used all your credits. Top up below to continue.</div>',
-        unsafe_allow_html=True,
-    )
-    _render_pricing()
-    st.stop()
-
-if st.button("⬇️ Download MP3", type="primary", disabled=(credits == 0)):
-    url = url_input.strip()
-
-    if not url:
-        st.warning("Please enter a recording URL.")
-        st.stop()
-    if not url.startswith(("http://", "https://")):
-        st.error("Please enter a valid URL starting with http:// or https://")
-        st.stop()
     if _is_rate_limited():
         st.error(
-            f"⛔ Too many requests. "
-            f"Limit: {RATE_LIMIT_REQUESTS} per {RATE_LIMIT_WINDOW}s. Please wait a moment and try again."
+            f"Too many requests — limit is {RATE_LIMIT_REQUESTS} per {RATE_LIMIT_WINDOW}s. "
+            "Please wait a moment and try again."
         )
-        st.stop()
+        return
 
     with tempfile.TemporaryDirectory() as tmpdir:
         src_path   = os.path.join(tmpdir, "source")
@@ -790,57 +686,225 @@ if st.button("⬇️ Download MP3", type="primary", disabled=(credits == 0)):
         audio_bytes = None
 
         try:
-            with st.status("Locating video URL…", expanded=True) as status:
+            with st.status("Fetching audio…", expanded=True) as status:
                 video_url, method, audio_only = find_video_url(url)
-                st.caption(f"✓ Found via: **{method}**")
-                status.update(label="Video URL found ✓", state="complete")
+                st.caption(f"✓ Source located via {method}")
+                status.update(label="Source located ✓", state="complete")
 
-            dl_bar = st.progress(0, "Preparing download…")
+            dl_bar = st.progress(0, "Downloading…")
             download_to_file(
                 video_url, src_path, dl_bar,
-                "⬇️ Downloading audio track from CDN" if audio_only else "⬇️ Downloading video from CDN",
+                "Downloading audio" if audio_only else "Downloading video",
             )
 
-            conv_bar = st.progress(0, "Starting conversion…")
-            convert_to_mp3(src_path, audio_path, conv_bar, "🔄 Converting to MP3")
+            conv_bar = st.progress(0, "Converting…")
+            convert_to_mp3(src_path, audio_path, conv_bar, "Converting to MP3")
 
-            st.success("✅ Your MP3 is ready!")
             with open(audio_path, "rb") as f:
                 audio_bytes = f.read()
 
         except requests.HTTPError as e:
             st.error(f"HTTP error: {e}")
-            st.stop()
+            return
         except ValueError as e:
             st.error(str(e))
-            st.stop()
+            return
         except RuntimeError as e:
             st.error(str(e))
-            st.stop()
+            return
         except Exception as e:
             st.error(f"Unexpected error: {e}")
-            st.stop()
+            return
 
-    # Credit is deducted only after a successful conversion
     if audio_bytes:
         _deduct_credit()
+        st.success("Your MP3 is ready!")
         st.download_button(
-            label="💾 Save MP3",
+            label="⬇ Save MP3",
             data=audio_bytes,
             file_name="cap_audio.mp3",
             mime="audio/mpeg",
+            use_container_width=True,
         )
         del audio_bytes
         gc.collect()
 
+
+# ---------------------------------------------------------------------------
+# App entry point
+# ---------------------------------------------------------------------------
+
+st.set_page_config(
+    page_title="CapMP3 — cap.so to MP3",
+    page_icon="🎵",
+    layout="centered",
+)
+
+_init_session()
+_inject_css()
+
+# ── ffmpeg guard ─────────────────────────────────────────────────────────────
+if not check_ffmpeg():
+    st.error(
+        "**ffmpeg not found.**\n\n"
+        "- macOS: `brew install ffmpeg`\n"
+        "- Ubuntu: `sudo apt install ffmpeg`\n"
+        "- Windows: [ffmpeg.org](https://ffmpeg.org/download.html)"
+    )
+    st.stop()
+
+# ── Logo ──────────────────────────────────────────────────────────────────────
 st.markdown(
     """
-    <div style="text-align:center; padding: 40px 0 16px;">
-        <hr style="border-color:#1E293B; margin-bottom:24px;">
-        <p style="font-size:13px; color:#1E3A5F; margin:0;">
-            cap.so &nbsp;·&nbsp; cap.link &nbsp;·&nbsp; Temporary files are deleted automatically
-            &nbsp;·&nbsp; <a href="mailto:info@tomaszahradnik.com" style="color:#1E3A5F; text-decoration:none;">Contact</a>
-        </p>
+    <div class="logo">
+        <div class="logo-mark">🎵</div>
+        <span class="logo-text">CapMP3</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ── Hero ──────────────────────────────────────────────────────────────────────
+st.markdown(
+    """
+    <h1 class="hero-title">
+        cap.so recordings<br>to <span class="grad">MP3</span>, instantly.
+    </h1>
+    <p class="hero-sub">
+        Paste any cap.so or cap.link URL and download<br>a clean MP3 in under 30 seconds.
+    </p>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ── Converter card ────────────────────────────────────────────────────────────
+st.markdown('<div class="converter-card">', unsafe_allow_html=True)
+
+url_input = st.text_input(
+    "url",
+    placeholder="https://cap.so/s/...  or  https://cap.link/...",
+    label_visibility="collapsed",
+    key="url_input",
+)
+
+# Credit pill — only shown when registered
+if st.session_state.registered:
+    credits = _credits()
+    if credits > 0:
+        label = "credit" if credits == 1 else "credits"
+        st.markdown(
+            f'<div class="credit-pill">✦ {credits} {label} remaining</div>',
+            unsafe_allow_html=True,
+        )
+
+clicked = st.button("Convert to MP3 →", type="primary", use_container_width=True, key="convert_btn")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# ── Trust bar ─────────────────────────────────────────────────────────────────
+st.markdown(
+    """
+    <div class="trust-bar">
+        <span class="trust-item">🔒 No account needed</span>
+        <span class="trust-dot"></span>
+        <span class="trust-item">⚡ ~30 second conversion</span>
+        <span class="trust-dot"></span>
+        <span class="trust-item">🗑 Files auto-deleted</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ── Handle Convert click ──────────────────────────────────────────────────────
+if clicked:
+    url = url_input.strip()
+    if not url:
+        st.warning("Paste a cap.so or cap.link URL above.")
+    elif not url.startswith(("http://", "https://")):
+        st.error("Please enter a URL that starts with https://")
+    elif not st.session_state.registered:
+        # Not registered yet — show inline email gate
+        st.session_state.pending_url = url
+        st.session_state.show_gate   = True
+        st.rerun()
+    elif _credits() <= 0:
+        # Registered but out of credits — show pricing
+        st.session_state.show_gate = False
+        pass  # falls through to pricing section below
+    else:
+        # Registered and has credits — convert
+        _run_conversion(url)
+
+# ── Inline email gate ─────────────────────────────────────────────────────────
+if st.session_state.show_gate and not st.session_state.registered:
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="gate-card">
+            <p class="gate-title">Get your first MP3 free</p>
+            <p class="gate-sub">
+                Enter your email to unlock <strong style="color:#F1F5F9;">1 free download</strong>.
+                No password, no subscription.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    with st.form("email_gate_form", clear_on_submit=True):
+        email_input = st.text_input(
+            "email",
+            placeholder="you@example.com",
+            label_visibility="collapsed",
+        )
+        go = st.form_submit_button(
+            "Claim free download →",
+            type="primary",
+            use_container_width=True,
+        )
+
+    st.markdown(
+        '<p class="privacy-note">🔒 No spam, ever. Unsubscribe anytime.</p>',
+        unsafe_allow_html=True,
+    )
+
+    if go:
+        clean_email = email_input.strip().lower()
+        if not clean_email or "@" not in clean_email or "." not in clean_email.split("@")[-1]:
+            st.error("Please enter a valid email address.")
+            st.stop()
+
+        db_credits = _load_credits_from_supabase(clean_email)
+
+        st.session_state.email      = clean_email
+        st.session_state.registered = True
+        st.session_state.credits    = db_credits if db_credits is not None else FREE_CREDITS
+        st.session_state.show_gate  = False
+        st.session_state.do_convert = True
+
+        _save_email_to_supabase(clean_email)
+        st.rerun()
+
+# ── Post-registration: auto-trigger conversion ────────────────────────────────
+if st.session_state.do_convert and st.session_state.registered and st.session_state.pending_url:
+    st.session_state.do_convert = False
+    _run_conversion(st.session_state.pending_url)
+
+# ── Out of credits → show pricing ─────────────────────────────────────────────
+if st.session_state.registered and _credits() <= 0 and not st.session_state.do_convert:
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        '<div class="credit-pill empty">✦ No credits remaining</div>',
+        unsafe_allow_html=True,
+    )
+    _render_pricing()
+
+# ── Footer ────────────────────────────────────────────────────────────────────
+st.markdown(
+    f"""
+    <div class="footer">
+        cap.so · cap.link · Files deleted immediately after download
+        · <a href="mailto:{CONTACT_EMAIL}">Contact</a>
     </div>
     """,
     unsafe_allow_html=True,
