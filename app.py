@@ -1261,6 +1261,219 @@ def _run_conversion(url: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Terms of Service page
+# ---------------------------------------------------------------------------
+
+def _render_terms() -> None:
+    st.markdown(
+        """
+        <style>
+        .tos-h1  { font-size:28px; font-weight:800; color:#0F172A; margin:0 0 4px; letter-spacing:-.02em; }
+        .tos-updated { font-size:13px; color:#94A3B8; margin:0 0 40px; }
+        .tos-disclaimer {
+            background:#FFF7ED; border:1.5px solid #FED7AA; border-radius:12px;
+            padding:20px 24px; margin-bottom:32px;
+        }
+        .tos-disclaimer strong { color:#C2410C; }
+        .tos-disclaimer p { font-size:13px; color:#78350F; margin:4px 0 0; line-height:1.6; }
+        .tos-h2  { font-size:18px; font-weight:700; color:#0F172A; margin:32px 0 8px; letter-spacing:-.01em; }
+        .tos-p   { font-size:14px; color:#374151; line-height:1.75; margin:0 0 10px; }
+        .tos-ul  { padding-left:20px; margin:0 0 12px; }
+        .tos-ul li { font-size:14px; color:#374151; line-height:1.75; }
+        .tos-risk { background:#FEF2F2; border:1px solid #FECACA; border-radius:8px; padding:12px 16px; margin:8px 0; font-size:13px; color:#991B1B; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="logo" style="margin-bottom:32px;">
+            <div class="logo-mark">🎵</div>
+            <span class="logo-text">CapMP3</span>
+        </div>
+        <h1 class="tos-h1">Terms of Service</h1>
+        <p class="tos-updated">Last updated: April 19, 2026</p>
+
+        <div class="tos-disclaimer">
+            <strong>⚠ Legal Disclaimer</strong>
+            <p>CapMP3 is an independent platform and is not affiliated with, endorsed by, or in any way
+            officially connected to Cap Software, Inc. or the cap.so platform. The names "cap.so" and
+            "cap.link" are used solely for descriptive purposes.</p>
+            <p><strong>How it works:</strong> CapMP3 receives a publicly accessible URL provided by the user,
+            fetches the audio stream from that URL, and converts it to MP3 format. We do not host,
+            store, or cache any recording content on our servers. All files are deleted immediately
+            after the download completes.</p>
+            <p>The Service is provided "as is" and "as available", without warranties of uninterrupted,
+            error-free, or 100% available operation. cap.so may change its platform or API at any time,
+            which may affect or disable CapMP3 without notice.</p>
+        </div>
+
+        <h2 class="tos-h2">1. General Provisions</h2>
+        <p class="tos-p">Welcome to CapMP3 (capmp3.com) — a browser-based tool that converts cap.so and cap.link
+        screen recordings to MP3 audio files. By accessing or using the Service, you agree to be bound
+        by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.</p>
+
+        <h2 class="tos-h2">2. Service Description</h2>
+        <p class="tos-p">CapMP3 provides a technical conversion utility that:</p>
+        <ul class="tos-ul">
+            <li>Accepts a publicly accessible cap.so or cap.link URL submitted by the user</li>
+            <li>Retrieves the audio stream from that URL</li>
+            <li>Converts the stream to MP3 format using server-side processing</li>
+            <li>Delivers the resulting MP3 file to the user for immediate download</li>
+        </ul>
+        <p class="tos-p">CapMP3 does not index, archive, cache, or redistribute any recording content.
+        All temporary files are permanently deleted within seconds of the user's download completing.</p>
+
+        <h2 class="tos-h2">3. User Eligibility</h2>
+        <p class="tos-p">You must be at least 13 years of age (or the applicable age of digital consent in your
+        jurisdiction, which may be higher) to use the Service. By using the Service, you represent and
+        warrant that you meet this requirement.</p>
+
+        <h2 class="tos-h2">4. Acceptable Use & User Responsibilities</h2>
+        <p class="tos-p">By using the Service, you represent, warrant, and agree that:</p>
+        <ul class="tos-ul">
+            <li>You are the owner of the cap.so or cap.link recording you are converting,
+            or you have obtained explicit permission from the recording's owner to download and use
+            it in audio format.</li>
+            <li>You will not use the Service to infringe upon the copyright, trademark, or other
+            intellectual property rights of any person or entity.</li>
+            <li>You will use downloaded audio files solely for personal, non-commercial purposes,
+            unless you hold the rights to use the content commercially.</li>
+            <li>You will comply with cap.so's own Terms of Service when accessing their platform.
+            CapMP3 has no control over cap.so's terms and cannot guarantee compatibility.</li>
+            <li>You will not use automated tools, bots, or scripts to make bulk requests to the Service.</li>
+            <li>You will not attempt to circumvent rate limits, abuse the credit system, or otherwise
+            interfere with the Service's operation.</li>
+            <li>You are solely responsible for ensuring that your use of downloaded audio complies
+            with all applicable laws in your jurisdiction.</li>
+        </ul>
+
+        <h2 class="tos-h2">5. Intellectual Property</h2>
+        <p class="tos-p">CapMP3 does not claim ownership of any recordings processed through the Service.
+        All cap.so recordings remain the property of their respective creators and rights holders.</p>
+        <p class="tos-p">CapMP3 operates solely as a technical conversion utility. The responsibility
+        for ensuring that the conversion and use of any audio file complies with applicable copyright
+        law rests entirely with the user.</p>
+
+        <h2 class="tos-h2">6. Credits, Payments & Refunds</h2>
+        <ul class="tos-ul">
+            <li><strong>Free credit:</strong> One (1) free conversion credit is provided upon email
+            registration. This credit carries no monetary value and cannot be transferred or
+            exchanged for cash.</li>
+            <li><strong>Paid credits:</strong> Additional credits are available for purchase via
+            Stripe. All prices are listed in USD. By purchasing credits, you also agree to
+            <a href="https://stripe.com/legal/ssa" target="_blank">Stripe's Terms of Service</a>.</li>
+            <li><strong>No refunds:</strong> Credits are non-refundable once purchased, as they
+            represent access to a digital service consumed on demand. If a conversion fails due
+            to a verified error on our part, the credit will be restored to your account.</li>
+            <li><strong>Credit expiry:</strong> Purchased credits do not expire.</li>
+        </ul>
+
+        <h2 class="tos-h2">7. Privacy & Data Processing</h2>
+        <p class="tos-p">We collect and process the following personal data:</p>
+        <ul class="tos-ul">
+            <li><strong>Email address</strong> — collected voluntarily at registration, used solely
+            to manage your credit balance and send occasional product updates. You may opt out at
+            any time by contacting us.</li>
+            <li><strong>IP address</strong> — processed ephemerally for rate limiting and abuse
+            prevention. Not stored beyond the current session window.</li>
+        </ul>
+        <p class="tos-p">We do not collect, store, or process the content of any recording submitted
+        to the Service. We do not sell, rent, or share personal data with third parties.</p>
+        <p class="tos-p"><strong>EU/EEA users (GDPR):</strong> You have the right to access, rectify,
+        erase, and port your personal data, and to withdraw consent at any time. To exercise these
+        rights, contact us at info@tomaszahradnik.com. You also have the right to lodge a complaint
+        with your local supervisory authority.</p>
+
+        <h2 class="tos-h2">8. Disclaimer of Warranties</h2>
+        <p class="tos-p">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICE IS PROVIDED
+        "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+        BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE,
+        OR NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE,
+        OR THAT ANY SPECIFIC RECORDING WILL BE PROCESSABLE.</p>
+
+        <h2 class="tos-h2">9. Limitation of Liability</h2>
+        <p class="tos-p">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CAPMP3 AND ITS OPERATORS
+        SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES,
+        INCLUDING BUT NOT LIMITED TO LOSS OF DATA, REVENUE, OR PROFITS, ARISING OUT OF OR IN CONNECTION
+        WITH THE USE OF THE SERVICE.</p>
+        <p class="tos-p">In no event shall CapMP3's total cumulative liability to any user exceed the
+        total amount paid by that user for credits in the twelve (12) months immediately preceding
+        the claim. Users in jurisdictions that do not allow limitation of liability for personal
+        injury or consequential damages may not be subject to this limitation.</p>
+
+        <h2 class="tos-h2">10. DMCA & Copyright Complaints</h2>
+        <p class="tos-p">If you believe that a recording processed through CapMP3 infringes your
+        copyright, please send a written notice to:</p>
+        <p class="tos-p">
+            <strong>Email:</strong> info@tomaszahradnik.com<br>
+            <strong>Subject line:</strong> DMCA Takedown Request
+        </p>
+        <p class="tos-p">Your notice must include: (i) identification of the copyrighted work claimed
+        to be infringed; (ii) the specific URL submitted to CapMP3; (iii) your full name and contact
+        information; (iv) a statement that you have a good-faith belief that the use is unauthorised;
+        (v) a statement, under penalty of perjury, that the information in the notice is accurate and
+        that you are the rights holder or authorised to act on their behalf.</p>
+        <p class="tos-p">Note: CapMP3 does not store or host any recording content. DMCA notices may
+        be forwarded to cap.so or the relevant CDN provider as appropriate.</p>
+
+        <h2 class="tos-h2">11. Third-Party Services</h2>
+        <p class="tos-p">The Service integrates with:</p>
+        <ul class="tos-ul">
+            <li><strong>cap.so / Cap Software, Inc.</strong> — for accessing publicly shared
+            recordings. CapMP3 is not affiliated with or endorsed by Cap Software, Inc.</li>
+            <li><strong>Stripe</strong> — for payment processing. Credit purchases are subject to
+            Stripe's Terms of Service and Privacy Policy.</li>
+        </ul>
+
+        <h2 class="tos-h2">12. Changes to Terms</h2>
+        <p class="tos-p">We reserve the right to modify these Terms at any time. Material changes
+        will be notified via the Service. Continued use of the Service after changes are posted
+        constitutes acceptance of the revised Terms.</p>
+
+        <h2 class="tos-h2">13. Anti-Spam Policy</h2>
+        <p class="tos-p">We commit to the following:</p>
+        <ul class="tos-ul">
+            <li>CapMP3 will never be promoted through unsolicited messages of any kind</li>
+            <li>We will not send bulk emails without prior, explicit user consent</li>
+            <li>All user email communications are strictly opt-in and permission-based</li>
+            <li>We will not share or sell email addresses for any marketing purpose</li>
+        </ul>
+        <p class="tos-p">If you receive an unsolicited message appearing to promote CapMP3, please
+        contact info@tomaszahradnik.com immediately.</p>
+
+        <h2 class="tos-h2">14. Governing Law & Dispute Resolution</h2>
+        <p class="tos-p">These Terms shall be governed by and construed in accordance with the laws
+        of the Czech Republic, without regard to its conflict of law provisions. Any disputes arising
+        under these Terms shall be subject to the exclusive jurisdiction of the competent courts of
+        the Czech Republic.</p>
+        <p class="tos-p">For users in the European Union, mandatory consumer protection provisions
+        of your country of residence apply in addition to the above, and nothing in these Terms
+        limits rights you have under EU consumer law.</p>
+
+        <h2 class="tos-h2">15. Contact Information</h2>
+        <p class="tos-p">For questions, complaints, or requests relating to these Terms:</p>
+        <p class="tos-p">
+            <strong>Email:</strong> info@tomaszahradnik.com<br>
+            <strong>Website:</strong> capmp3.com
+        </p>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div style="margin-top:48px; padding-top:24px; border-top:1px solid #F1F5F9;
+                    text-align:center; font-size:12px; color:#CBD5E1;">
+            capmp3.com · <a href="/" style="color:#CBD5E1; text-decoration:none;">← Back to converter</a>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ---------------------------------------------------------------------------
 # App entry point
 # ---------------------------------------------------------------------------
 
@@ -1272,6 +1485,11 @@ st.set_page_config(
 
 _init_session()
 _inject_css()
+
+# ── Page routing ──────────────────────────────────────────────────────────────
+if st.query_params.get("page") == "terms":
+    _render_terms()
+    st.stop()
 
 # ── ffmpeg guard ─────────────────────────────────────────────────────────────
 if not check_ffmpeg():
@@ -1462,6 +1680,7 @@ st.markdown(
     f"""
     <div class="footer">
         cap.so · cap.link · Files deleted immediately after download
+        · <a href="?page=terms">Terms of Service</a>
         · <a href="mailto:{CONTACT_EMAIL}">Contact</a>
     </div>
     """,
