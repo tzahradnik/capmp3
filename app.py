@@ -12,6 +12,7 @@ import subprocess
 from collections import defaultdict
 from urllib.parse import urlparse
 
+import html as html_lib
 import requests
 import streamlit as st
 
@@ -19,7 +20,7 @@ import streamlit as st
 # Config
 # ---------------------------------------------------------------------------
 
-MAX_VIDEO_MB = 400
+MAX_VIDEO_MB = 1500
 FREE_CREDITS = 1
 
 STRIPE_BASIC_URL = "https://buy.stripe.com/REPLACE_BASIC"
@@ -717,7 +718,42 @@ def _inject_css() -> None:
         }
 
         /* ── Alerts ───────────────────────────────────────── */
-        .stAlert { border-radius: 10px !important; font-size: 16px !important; }
+        .stAlert { border-radius: 12px !important; font-size: 15px !important; }
+        [data-testid="stAlert"] p {
+            font-size: 15px !important;
+            color: inherit !important;
+            -webkit-text-fill-color: inherit !important;
+            line-height: 1.6 !important;
+            margin: 0 !important;
+        }
+
+        /* ── Custom error box ─────────────────────────────── */
+        .error-box {
+            background: #FEF2F2 !important;
+            border: 1.5px solid #FECACA !important;
+            border-radius: 12px !important;
+            padding: 16px 20px !important;
+            font-size: 15px !important;
+            color: #991B1B !important;
+            -webkit-text-fill-color: #991B1B !important;
+            line-height: 1.6 !important;
+            margin: 8px 0 !important;
+        }
+        .error-box strong {
+            color: #7F1D1D !important;
+            -webkit-text-fill-color: #7F1D1D !important;
+        }
+        .warn-box {
+            background: #FFFBEB !important;
+            border: 1.5px solid #FDE68A !important;
+            border-radius: 12px !important;
+            padding: 16px 20px !important;
+            font-size: 15px !important;
+            color: #92400E !important;
+            -webkit-text-fill-color: #92400E !important;
+            line-height: 1.6 !important;
+            margin: 8px 0 !important;
+        }
 
         /* ── Status box ───────────────────────────────────── */
         [data-testid="stStatusWidget"] { border-radius: 10px !important; }
@@ -880,6 +916,10 @@ def _inject_css() -> None:
             border-radius: 8px;
             flex-shrink: 0;
             background: #EFF6FF;
+        }
+        .preview-info {
+            min-width: 0 !important;
+            flex: 1 !important;
         }
         .preview-thumb-placeholder {
             width: 96px;
@@ -1626,21 +1666,26 @@ if st.session_state.video_meta and (st.session_state.show_gate or st.session_sta
     title = meta.get("title", "cap.so Recording")
     thumb = meta.get("thumbnail", "")
 
+    safe_title = html_lib.escape(title)
+
     if thumb:
-        thumb_html = f'<img src="{thumb}" class="preview-thumb" onerror="this.style.display=\'none\'">'
+        thumb_html = f'<img src="{html_lib.escape(thumb)}" class="preview-thumb" loading="lazy">'
     else:
         thumb_html = '<div class="preview-thumb-placeholder">🎵</div>'
 
-    gate_hint = "" if st.session_state.registered else \
-        '<p class="preview-hint">Enter your email below to start the free download ↓</p>'
+    gate_hint = (
+        ""
+        if st.session_state.registered
+        else '<p class="preview-hint">Enter your email below to start the free download ↓</p>'
+    )
 
     st.markdown(
         f"""
         <div class="preview-card">
             {thumb_html}
-            <div style="min-width:0; flex:1;">
+            <div class="preview-info">
                 <div class="preview-status">✓ Recording found</div>
-                <p class="preview-title">{title}</p>
+                <p class="preview-title">{safe_title}</p>
                 {gate_hint}
             </div>
         </div>
