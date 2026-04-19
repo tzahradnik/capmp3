@@ -12,9 +12,11 @@ import subprocess
 from collections import defaultdict
 from urllib.parse import urlparse
 
+import hashlib
 import html as html_lib
 import requests
 import streamlit as st
+import streamlit.components.v1 as _components
 
 # ---------------------------------------------------------------------------
 # Config
@@ -34,6 +36,11 @@ RATE_LIMIT_WINDOW   = 60
 # Rate limiting
 # ---------------------------------------------------------------------------
 
+# In-memory sets — persist for the lifetime of the server process.
+# Blocks same email or same browser fingerprint from claiming a second free credit.
+_used_emails: set        = set()
+_used_fingerprints: set  = set()
+
 _request_log: dict = defaultdict(list)
 
 
@@ -45,6 +52,26 @@ def _get_client_ip() -> str:
     except Exception:
         pass
     return "unknown"
+
+
+def _make_fingerprint() -> str:
+    """Hash of IP + User-Agent — stable per browser/device, resets on server restart."""
+    ip = _get_client_ip()
+    try:
+        ua = st.context.headers.get("User-Agent", "")
+    except Exception:
+        ua = ""
+    raw = f"{ip}:{ua[:120]}"
+    return hashlib.sha256(raw.encode()).hexdigest()[:24]
+
+
+def _has_used_free_credit(email: str) -> bool:
+    return email in _used_emails or _make_fingerprint() in _used_fingerprints
+
+
+def _mark_free_credit_used(email: str) -> None:
+    _used_emails.add(email.lower().strip())
+    _used_fingerprints.add(_make_fingerprint())
 
 
 def _is_rate_limited() -> bool:
@@ -261,13 +288,15 @@ def _fetch_cap_metadata(url: str) -> dict:
 
 def _init_session() -> None:
     defaults = {
-        "registered":  False,
-        "email":       "",
-        "credits":     0,
-        "show_gate":   False,
-        "pending_url": "",
-        "do_convert":  False,
-        "video_meta":  None,
+        "registered":       False,
+        "email":            "",
+        "credits":          0,
+        "show_gate":        False,
+        "pending_url":      "",
+        "do_convert":       False,
+        "video_meta":       None,
+        "_balloons_fired":  False,
+        "_scroll_pricing":  False,
     }
     for key, val in defaults.items():
         if key not in st.session_state:
@@ -280,6 +309,9 @@ def _credits() -> int:
 
 def _deduct_credit() -> None:
     st.session_state.credits = max(0, st.session_state.credits - 1)
+    email = st.session_state.get("email", "")
+    if email:
+        _mark_free_credit_used(email)
 
 
 def _add_credits(amount: int) -> None:
@@ -654,6 +686,10 @@ def _inject_css() -> None:
         }
 
         /* ── Progress bar ─────────────────────────────────── */
+        @keyframes bar-sweep {
+            0%   { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
         .stProgress { margin: 16px 0 4px !important; }
         .stProgress > div > div > div {
             height: 14px !important;
@@ -664,8 +700,13 @@ def _inject_css() -> None:
         .stProgress > div > div > div > div {
             height: 14px !important;
             border-radius: 999px !important;
-            background: linear-gradient(90deg, #2563EB, #7C3AED) !important;
-            transition: width .2s ease !important;
+            background: linear-gradient(
+                90deg,
+                #1D4ED8 0%, #7C3AED 30%, #60A5FA 50%, #7C3AED 70%, #1D4ED8 100%
+            ) !important;
+            background-size: 300% 100% !important;
+            animation: bar-sweep 2s linear infinite !important;
+            transition: width .25s ease !important;
         }
         .stProgress > div > div > p,
         [data-testid="stProgressBarMessage"] {
@@ -1109,9 +1150,17 @@ def _inject_css() -> None:
 # ---------------------------------------------------------------------------
 
 def _render_pricing() -> None:
+    # Auto-scroll here when triggered after a successful download
+    if st.session_state.get("_scroll_pricing"):
+        st.session_state["_scroll_pricing"] = False
+        _components.html(
+            "<script>window.parent.scrollTo({top: window.parent.document.body.scrollHeight, behavior: 'smooth'});</script>",
+            height=0,
+        )
+
     st.markdown(
         """
-        <div class="pricing-header">
+        <div class="pricing-header" id="pricing">
             <p class="pricing-label">PRICING</p>
             <h2 class="pricing-title">Top up your credits</h2>
             <p class="pricing-sub">One-time · Credits never expire · Stripe checkout</p>
@@ -1461,7 +1510,6 @@ def _run_conversion(url: str) -> None:
             """,
             unsafe_allow_html=True,
         )
-        st.balloons()
         st.download_button(
             label="⬇ Save MP3",
             data=audio_bytes,
@@ -1469,6 +1517,13 @@ def _run_conversion(url: str) -> None:
             mime="audio/mpeg",
             use_container_width=True,
         )
+        # Balloons fire once per conversion
+        if not st.session_state.get("_balloons_fired"):
+            st.session_state["_balloons_fired"] = True
+            st.balloons()
+        # Signal to scroll to pricing on next rerun (when credits hit 0)
+        if _credits() <= 0:
+            st.session_state["_scroll_pricing"] = True
         del audio_bytes
         gc.collect()
 
@@ -1860,11 +1915,21 @@ if st.session_state.show_gate and not st.session_state.registered:
 
         db_credits = _load_credits_from_supabase(clean_email)
 
-        st.session_state.email      = clean_email
-        st.session_state.registered = True
-        st.session_state.credits    = db_credits if db_credits is not None else FREE_CREDITS
-        st.session_state.show_gate  = False
-        st.session_state.do_convert = True
+        if db_credits is not None:
+            # Returning user with persisted balance
+            assigned = db_credits
+        elif _has_used_free_credit(clean_email):
+            # Same email or same browser already consumed the free credit
+            assigned = 0
+        else:
+            assigned = FREE_CREDITS
+
+        st.session_state.email             = clean_email
+        st.session_state.registered        = True
+        st.session_state.credits           = assigned
+        st.session_state.show_gate         = False
+        st.session_state.do_convert        = True
+        st.session_state["_balloons_fired"] = False
 
         _save_email_to_supabase(clean_email)
         st.rerun()
