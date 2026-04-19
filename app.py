@@ -360,10 +360,11 @@ def _inject_css() -> None:
             font-size: 16px;
         }
         .logo-text {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0F172A;
-            letter-spacing: -.02em;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            color: #0F172A !important;
+            -webkit-text-fill-color: #0F172A !important;
+            letter-spacing: -.02em !important;
         }
 
         /* ── Hero ─────────────────────────────────────────── */
@@ -382,10 +383,11 @@ def _inject_css() -> None:
             background-clip: text;
         }
         .hero-sub {
-            font-size: 18px;
-            color: #64748B;
-            margin: 0 0 32px;
-            line-height: 1.65;
+            font-size: 18px !important;
+            color: #64748B !important;
+            -webkit-text-fill-color: #64748B !important;
+            margin: 0 0 32px !important;
+            line-height: 1.65 !important;
         }
 
         /* ── Converter card ───────────────────────────────── */
@@ -472,17 +474,20 @@ def _inject_css() -> None:
             margin: 20px 0 0;
         }
         .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            color: #94A3B8;
-            font-weight: 500;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            font-size: 13px !important;
+            color: #94A3B8 !important;
+            -webkit-text-fill-color: #94A3B8 !important;
+            font-weight: 500 !important;
         }
         .trust-dot {
-            width: 4px; height: 4px;
-            border-radius: 50%;
-            background: #CBD5E1;
+            display: inline-block !important;
+            width: 3px !important; height: 3px !important;
+            border-radius: 50% !important;
+            background: #CBD5E1 !important;
+            flex-shrink: 0 !important;
         }
 
         /* ── Email gate ───────────────────────────────────── */
@@ -495,23 +500,31 @@ def _inject_css() -> None:
             box-shadow: 0 1px 4px rgba(15,23,42,.06);
         }
         .gate-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0F172A;
-            margin: 0 0 6px;
-            letter-spacing: -.02em;
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: #0F172A !important;
+            -webkit-text-fill-color: #0F172A !important;
+            margin: 0 0 6px !important;
+            letter-spacing: -.02em !important;
         }
         .gate-sub {
-            font-size: 16px;
-            color: #64748B;
-            margin: 0 0 20px;
-            line-height: 1.6;
+            font-size: 16px !important;
+            color: #64748B !important;
+            -webkit-text-fill-color: #64748B !important;
+            margin: 0 0 20px !important;
+            line-height: 1.6 !important;
         }
         .privacy-note {
-            text-align: center;
-            font-size: 13px;
-            color: #94A3B8;
-            margin: 8px 0 0;
+            text-align: center !important;
+            font-size: 13px !important;
+            color: #94A3B8 !important;
+            -webkit-text-fill-color: #94A3B8 !important;
+            margin: 8px 0 0 !important;
+        }
+        .gate-strong {
+            color: #0F172A !important;
+            -webkit-text-fill-color: #0F172A !important;
+            font-weight: 700 !important;
         }
 
         /* ── Credit pill ──────────────────────────────────── */
@@ -540,23 +553,26 @@ def _inject_css() -> None:
             text-align: center;
         }
         .pricing-label {
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: .1em;
-            color: #2563EB;
-            margin: 0 0 6px;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            letter-spacing: .1em !important;
+            color: #2563EB !important;
+            -webkit-text-fill-color: #2563EB !important;
+            margin: 0 0 6px !important;
         }
         .pricing-title {
-            font-size: 26px;
-            font-weight: 700;
-            color: #0F172A;
-            margin: 0 0 6px;
-            letter-spacing: -.02em;
+            font-size: 26px !important;
+            font-weight: 700 !important;
+            color: #0F172A !important;
+            -webkit-text-fill-color: #0F172A !important;
+            margin: 0 0 6px !important;
+            letter-spacing: -.02em !important;
         }
         .pricing-sub {
-            font-size: 15px;
-            color: #64748B;
-            margin: 0;
+            font-size: 15px !important;
+            color: #64748B !important;
+            -webkit-text-fill-color: #64748B !important;
+            margin: 0 !important;
         }
         .pricing-card {
             background: #FFFFFF;
@@ -601,17 +617,19 @@ def _inject_css() -> None:
 
         /* ── Converter form card ──────────────────────────── */
         .url-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-            margin: 0 0 8px;
-            letter-spacing: -.01em;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            -webkit-text-fill-color: #374151 !important;
+            margin: 0 0 8px !important;
+            letter-spacing: -.01em !important;
+            display: block !important;
         }
         [data-testid="stForm"] {
             background: #FFFFFF;
             border: 1.5px solid #E2E8F0;
             border-radius: 16px;
-            padding: 20px !important;
+            padding: 24px !important;
             box-shadow: 0 1px 6px rgba(15,23,42,.07);
         }
         /* Strip all Streamlit wrappers inside the form so only the outer card border shows */
@@ -1486,7 +1504,7 @@ def _render_terms() -> None:
     st.markdown(
         """
         <div style="margin-top:48px; padding-top:24px; border-top:1px solid #F1F5F9;
-                    text-align:center; font-size:12px; color:#CBD5E1;">
+                    text-align:center; font-size:13px; color:#CBD5E1;">
             capmp3.com · <a href="/" style="color:#CBD5E1; text-decoration:none;">← Back to converter</a>
         </div>
         """,
@@ -1540,16 +1558,15 @@ st.markdown(
         cap.so recordings<br>to <span class="grad">MP3</span>, instantly.
     </h1>
     <p class="hero-sub">
-        Paste any cap.so or cap.link URL and download<br>a clean MP3 in under 30 seconds.
+        Paste any cap.so or cap.link URL and download a clean MP3 in under 30 seconds.
     </p>
     """,
     unsafe_allow_html=True,
 )
 
 # ── Converter ─────────────────────────────────────────────────────────────────
-st.markdown('<p class="url-label">Paste your cap.so or cap.link recording URL</p>', unsafe_allow_html=True)
-
 with st.form("converter_form", clear_on_submit=False):
+    st.markdown('<p class="url-label">Paste your cap.so or cap.link recording URL</p>', unsafe_allow_html=True)
     url_input = st.text_input(
         "url",
         placeholder="https://cap.so/s/xxxxxxxx  ·  https://cap.link/xxxxxxxx",
@@ -1633,19 +1650,16 @@ if st.session_state.video_meta and (st.session_state.show_gate or st.session_sta
 
 # ── Inline email gate ─────────────────────────────────────────────────────────
 if st.session_state.show_gate and not st.session_state.registered:
-    st.markdown("""
-        <div class="gate-card">
+    with st.form("email_gate_form", clear_on_submit=True):
+        st.markdown("""
             <p class="gate-title">Get your first MP3 free</p>
             <p class="gate-sub">
-                Enter your email to unlock <strong style="color:#0F172A;">1 free download</strong>.
+                Enter your email to unlock <strong class="gate-strong">1 free download</strong>.
                 No password, no subscription.
             </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    with st.form("email_gate_form", clear_on_submit=True):
+            """,
+            unsafe_allow_html=True,
+        )
         email_input = st.text_input(
             "email",
             placeholder="you@example.com",
