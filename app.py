@@ -654,8 +654,26 @@ def _inject_css() -> None:
         }
 
         /* ── Progress bar ─────────────────────────────────── */
+        .stProgress { margin: 16px 0 4px !important; }
         .stProgress > div > div > div {
+            height: 14px !important;
+            border-radius: 999px !important;
+            background: #E2E8F0 !important;
+            overflow: hidden !important;
+        }
+        .stProgress > div > div > div > div {
+            height: 14px !important;
+            border-radius: 999px !important;
             background: linear-gradient(90deg, #2563EB, #7C3AED) !important;
+            transition: width .2s ease !important;
+        }
+        .stProgress > div > div > p,
+        [data-testid="stProgressBarMessage"] {
+            font-size: 13px !important;
+            color: #64748B !important;
+            -webkit-text-fill-color: #64748B !important;
+            font-weight: 500 !important;
+            margin: 6px 0 0 !important;
         }
 
         /* ── Referral banner ─────────────────────────────── */
@@ -898,66 +916,156 @@ def _inject_css() -> None:
         }
 
         /* ── Video preview card ──────────────────────────── */
+        /* ── Video preview card (CSS grid — no nested divs) ── */
         .preview-card {
-            background: #FFFFFF;
-            border: 1.5px solid #BFDBFE;
-            border-radius: 14px;
-            padding: 16px;
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            margin: 16px 0;
-            box-shadow: 0 2px 8px rgba(37,99,235,.08);
+            background: #FFFFFF !important;
+            border: 1.5px solid #BFDBFE !important;
+            border-radius: 14px !important;
+            padding: 16px !important;
+            display: grid !important;
+            grid-template-columns: 100px 1fr !important;
+            grid-template-rows: auto auto auto !important;
+            column-gap: 16px !important;
+            row-gap: 3px !important;
+            align-items: center !important;
+            margin: 16px 0 !important;
+            box-shadow: 0 2px 8px rgba(37,99,235,.08) !important;
         }
         .preview-thumb {
-            width: 96px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            flex-shrink: 0;
-            background: #EFF6FF;
-        }
-        .preview-info {
-            min-width: 0 !important;
-            flex: 1 !important;
+            grid-column: 1 !important;
+            grid-row: 1 / 4 !important;
+            align-self: center !important;
+            width: 100px !important;
+            height: 64px !important;
+            object-fit: cover !important;
+            border-radius: 8px !important;
+            background: #EFF6FF !important;
+            display: block !important;
         }
         .preview-thumb-placeholder {
-            width: 96px;
-            height: 60px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #EFF6FF, #E0E7FF);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
+            grid-column: 1 !important;
+            grid-row: 1 / 4 !important;
+            align-self: center !important;
+            width: 100px !important;
+            height: 64px !important;
+            border-radius: 8px !important;
+            background: linear-gradient(135deg, #EFF6FF, #E0E7FF) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 24px !important;
         }
         .preview-status {
-            font-size: 12px !important;
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            font-size: 11px !important;
             font-weight: 700 !important;
-            letter-spacing: .06em !important;
+            letter-spacing: .07em !important;
             color: #16A34A !important;
             -webkit-text-fill-color: #16A34A !important;
-            margin: 0 0 4px !important;
+            margin: 0 !important;
             text-transform: uppercase !important;
         }
         .preview-title {
-            font-size: 16px !important;
+            grid-column: 2 !important;
+            grid-row: 2 !important;
+            font-size: 15px !important;
             font-weight: 600 !important;
             color: #0F172A !important;
             -webkit-text-fill-color: #0F172A !important;
-            margin: 0 0 4px !important;
+            margin: 0 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
-            max-width: 520px !important;
         }
         .preview-hint {
+            grid-column: 2 !important;
+            grid-row: 3 !important;
             font-size: 13px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
             margin: 0 !important;
         }
+
+        /* ── Success card ─────────────────────────────────── */
+        .success-card {
+            background: linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%) !important;
+            border: 1.5px solid #86EFAC !important;
+            border-radius: 16px !important;
+            padding: 32px 24px !important;
+            text-align: center !important;
+            margin: 8px 0 4px !important;
+        }
+        .success-icon {
+            font-size: 44px !important;
+            display: block !important;
+            margin-bottom: 12px !important;
+            line-height: 1 !important;
+        }
+        .success-title {
+            font-size: 24px !important;
+            font-weight: 800 !important;
+            color: #064E3B !important;
+            -webkit-text-fill-color: #064E3B !important;
+            margin: 0 0 6px !important;
+            letter-spacing: -.02em !important;
+        }
+        .success-sub {
+            font-size: 14px !important;
+            color: #065F46 !important;
+            -webkit-text-fill-color: #065F46 !important;
+            margin: 0 !important;
+            line-height: 1.6 !important;
+        }
+
+        /* ── Plan buttons inside pricing HTML ─────────────── */
+        .plan-btn {
+            display: block !important;
+            background: #F8FAFC !important;
+            border: 1.5px solid #CBD5E1 !important;
+            border-radius: 10px !important;
+            color: #374151 !important;
+            -webkit-text-fill-color: #374151 !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            padding: 13px 20px !important;
+            text-align: center !important;
+            text-decoration: none !important;
+            margin-top: 16px !important;
+            transition: border-color .15s, background .15s !important;
+        }
+        .plan-btn:hover {
+            border-color: #2563EB !important;
+            color: #2563EB !important;
+            -webkit-text-fill-color: #2563EB !important;
+            background: #EFF6FF !important;
+            text-decoration: none !important;
+        }
+        .plan-btn-primary {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
+            border-color: transparent !important;
+            color: #fff !important;
+            -webkit-text-fill-color: #fff !important;
+            box-shadow: 0 2px 12px rgba(37,99,235,.25) !important;
+        }
+        .plan-btn-primary:hover {
+            opacity: .92 !important;
+            color: #fff !important;
+            -webkit-text-fill-color: #fff !important;
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
+        }
+        /* Pricing cards as flex columns so button sticks to bottom */
+        .pricing-card {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        .plan-features {
+            flex: 1 !important;
+        }
+
+        /* Hide st.status widget entirely */
+        [data-testid="stStatusWidget"],
+        [data-testid="stStatus"] { display: none !important; }
 
         /* ── FAQ ──────────────────────────────────────────── */
         [data-testid="stExpander"] {
@@ -1016,26 +1124,26 @@ def _render_pricing() -> None:
 
     with col1:
         st.markdown(
-            """
+            f"""
             <div class="pricing-card">
                 <p class="plan-name">Starter</p>
                 <p class="plan-price">$4.99</p>
                 <p class="plan-credits">10 credits</p>
                 <p class="plan-unit">$0.50 / download</p>
                 <ul class="plan-features">
-                    <li>✓ 10 MP3 downloads</li>
-                    <li>✓ 190 kbps quality</li>
-                    <li>✓ cap.so & cap.link</li>
+                    <li>10 MP3 downloads</li>
+                    <li>190 kbps quality</li>
+                    <li>cap.so &amp; cap.link</li>
                 </ul>
+                <a href="{STRIPE_BASIC_URL}" target="_blank" rel="noopener" class="plan-btn">Get Starter →</a>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        st.link_button("Get Starter", url=STRIPE_BASIC_URL, use_container_width=True)
 
     with col2:
         st.markdown(
-            """
+            f"""
             <div class="pricing-card pricing-card--featured">
                 <span class="plan-badge">BEST VALUE</span>
                 <p class="plan-name">Pro</p>
@@ -1043,39 +1151,35 @@ def _render_pricing() -> None:
                 <p class="plan-credits">30 credits</p>
                 <p class="plan-unit">$0.33 / download</p>
                 <ul class="plan-features">
-                    <li>✓ 30 MP3 downloads</li>
-                    <li>✓ 190 kbps quality</li>
-                    <li>✓ cap.so & cap.link</li>
-                    <li>✓ Priority processing</li>
+                    <li>30 MP3 downloads</li>
+                    <li>190 kbps quality</li>
+                    <li>cap.so &amp; cap.link</li>
+                    <li>Priority processing</li>
                 </ul>
+                <a href="{STRIPE_PRO_URL}" target="_blank" rel="noopener" class="plan-btn plan-btn-primary">Get Pro →</a>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        st.link_button("Get Pro", url=STRIPE_PRO_URL, use_container_width=True, type="primary")
 
     with col3:
         st.markdown(
-            """
+            f"""
             <div class="pricing-card">
                 <p class="plan-name">Teams</p>
-                <p class="plan-price" style="font-size:20px;padding-top:6px;">Custom</p>
+                <p class="plan-price" style="font-size:22px;padding-top:6px;line-height:1.2;">Custom</p>
                 <p class="plan-credits">&nbsp;</p>
-                <p class="plan-unit">For teams & power users</p>
+                <p class="plan-unit">For teams &amp; power users</p>
                 <ul class="plan-features">
-                    <li>✓ Unlimited downloads</li>
-                    <li>✓ API access</li>
-                    <li>✓ Dedicated support</li>
-                    <li>✓ SLA</li>
+                    <li>Unlimited downloads</li>
+                    <li>API access</li>
+                    <li>Dedicated support</li>
+                    <li>SLA</li>
                 </ul>
+                <a href="mailto:{CONTACT_EMAIL}?subject=CapMP3%20Teams" class="plan-btn">Contact us →</a>
             </div>
             """,
             unsafe_allow_html=True,
-        )
-        st.link_button(
-            "Contact us",
-            url=f"mailto:{CONTACT_EMAIL}?subject=CapMP3%20Teams",
-            use_container_width=True,
         )
 
 
@@ -1279,6 +1383,21 @@ def _render_content() -> None:
 # Conversion logic
 # ---------------------------------------------------------------------------
 
+class _ScaledBar:
+    """Maps bar.progress(0–1) into a sub-range of the real Streamlit progress bar."""
+
+    def __init__(self, bar, lo: float, hi: float) -> None:
+        self._bar = bar
+        self._lo  = lo
+        self._hi  = hi
+
+    def progress(self, value: float, text: str = "") -> None:
+        scaled  = self._lo + min(max(value, 0.0), 1.0) * (self._hi - self._lo)
+        overall = int(scaled * 100)
+        label   = f"{text}  ·  {overall}%" if text else f"{overall}%"
+        self._bar.progress(min(scaled, self._hi), label)
+
+
 def _run_conversion(url: str) -> None:
     """Execute the full download + convert pipeline and render result."""
 
@@ -1290,24 +1409,29 @@ def _run_conversion(url: str) -> None:
         return
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        src_path   = os.path.join(tmpdir, "source")
-        audio_path = os.path.join(tmpdir, "audio.mp3")
+        src_path    = os.path.join(tmpdir, "source")
+        audio_path  = os.path.join(tmpdir, "audio.mp3")
         audio_bytes = None
 
         try:
-            with st.status("Fetching audio…", expanded=True) as status:
-                video_url, method, audio_only = find_video_url(url)
-                st.caption(f"✓ Source located via {method}")
-                status.update(label="Source located ✓", state="complete")
+            bar = st.progress(0, text="Finding audio source…  0%")
 
-            dl_bar = st.progress(0, "Downloading…")
+            video_url, _method, audio_only = find_video_url(url)
+            bar.progress(0.04, text="Downloading…  4%")
+
             download_to_file(
-                video_url, src_path, dl_bar,
-                "Downloading audio" if audio_only else "Downloading video",
+                video_url, src_path,
+                _ScaledBar(bar, 0.04, 0.72),
+                "Downloading" if audio_only else "Downloading",
             )
 
-            conv_bar = st.progress(0, "Converting…")
-            convert_to_mp3(src_path, audio_path, conv_bar, "Converting to MP3")
+            convert_to_mp3(
+                src_path, audio_path,
+                _ScaledBar(bar, 0.72, 1.00),
+                "Converting to MP3",
+            )
+
+            bar.progress(1.0, text="✓ Complete  100%")
 
             with open(audio_path, "rb") as f:
                 audio_bytes = f.read()
@@ -1327,7 +1451,17 @@ def _run_conversion(url: str) -> None:
 
     if audio_bytes:
         _deduct_credit()
-        st.success("Your MP3 is ready!")
+        st.markdown(
+            """
+            <div class="success-card">
+                <span class="success-icon">🎉</span>
+                <p class="success-title">Your MP3 is ready!</p>
+                <p class="success-sub">Click the button below to save. File is deleted from our servers immediately after download.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.balloons()
         st.download_button(
             label="⬇ Save MP3",
             data=audio_bytes,
@@ -1679,17 +1813,14 @@ if st.session_state.video_meta and (st.session_state.show_gate or st.session_sta
         else '<p class="preview-hint">Enter your email below to start the free download ↓</p>'
     )
 
+    # Flat HTML — no nested divs (Markdown parser strips/corrupts them)
     st.markdown(
-        f"""
-        <div class="preview-card">
-            {thumb_html}
-            <div class="preview-info">
-                <div class="preview-status">✓ Recording found</div>
-                <p class="preview-title">{safe_title}</p>
-                {gate_hint}
-            </div>
-        </div>
-        """,
+        f'<div class="preview-card">'
+        f'{thumb_html}'
+        f'<div class="preview-status">✓ Recording found</div>'
+        f'<p class="preview-title">{safe_title}</p>'
+        f'{gate_hint}'
+        f'</div>',
         unsafe_allow_html=True,
     )
 
