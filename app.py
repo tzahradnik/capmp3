@@ -18,6 +18,13 @@ import requests
 import streamlit as st
 import streamlit.components.v1 as _components
 
+# Load .env for local development (no-op in production where env vars are set directly)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
@@ -66,12 +73,19 @@ def _make_fingerprint() -> str:
 
 
 def _has_used_free_credit(email: str) -> bool:
-    return email in _used_emails or _make_fingerprint() in _used_fingerprints
+    """In-memory check (fast) + persistent Supabase check (cross-restart)."""
+    fp = _make_fingerprint()
+    if email in _used_emails or fp in _used_fingerprints:
+        return True
+    # Persistent check — catches new sessions after server restart
+    return _is_fingerprint_used_in_supabase(fp)
 
 
 def _mark_free_credit_used(email: str) -> None:
+    fp = _make_fingerprint()
     _used_emails.add(email.lower().strip())
-    _used_fingerprints.add(_make_fingerprint())
+    _used_fingerprints.add(fp)
+    _save_fingerprint_to_supabase(fp, email)
 
 
 def _is_rate_limited() -> bool:
@@ -311,7 +325,8 @@ def _deduct_credit() -> None:
     st.session_state.credits = max(0, st.session_state.credits - 1)
     email = st.session_state.get("email", "")
     if email:
-        _mark_free_credit_used(email)
+        _mark_free_credit_used(email)           # in-memory + fingerprint
+        _deduct_credit_in_supabase(email)       # persistent DB decrement
 
 
 def _add_credits(amount: int) -> None:
@@ -321,24 +336,107 @@ def _add_credits(amount: int) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Supabase stubs
+# Supabase client
+# ---------------------------------------------------------------------------
+
+_supa_client = None   # module-level singleton
+
+
+def _get_supabase():
+    """Lazy-init Supabase client using service_role key (bypasses RLS)."""
+    global _supa_client
+    if _supa_client is not None:
+        return _supa_client
+    try:
+        from supabase import create_client
+        url = os.getenv("SUPABASE_URL", "")
+        key = os.getenv("SUPABASE_SERVICE_KEY", "")
+        if url and key and not key.startswith("your_"):
+            _supa_client = create_client(url, key)
+    except Exception:
+        pass
+    return _supa_client
+
+
+# ---------------------------------------------------------------------------
+# Supabase helpers
 # ---------------------------------------------------------------------------
 
 def _save_email_to_supabase(email: str) -> None:
-    """
-    TODO: After Supabase MCP auth, persist email to `subscribers` table:
-        CREATE TABLE subscribers (
-            id         uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-            email      text UNIQUE NOT NULL,
-            created_at timestamptz DEFAULT now()
-        );
-    """
-    pass
+    """Upsert user — preserves existing credits_balance on conflict."""
+    db = _get_supabase()
+    if not db:
+        return
+    try:
+        db.table("users").upsert(
+            {"email": email, "credits_balance": FREE_CREDITS},
+            on_conflict="email",
+            ignore_duplicates=True,   # INSERT ... ON CONFLICT DO NOTHING
+        ).execute()
+    except Exception:
+        pass
 
 
 def _load_credits_from_supabase(email: str) -> int | None:
-    """TODO: Load credit balance for email. Returns None if not found."""
+    """Return credits_balance for email, or None if not found."""
+    db = _get_supabase()
+    if not db:
+        return None
+    try:
+        res = (
+            db.table("users")
+            .select("credits_balance")
+            .eq("email", email)
+            .limit(1)
+            .execute()
+        )
+        if res.data:
+            return int(res.data[0].get("credits_balance") or 0)
+    except Exception:
+        pass
     return None
+
+
+def _deduct_credit_in_supabase(email: str) -> None:
+    """Atomically decrement credits_balance (floor 0) via DB function."""
+    db = _get_supabase()
+    if not db or not email:
+        return
+    try:
+        db.rpc("decrement_credits", {"user_email": email}).execute()
+    except Exception:
+        pass
+
+
+def _is_fingerprint_used_in_supabase(fp_hash: str) -> bool:
+    """Check whether this browser fingerprint already consumed a free credit."""
+    db = _get_supabase()
+    if not db:
+        return False
+    try:
+        res = (
+            db.table("fingerprints")
+            .select("id")
+            .eq("fp_hash", fp_hash)
+            .limit(1)
+            .execute()
+        )
+        return bool(res.data)
+    except Exception:
+        return False
+
+
+def _save_fingerprint_to_supabase(fp_hash: str, email: str) -> None:
+    """Persist fingerprint → email mapping."""
+    db = _get_supabase()
+    if not db:
+        return
+    try:
+        db.table("fingerprints").upsert(
+            {"fp_hash": fp_hash, "email": email}
+        ).execute()
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -1916,21 +2014,22 @@ if st.session_state.show_gate and not st.session_state.registered:
         db_credits = _load_credits_from_supabase(clean_email)
 
         if db_credits is not None:
-            # Returning user with persisted balance
+            # Returning user — use persisted balance from DB
             assigned = db_credits
         elif _has_used_free_credit(clean_email):
-            # Same email or same browser already consumed the free credit
+            # Same email or same browser fingerprint already used free credit
             assigned = 0
         else:
             assigned = FREE_CREDITS
 
-        st.session_state.email             = clean_email
-        st.session_state.registered        = True
-        st.session_state.credits           = assigned
-        st.session_state.show_gate         = False
-        st.session_state.do_convert        = True
-        st.session_state["_balloons_fired"] = False
+        st.session_state.email              = clean_email
+        st.session_state.registered         = True
+        st.session_state.credits            = assigned
+        st.session_state.show_gate          = False
+        st.session_state.do_convert         = True
+        st.session_state["_balloons_fired"]  = False
 
+        # Persist: upsert user row (preserves existing balance on conflict)
         _save_email_to_supabase(clean_email)
         st.rerun()
 
