@@ -24,7 +24,7 @@ FREE_CREDITS = 1
 
 STRIPE_BASIC_URL = "https://buy.stripe.com/REPLACE_BASIC"
 STRIPE_PRO_URL   = "https://buy.stripe.com/REPLACE_PRO"
-CONTACT_EMAIL    = "info@tomaszahradnik.com"
+CONTACT_EMAIL    = "info@capmp3.com"
 
 RATE_LIMIT_REQUESTS = 5
 RATE_LIMIT_WINDOW   = 60
@@ -1383,7 +1383,7 @@ def _render_terms() -> None:
         to the Service. We do not sell, rent, or share personal data with third parties.</p>
         <p class="tos-p"><strong>EU/EEA users (GDPR):</strong> You have the right to access, rectify,
         erase, and port your personal data, and to withdraw consent at any time. To exercise these
-        rights, contact us at info@tomaszahradnik.com. You also have the right to lodge a complaint
+        rights, contact us at info@capmp3.com. You also have the right to lodge a complaint
         with your local supervisory authority.</p>
 
         <h2 class="tos-h2">8. Disclaimer of Warranties</h2>
@@ -1407,7 +1407,7 @@ def _render_terms() -> None:
         <p class="tos-p">If you believe that a recording processed through CapMP3 infringes your
         copyright, please send a written notice to:</p>
         <p class="tos-p">
-            <strong>Email:</strong> info@tomaszahradnik.com<br>
+            <strong>Email:</strong> info@capmp3.com<br>
             <strong>Subject line:</strong> DMCA Takedown Request
         </p>
         <p class="tos-p">Your notice must include: (i) identification of the copyrighted work claimed
@@ -1441,7 +1441,7 @@ def _render_terms() -> None:
             <li>We will not share or sell email addresses for any marketing purpose</li>
         </ul>
         <p class="tos-p">If you receive an unsolicited message appearing to promote CapMP3, please
-        contact info@tomaszahradnik.com immediately.</p>
+        contact info@capmp3.com immediately.</p>
 
         <h2 class="tos-h2">14. Governing Law & Dispute Resolution</h2>
         <p class="tos-p">These Terms shall be governed by and construed in accordance with the laws
@@ -1455,7 +1455,7 @@ def _render_terms() -> None:
         <h2 class="tos-h2">15. Contact Information</h2>
         <p class="tos-p">For questions, complaints, or requests relating to these Terms:</p>
         <p class="tos-p">
-            <strong>Email:</strong> info@tomaszahradnik.com<br>
+            <strong>Email:</strong> info@capmp3.com<br>
             <strong>Website:</strong> capmp3.com
         </p>
         """,
