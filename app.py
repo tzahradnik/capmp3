@@ -610,6 +610,140 @@ def _inject_css() -> None:
             width: 100% !important;
         }
 
+        /* ── Content sections ────────────────────────────── */
+        .content-section { margin: 56px 0 0; }
+        .content-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            color: #2563EB;
+            margin: 0 0 6px;
+            text-transform: uppercase;
+        }
+        .content-h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0 0 12px;
+            letter-spacing: -.02em;
+        }
+        .content-p {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.7;
+            margin: 0 0 12px;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .feature-list li {
+            font-size: 13px;
+            color: #374151;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.5;
+        }
+        .feature-list li::before {
+            content: "✓";
+            color: #2563EB;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0 0;
+        }
+        .step-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px 16px;
+            box-shadow: 0 1px 4px rgba(15,23,42,.05);
+        }
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, #2563EB, #7C3AED);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .step-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0 0 4px;
+        }
+        .step-desc {
+            font-size: 12px;
+            color: #64748B;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .use-cases {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0 0;
+        }
+        .use-case {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(15,23,42,.05);
+        }
+        .use-case-icon { font-size: 20px; margin-bottom: 6px; }
+        .use-case-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0 0 4px;
+        }
+        .use-case-desc {
+            font-size: 12px;
+            color: #64748B;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .divider-line {
+            border: none;
+            border-top: 1px solid #F1F5F9;
+            margin: 48px 0;
+        }
+
+        /* ── FAQ ──────────────────────────────────────────── */
+        [data-testid="stExpander"] {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 10px !important;
+            margin-bottom: 8px !important;
+            box-shadow: none !important;
+        }
+        [data-testid="stExpander"] summary {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: #0F172A !important;
+        }
+        [data-testid="stExpanderDetails"] p {
+            font-size: 13px !important;
+            color: #475569 !important;
+            line-height: 1.65 !important;
+        }
+
         /* ── Footer ───────────────────────────────────────── */
         .footer {
             text-align: center;
@@ -709,6 +843,181 @@ def _render_pricing() -> None:
             url=f"mailto:{CONTACT_EMAIL}?subject=CapMP3%20Teams",
             use_container_width=True,
         )
+
+
+# ---------------------------------------------------------------------------
+# Content / SEO section
+# ---------------------------------------------------------------------------
+
+def _render_content() -> None:
+    st.markdown('<hr class="divider-line">', unsafe_allow_html=True)
+
+    # ── What is CapMP3 ────────────────────────────────────────────────────────
+    st.markdown(
+        """
+        <div class="content-section">
+            <p class="content-label">About</p>
+            <h2 class="content-h2">What is CapMP3?</h2>
+            <p class="content-p">
+                CapMP3 is a free online tool that converts <strong>cap.so</strong> and
+                <strong>cap.link</strong> screen recordings to downloadable MP3 audio files.
+                Paste any cap.so or cap.link URL and CapMP3 extracts the audio track,
+                converts it to high-quality MP3, and delivers it straight to your browser —
+                no software installation required.
+            </p>
+            <p class="content-p">
+                cap.so is a screen recording and video-sharing platform used by product teams,
+                engineers, and creators for async demos, meeting recaps, onboarding guides, and
+                product walkthroughs. CapMP3 gives you the audio layer of those recordings as a
+                standalone MP3 — ready for offline playback, transcription, or archiving.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ── Features ──────────────────────────────────────────────────────────────
+    st.markdown(
+        """
+        <div class="content-section">
+            <p class="content-label">Features</p>
+            <h2 class="content-h2">Everything you need, nothing you don't</h2>
+            <ul class="feature-list">
+                <li>Converts cap.so and cap.link URLs to MP3</li>
+                <li>190 kbps audio quality — clean and clear</li>
+                <li>Runs entirely in your browser</li>
+                <li>No software or extension to install</li>
+                <li>Files deleted immediately after download</li>
+                <li>1 free download — no credit card required</li>
+                <li>Conversion completes in under 30 seconds</li>
+                <li>Works on desktop and mobile browsers</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ── How to use ────────────────────────────────────────────────────────────
+    st.markdown(
+        """
+        <div class="content-section">
+            <p class="content-label">How it works</p>
+            <h2 class="content-h2">Convert a cap.so recording to MP3 in 3 steps</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <p class="step-title">Copy the URL</p>
+                    <p class="step-desc">Open your cap.so or cap.link recording and copy the URL from the browser address bar.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <p class="step-title">Paste &amp; convert</p>
+                    <p class="step-desc">Paste the URL into CapMP3 above and click "Convert to MP3". Processing takes under 30 seconds.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <p class="step-title">Download your MP3</p>
+                    <p class="step-desc">Click "Save MP3" to download the file. It's saved directly to your device — no cloud storage involved.</p>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ── Use cases ─────────────────────────────────────────────────────────────
+    st.markdown(
+        """
+        <div class="content-section">
+            <p class="content-label">Use cases</p>
+            <h2 class="content-h2">Why extract audio from cap.so recordings?</h2>
+            <div class="use-cases">
+                <div class="use-case">
+                    <div class="use-case-icon">🎙️</div>
+                    <p class="use-case-title">Transcription</p>
+                    <p class="use-case-desc">Feed the MP3 into Whisper, Otter.ai, Descript, or Notion AI for automatic transcription of meetings, demos, and walkthroughs.</p>
+                </div>
+                <div class="use-case">
+                    <div class="use-case-icon">🎧</div>
+                    <p class="use-case-title">Offline listening</p>
+                    <p class="use-case-desc">Play back meeting recaps and briefings without an internet connection or the cap.so app — on any device that supports MP3.</p>
+                </div>
+                <div class="use-case">
+                    <div class="use-case-icon">🎚️</div>
+                    <p class="use-case-title">Podcast &amp; video production</p>
+                    <p class="use-case-desc">Use interview or presentation audio as raw material in your podcast editor, Premiere Pro, or DaVinci Resolve.</p>
+                </div>
+                <div class="use-case">
+                    <div class="use-case-icon">🗄️</div>
+                    <p class="use-case-title">Archiving</p>
+                    <p class="use-case-desc">Create lightweight audio backups of important cap.so sessions — much smaller than the original video file.</p>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ── FAQ ───────────────────────────────────────────────────────────────────
+    st.markdown(
+        """
+        <div class="content-section">
+            <p class="content-label">FAQ</p>
+            <h2 class="content-h2">Frequently asked questions</h2>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    faqs = [
+        (
+            "What is cap.so?",
+            "cap.so is a screen recording and async video platform used by product and engineering teams. "
+            "It lets users record their screen, camera, or both and share the recording via a short URL "
+            "(cap.so/s/... or cap.link/...). It's widely used for product demos, bug reports, onboarding "
+            "videos, and meeting summaries.",
+        ),
+        (
+            "Can I convert any cap.so or cap.link recording to MP3?",
+            "CapMP3 works with any publicly accessible cap.so or cap.link recording. Private recordings "
+            "that require a password or login to view are not supported, as CapMP3 cannot authenticate "
+            "on your behalf.",
+        ),
+        (
+            "What audio quality does CapMP3 produce?",
+            "CapMP3 encodes audio at 190 kbps using the MP3 format (LAME encoder, variable bitrate). "
+            "This quality level is well-suited for voice recordings, meetings, presentations, and "
+            "screen recording audio. The output is clean and clear for all typical cap.so use cases.",
+        ),
+        (
+            "Are my recordings stored on CapMP3 servers?",
+            "No. CapMP3 processes everything in a temporary directory that is deleted immediately after "
+            "your download completes. We never store your recordings, audio files, or any personal data "
+            "beyond your email address (used only to manage your free credit).",
+        ),
+        (
+            "How long does conversion take?",
+            "Most cap.so recordings convert in under 30 seconds. The exact time depends on the length "
+            "of the recording and current server load. Recordings longer than 60 minutes may take up "
+            "to 2 minutes.",
+        ),
+        (
+            "Does CapMP3 work on iPhone, iPad, and Android?",
+            "Yes. CapMP3 runs entirely in your browser and works on iOS Safari, Android Chrome, and all "
+            "modern mobile browsers. After downloading, the MP3 is saved to your device's default "
+            "Downloads folder or Files app.",
+        ),
+        (
+            "What's the difference between the free credit and paid credits?",
+            "Every new user gets 1 free download after entering their email — no credit card required. "
+            "Additional downloads are available as one-time credit packs: Starter ($4.99 / 10 downloads) "
+            "and Pro ($9.99 / 30 downloads). Credits never expire.",
+        ),
+    ]
+
+    for question, answer in faqs:
+        with st.expander(question):
+            st.write(answer)
 
 
 # ---------------------------------------------------------------------------
@@ -940,6 +1249,9 @@ if st.session_state.registered and _credits() <= 0 and not st.session_state.do_c
         unsafe_allow_html=True,
     )
     _render_pricing()
+
+# ── Content & FAQ ─────────────────────────────────────────────────────────────
+_render_content()
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown(
