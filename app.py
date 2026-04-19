@@ -285,7 +285,7 @@ def _inject_css() -> None:
         html, body, [class*="css"] {
             font-family: 'Inter', sans-serif !important;
         }
-        .stApp { background: #0A0F1C !important; }
+        .stApp { background: #F8FAFC !important; }
 
         /* ── Hide sidebar & header clutter ───────────────── */
         [data-testid="stSidebar"],
@@ -316,7 +316,7 @@ def _inject_css() -> None:
         .logo-text {
             font-size: 17px;
             font-weight: 700;
-            color: #F1F5F9;
+            color: #0F172A;
             letter-spacing: -.02em;
         }
 
@@ -325,12 +325,12 @@ def _inject_css() -> None:
             font-size: clamp(28px, 5vw, 40px);
             font-weight: 800;
             line-height: 1.15;
-            color: #F1F5F9;
+            color: #0F172A;
             margin: 0 0 12px;
             letter-spacing: -.02em;
         }
         .grad {
-            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -344,31 +344,32 @@ def _inject_css() -> None:
 
         /* ── Converter card ───────────────────────────────── */
         .converter-card {
-            background: #0F172A;
-            border: 1px solid #1E293B;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 16px;
+            box-shadow: 0 1px 4px rgba(15,23,42,.06);
         }
 
         /* ── Input ────────────────────────────────────────── */
         .stTextInput > div > div > input {
-            background: #020917 !important;
-            border: 1.5px solid #1E293B !important;
+            background: #F8FAFC !important;
+            border: 1.5px solid #CBD5E1 !important;
             border-radius: 10px !important;
-            color: #F1F5F9 !important;
+            color: #0F172A !important;
             font-size: 15px !important;
             padding: 13px 16px !important;
             transition: border-color .15s, box-shadow .15s;
             font-family: 'Inter', sans-serif !important;
         }
         .stTextInput > div > div > input:focus {
-            border-color: #3B82F6 !important;
-            box-shadow: 0 0 0 3px rgba(59,130,246,.12) !important;
+            border-color: #2563EB !important;
+            box-shadow: 0 0 0 3px rgba(37,99,235,.1) !important;
             outline: none !important;
         }
         .stTextInput > div > div > input::placeholder {
-            color: #334155 !important;
+            color: #94A3B8 !important;
         }
         /* Remove input label space */
         .stTextInput label { display: none !important; }
@@ -385,13 +386,13 @@ def _inject_css() -> None:
             padding: 13px 24px !important;
             letter-spacing: -.01em !important;
             transition: opacity .15s, transform .1s, box-shadow .15s !important;
-            box-shadow: 0 2px 16px rgba(59,130,246,.2) !important;
+            box-shadow: 0 2px 12px rgba(37,99,235,.25) !important;
         }
         .stButton > button[kind="primary"]:hover,
         .stFormSubmitButton > button[kind="primary"]:hover {
             opacity: .92 !important;
             transform: translateY(-1px) !important;
-            box-shadow: 0 4px 24px rgba(59,130,246,.35) !important;
+            box-shadow: 0 4px 20px rgba(37,99,235,.35) !important;
         }
         .stButton > button[kind="primary"]:active,
         .stFormSubmitButton > button[kind="primary"]:active {
@@ -402,17 +403,17 @@ def _inject_css() -> None:
         .stButton > button[kind="secondary"],
         .stFormSubmitButton > button[kind="secondary"],
         .stLinkButton > a {
-            background: transparent !important;
-            border: 1.5px solid #1E293B !important;
+            background: #FFFFFF !important;
+            border: 1.5px solid #CBD5E1 !important;
             border-radius: 10px !important;
-            color: #94A3B8 !important;
+            color: #475569 !important;
             font-weight: 500 !important;
             transition: border-color .15s, color .15s !important;
         }
-        .stLinkButton > a[data-featured="true"] {
-            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
-            border: none !important;
-            color: #fff !important;
+        .stButton > button[kind="secondary"]:hover,
+        .stLinkButton > a:hover {
+            border-color: #2563EB !important;
+            color: #2563EB !important;
         }
 
         /* ── Trust bar ────────────────────────────────────── */
@@ -428,27 +429,28 @@ def _inject_css() -> None:
             align-items: center;
             gap: 6px;
             font-size: 12px;
-            color: #475569;
+            color: #94A3B8;
             font-weight: 500;
         }
         .trust-dot {
-            width: 5px; height: 5px;
+            width: 4px; height: 4px;
             border-radius: 50%;
-            background: #1E3A5F;
+            background: #CBD5E1;
         }
 
         /* ── Email gate ───────────────────────────────────── */
         .gate-card {
-            background: #0F172A;
-            border: 1px solid #1E293B;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
             border-radius: 16px;
             padding: 28px 24px 8px;
             margin-bottom: 4px;
+            box-shadow: 0 1px 4px rgba(15,23,42,.06);
         }
         .gate-title {
             font-size: 18px;
             font-weight: 700;
-            color: #F1F5F9;
+            color: #0F172A;
             margin: 0 0 6px;
             letter-spacing: -.02em;
         }
@@ -461,7 +463,7 @@ def _inject_css() -> None:
         .privacy-note {
             text-align: center;
             font-size: 12px;
-            color: #334155;
+            color: #94A3B8;
             margin: 8px 0 0;
         }
 
@@ -470,19 +472,19 @@ def _inject_css() -> None:
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(59,130,246,.08);
-            border: 1px solid rgba(59,130,246,.18);
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
             border-radius: 999px;
             padding: 5px 12px;
             font-size: 12px;
-            color: #93C5FD;
+            color: #2563EB;
             font-weight: 500;
             margin-bottom: 16px;
         }
         .credit-pill.empty {
-            background: rgba(239,68,68,.08);
-            border-color: rgba(239,68,68,.2);
-            color: #FCA5A5;
+            background: #FEF2F2;
+            border-color: #FECACA;
+            color: #DC2626;
         }
 
         /* ── Pricing ──────────────────────────────────────── */
@@ -494,32 +496,33 @@ def _inject_css() -> None:
             font-size: 11px;
             font-weight: 700;
             letter-spacing: .1em;
-            color: #3B82F6;
+            color: #2563EB;
             margin: 0 0 6px;
         }
         .pricing-title {
             font-size: 24px;
             font-weight: 700;
-            color: #F1F5F9;
+            color: #0F172A;
             margin: 0 0 6px;
             letter-spacing: -.02em;
         }
         .pricing-sub {
             font-size: 13px;
-            color: #475569;
+            color: #64748B;
             margin: 0;
         }
         .pricing-card {
-            background: #0F172A;
-            border: 1px solid #1E293B;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
             border-radius: 14px;
             padding: 24px 20px 20px;
             position: relative;
+            box-shadow: 0 1px 4px rgba(15,23,42,.06);
         }
         .pricing-card--featured {
             border-color: #2563EB;
-            background: linear-gradient(160deg, #0F172A 0%, #0D1F3C 100%);
-            box-shadow: 0 0 32px rgba(37,99,235,.1);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(37,99,235,.08), 0 4px 16px rgba(37,99,235,.1);
         }
         .plan-badge {
             position: absolute;
@@ -535,11 +538,11 @@ def _inject_css() -> None:
             white-space: nowrap;
         }
         .plan-name  { font-size: 13px; font-weight: 600; color: #64748B; margin: 0 0 8px; }
-        .plan-price { font-size: 32px; font-weight: 800; color: #F1F5F9; margin: 0; line-height: 1; letter-spacing: -.03em; }
-        .plan-credits { font-size: 13px; color: #3B82F6; font-weight: 600; margin: 5px 0 2px; }
-        .plan-unit  { font-size: 11px; color: #334155; margin: 0 0 16px; }
+        .plan-price { font-size: 32px; font-weight: 800; color: #0F172A; margin: 0; line-height: 1; letter-spacing: -.03em; }
+        .plan-credits { font-size: 13px; color: #2563EB; font-weight: 600; margin: 5px 0 2px; }
+        .plan-unit  { font-size: 11px; color: #94A3B8; margin: 0 0 16px; }
         .plan-features { list-style: none; padding: 0; margin: 0 0 20px; }
-        .plan-features li { font-size: 12px; color: #475569; padding: 3px 0; }
+        .plan-features li { font-size: 12px; color: #64748B; padding: 3px 0; }
 
         /* ── Progress bar ─────────────────────────────────── */
         .stProgress > div > div > div {
@@ -561,7 +564,7 @@ def _inject_css() -> None:
             font-weight: 600 !important;
             font-size: 15px !important;
             padding: 13px 24px !important;
-            box-shadow: 0 2px 16px rgba(59,130,246,.2) !important;
+            box-shadow: 0 2px 12px rgba(37,99,235,.25) !important;
             width: 100% !important;
         }
 
@@ -570,13 +573,13 @@ def _inject_css() -> None:
             text-align: center;
             padding: 48px 0 0;
             font-size: 12px;
-            color: #1E3A5F;
+            color: #CBD5E1;
         }
-        .footer a { color: #1E3A5F; text-decoration: none; }
-        .footer a:hover { color: #3B82F6; }
+        .footer a { color: #CBD5E1; text-decoration: none; }
+        .footer a:hover { color: #2563EB; }
 
         /* ── Divider ──────────────────────────────────────── */
-        hr { border-color: #0F172A !important; margin: 32px 0 !important; }
+        hr { border-color: #E2E8F0 !important; margin: 32px 0 !important; }
         </style>
         """,
         unsafe_allow_html=True,
