@@ -634,6 +634,63 @@ def _inject_css() -> None:
             background: linear-gradient(90deg, #2563EB, #7C3AED) !important;
         }
 
+        /* ── Referral banner ─────────────────────────────── */
+        .referral-banner {
+            background: linear-gradient(135deg, #EFF6FF 0%, #EDE9FE 100%);
+            border: 1.5px solid #BFDBFE;
+            border-radius: 16px;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            margin: 56px 0 0;
+            flex-wrap: wrap;
+        }
+        .referral-left { flex: 1; min-width: 200px; }
+        .referral-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563EB, #7C3AED);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            padding: 3px 10px;
+            border-radius: 999px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .referral-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0F172A;
+            margin: 0 0 6px;
+            letter-spacing: -.02em;
+        }
+        .referral-sub {
+            font-size: 14px;
+            color: #475569;
+            margin: 0;
+            line-height: 1.5;
+        }
+        .referral-cta {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+            color: #fff !important;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none !important;
+            white-space: nowrap;
+            box-shadow: 0 2px 12px rgba(37,99,235,.25);
+            transition: opacity .15s, transform .1s;
+        }
+        .referral-cta:hover {
+            opacity: .9;
+            transform: translateY(-1px);
+        }
+
         /* ── Alerts ───────────────────────────────────────── */
         .stAlert { border-radius: 10px !important; font-size: 14px !important; }
 
@@ -1051,6 +1108,27 @@ def _render_content() -> None:
                     <p class="use-case-desc">Create lightweight audio backups of important cap.so sessions — much smaller than the original video file.</p>
                 </div>
             </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ── Referral banner ───────────────────────────────────────────────────────
+    st.markdown(
+        """
+        <div class="referral-banner">
+            <div class="referral-left">
+                <span class="referral-badge">Exclusive offer</span>
+                <p class="referral-title">Get cap.so with 20% off — for 12 months</p>
+                <p class="referral-sub">
+                    cap.so is the screen recording tool behind every recording on this page.
+                    Use our link to get <strong>20% off your subscription for a full year</strong>.
+                    No coupon code needed — discount is applied automatically.
+                </p>
+            </div>
+            <a href="https://go.cap.so/tomas-zahradnik" target="_blank" rel="noopener" class="referral-cta">
+                Claim 20% off cap.so →
+            </a>
         </div>
         """,
         unsafe_allow_html=True,
