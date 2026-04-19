@@ -55,6 +55,7 @@ def _get_client_ip() -> str:
     try:
         forwarded = st.context.headers.get("X-Forwarded-For", "")
         if forwarded:
+            # Railway sets the real client IP as the leftmost entry
             return forwarded.split(",")[0].strip()
     except Exception:
         pass
@@ -124,6 +125,57 @@ HEADERS = {
     ),
     "Accept-Language": "en-US,en;q=0.9",
 }
+
+# ---------------------------------------------------------------------------
+# URL security — SSRF prevention
+# ---------------------------------------------------------------------------
+
+# Domains the user is permitted to submit
+_USER_URL_ALLOWED_DOMAINS: frozenset[str] = frozenset({"cap.so", "cap.link"})
+
+# Regex patterns that match private / loopback / link-local IP ranges
+_PRIVATE_IP_PATTERNS: list[re.Pattern] = [
+    re.compile(r"^127\."),           # loopback
+    re.compile(r"^10\."),            # RFC-1918
+    re.compile(r"^172\.(1[6-9]|2\d|3[01])\."),  # RFC-1918
+    re.compile(r"^192\.168\."),      # RFC-1918
+    re.compile(r"^169\.254\."),      # link-local / AWS metadata
+    re.compile(r"^0\."),             # "this" network
+    re.compile(r"^::1$"),            # IPv6 loopback
+    re.compile(r"^fc", re.IGNORECASE),  # IPv6 ULA
+    re.compile(r"^fe80", re.IGNORECASE),  # IPv6 link-local
+    re.compile(r"^localhost$", re.IGNORECASE),
+]
+
+
+def _validate_user_url(url: str) -> None:
+    """
+    Enforce that a user-submitted URL targets only cap.so / cap.link.
+    Raises ValueError with a safe, user-visible message on violation.
+    """
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        raise ValueError("Invalid URL format.")
+
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError("Only https:// URLs are supported.")
+
+    host = (parsed.hostname or "").lower().strip(".")
+
+    # Block raw private-IP URLs (e.g. http://192.168.1.1/...)
+    for pattern in _PRIVATE_IP_PATTERNS:
+        if pattern.search(host):
+            raise ValueError("Only cap.so and cap.link URLs are supported.")
+
+    # Domain whitelist
+    allowed = any(
+        host == domain or host.endswith("." + domain)
+        for domain in _USER_URL_ALLOWED_DOMAINS
+    )
+    if not allowed:
+        raise ValueError("Only cap.so and cap.link URLs are supported.")
+
 
 # ---------------------------------------------------------------------------
 # cap.so API
@@ -240,15 +292,31 @@ def download_to_file(source_url: str, dest_path: str, bar, label: str) -> None:
 
 
 def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
-    bar.progress(0.1, f"{label}…")
+    """Convert to MP3 using Popen so we can update the progress bar while ffmpeg runs."""
     cmd = [FFMPEG, "-y", "-i", input_path, "-vn",
            "-acodec", "libmp3lame", "-q:a", "2", "-ar", "44100", output_path]
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-    except subprocess.TimeoutExpired:
-        raise RuntimeError("Conversion took too long (> 5 min). Please try again.")
-    if result.returncode != 0:
-        raise RuntimeError(f"ffmpeg error:\n{result.stderr[-600:]}")
+        proc = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    except FileNotFoundError:
+        raise RuntimeError("ffmpeg not found. Please install ffmpeg.")
+
+    start   = time.time()
+    timeout = 300  # 5 minutes
+
+    while proc.poll() is None:
+        elapsed = time.time() - start
+        if elapsed > timeout:
+            proc.kill()
+            raise RuntimeError("Conversion took too long (> 5 min). Please try again.")
+        # Smooth progress: 0 → 90 % over ~60 s, capped at 90 % until ffmpeg exits
+        pct = min(elapsed / 60.0 * 0.90, 0.90)
+        bar.progress(pct, f"{label}…  {int(elapsed)}s")
+        time.sleep(0.5)
+
+    _, stderr_bytes = proc.communicate()
+    if proc.returncode != 0:
+        err = (stderr_bytes or b"").decode("utf-8", errors="replace")
+        raise RuntimeError(f"ffmpeg error:\n{err[-600:]}")
     bar.progress(1.0, f"{label} — complete.")
 
 
@@ -268,8 +336,15 @@ def _fetch_cap_metadata(url: str) -> dict:
     """Fetch og:title and og:image from a cap.so/cap.link recording page."""
     try:
         from bs4 import BeautifulSoup
-        resp = requests.get(url, headers=HEADERS, timeout=12, allow_redirects=True)
-        soup = BeautifulSoup(resp.text, "html.parser")
+        resp = requests.get(url, headers=HEADERS, timeout=12, allow_redirects=True,
+                            stream=True)
+        # Guard against huge responses — read max 1 MB
+        raw = b""
+        for chunk in resp.iter_content(chunk_size=64 * 1024):
+            raw += chunk
+            if len(raw) > 1_000_000:
+                break
+        soup = BeautifulSoup(raw.decode("utf-8", errors="replace"), "html.parser")
 
         title     = None
         thumbnail = None
@@ -309,7 +384,6 @@ def _init_session() -> None:
         "pending_url":      "",
         "do_convert":       False,
         "video_meta":       None,
-        "_balloons_fired":  False,
         "_scroll_pricing":  False,
     }
     for key, val in defaults.items():
@@ -784,9 +858,9 @@ def _inject_css() -> None:
         }
 
         /* ── Progress bar ─────────────────────────────────── */
-        @keyframes bar-sweep {
-            0%   { background-position: 200% center; }
-            100% { background-position: -200% center; }
+        @keyframes shimmer {
+            0%   { transform: translateX(-150%); }
+            100% { transform: translateX(550%); }
         }
         .stProgress { margin: 16px 0 4px !important; }
         .stProgress > div > div > div {
@@ -794,17 +868,30 @@ def _inject_css() -> None:
             border-radius: 999px !important;
             background: #E2E8F0 !important;
             overflow: hidden !important;
+            position: relative !important;
         }
+        /* Fill — solid gradient, width driven by Python value */
         .stProgress > div > div > div > div {
             height: 14px !important;
             border-radius: 999px !important;
+            background: linear-gradient(90deg, #2563EB 0%, #7C3AED 100%) !important;
+            transition: width .3s ease !important;
+        }
+        /* Shimmer sweeps the full track width — always visible, independent of fill % */
+        .stProgress > div > div > div::after {
+            content: "" !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 30% !important;
+            height: 100% !important;
             background: linear-gradient(
                 90deg,
-                #1D4ED8 0%, #7C3AED 30%, #60A5FA 50%, #7C3AED 70%, #1D4ED8 100%
+                transparent 0%,
+                rgba(255,255,255,0.55) 50%,
+                transparent 100%
             ) !important;
-            background-size: 300% 100% !important;
-            animation: bar-sweep 2s linear infinite !important;
-            transition: width .25s ease !important;
+            animation: shimmer 1.4s ease-in-out infinite !important;
         }
         .stProgress > div > div > p,
         [data-testid="stProgressBarMessage"] {
@@ -1549,9 +1636,24 @@ def _run_conversion(url: str) -> None:
     """Execute the full download + convert pipeline and render result."""
 
     if _is_rate_limited():
-        st.error(
-            f"Too many requests — limit is {RATE_LIMIT_REQUESTS} per {RATE_LIMIT_WINDOW}s. "
-            "Please wait a moment and try again."
+        st.markdown(
+            f'<div class="warn-box">Too many requests — please wait a moment and try again.</div>',
+            unsafe_allow_html=True,
+        )
+        return
+
+    # Re-verify credit balance from DB before every conversion.
+    # Prevents session-state manipulation via browser dev tools.
+    email = st.session_state.get("email", "")
+    if email:
+        db_credits = _load_credits_from_supabase(email)
+        if db_credits is not None:
+            st.session_state.credits = db_credits
+
+    if _credits() <= 0:
+        st.markdown(
+            '<div class="warn-box">No credits remaining. Purchase a plan below to continue.</div>',
+            unsafe_allow_html=True,
         )
         return
 
@@ -1584,16 +1686,38 @@ def _run_conversion(url: str) -> None:
                 audio_bytes = f.read()
 
         except requests.HTTPError as e:
-            st.error(f"HTTP error: {e}")
+            # Log full detail server-side; show generic message to user
+            print(f"[CAPMP3 ERROR] HTTPError for {url!r}: {e}", flush=True)
+            st.markdown(
+                '<div class="error-box"><strong>Connection error.</strong> '
+                "Could not retrieve the recording. Check that the URL is correct "
+                "and the recording is publicly accessible.</div>",
+                unsafe_allow_html=True,
+            )
             return
         except ValueError as e:
-            st.error(str(e))
+            # ValueError messages are written by us — safe to surface
+            st.markdown(
+                f'<div class="error-box">{html_lib.escape(str(e))}</div>',
+                unsafe_allow_html=True,
+            )
             return
         except RuntimeError as e:
-            st.error(str(e))
+            # May contain ffmpeg paths / internal details — log only
+            print(f"[CAPMP3 ERROR] RuntimeError for {url!r}: {e}", flush=True)
+            st.markdown(
+                '<div class="error-box"><strong>Conversion failed.</strong> '
+                "An error occurred during processing. Please try again or contact support.</div>",
+                unsafe_allow_html=True,
+            )
             return
         except Exception as e:
-            st.error(f"Unexpected error: {e}")
+            print(f"[CAPMP3 ERROR] Unexpected error for {url!r}: {type(e).__name__}: {e}", flush=True)
+            st.markdown(
+                '<div class="error-box"><strong>Unexpected error.</strong> '
+                "Something went wrong. Please try again or contact support.</div>",
+                unsafe_allow_html=True,
+            )
             return
 
     if audio_bytes:
@@ -1615,10 +1739,6 @@ def _run_conversion(url: str) -> None:
             mime="audio/mpeg",
             use_container_width=True,
         )
-        # Balloons fire once per conversion
-        if not st.session_state.get("_balloons_fired"):
-            st.session_state["_balloons_fired"] = True
-            st.balloons()
         # Signal to scroll to pricing on next rerun (when credits hit 0)
         if _credits() <= 0:
             st.session_state["_scroll_pricing"] = True
@@ -1933,6 +2053,17 @@ if clicked:
     elif not url.startswith(("http://", "https://")):
         st.error("Please enter a URL that starts with https://")
     else:
+        # SSRF guard — validate domain before any server-side fetch
+        try:
+            _validate_user_url(url)
+        except ValueError as _ve:
+            st.markdown(
+                f'<div class="error-box">{html_lib.escape(str(_ve))}</div>',
+                unsafe_allow_html=True,
+            )
+            url = ""  # prevent further processing
+
+    if url and url.startswith(("http://", "https://")):
         # Fetch metadata with animated spinner
         with st.spinner("Loading recording info…"):
             meta = _fetch_cap_metadata(url)
@@ -2026,9 +2157,9 @@ if st.session_state.show_gate and not st.session_state.registered:
         st.session_state.registered         = True
         st.session_state.credits            = assigned
         st.session_state.show_gate          = False
-        st.session_state.do_convert         = True
-        st.session_state["_balloons_fired"]  = False
-
+        # Only queue conversion if the user actually has credits.
+        # Critical: prevents 0-credit users from slipping through the do_convert path.
+        st.session_state.do_convert         = (assigned > 0)
         # Persist: upsert user row (preserves existing balance on conflict)
         _save_email_to_supabase(clean_email)
         st.rerun()
@@ -2040,9 +2171,12 @@ if st.session_state.do_convert and st.session_state.registered and st.session_st
 
 # ── Out of credits → show pricing ─────────────────────────────────────────────
 if st.session_state.registered and _credits() <= 0 and not st.session_state.do_convert:
-    st.markdown("<br>", unsafe_allow_html=True)
     st.markdown(
-        '<div class="credit-pill empty">✦ No credits remaining</div>',
+        '<div class="warn-box" style="margin-top:12px;">'
+        '⚠ <strong>Free credit already used.</strong> '
+        'Each email address and device is limited to 1 free download. '
+        'Top up below to continue.'
+        '</div>',
         unsafe_allow_html=True,
     )
     _render_pricing()
