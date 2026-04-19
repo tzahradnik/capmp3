@@ -222,14 +222,51 @@ def check_ffmpeg() -> bool:
 # Session state
 # ---------------------------------------------------------------------------
 
+def _fetch_cap_metadata(url: str) -> dict:
+    """Fetch og:title and og:image from a cap.so/cap.link recording page."""
+    try:
+        from bs4 import BeautifulSoup
+        resp = requests.get(url, headers=HEADERS, timeout=12, allow_redirects=True)
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        title     = None
+        thumbnail = None
+
+        og_title = soup.find("meta", property="og:title")
+        if og_title:
+            title = og_title.get("content", "").strip()
+
+        og_image = soup.find("meta", property="og:image")
+        if og_image:
+            thumbnail = og_image.get("content", "").strip()
+
+        if not title and soup.title and soup.title.string:
+            title = soup.title.string.strip()
+
+        # Remove cap.so branding suffixes
+        if title:
+            for suffix in [" | Cap", " - Cap", " | cap.so", " — Cap", " · Cap"]:
+                title = title.replace(suffix, "")
+            title = title.strip()
+
+        return {
+            "title":     title or "cap.so Recording",
+            "thumbnail": thumbnail or "",
+            "success":   bool(title or thumbnail),
+        }
+    except Exception:
+        return {"title": "cap.so Recording", "thumbnail": "", "success": False}
+
+
 def _init_session() -> None:
     defaults = {
-        "registered":      False,
-        "email":           "",
-        "credits":         0,
-        "show_gate":       False,
-        "pending_url":     "",
-        "do_convert":      False,
+        "registered":  False,
+        "email":       "",
+        "credits":     0,
+        "show_gate":   False,
+        "pending_url": "",
+        "do_convert":  False,
+        "video_meta":  None,
     }
     for key, val in defaults.items():
         if key not in st.session_state:
@@ -297,9 +334,15 @@ def _inject_css() -> None:
 
         /* ── Page wrapper: center & constrain width ──────── */
         .block-container {
-            max-width: 560px !important;
-            padding: 48px 24px 64px !important;
+            max-width: 720px !important;
+            padding: 48px 40px 64px !important;
             margin: 0 auto !important;
+        }
+        @media (max-width: 768px) {
+            .block-container { padding: 32px 20px 48px !important; }
+            .steps-grid { grid-template-columns: 1fr !important; }
+            .use-cases  { grid-template-columns: 1fr !important; }
+            .feature-list { grid-template-columns: 1fr !important; }
         }
 
         /* ── Logo ─────────────────────────────────────────── */
@@ -723,6 +766,61 @@ def _inject_css() -> None:
             border: none;
             border-top: 1px solid #F1F5F9;
             margin: 48px 0;
+        }
+
+        /* ── Video preview card ──────────────────────────── */
+        .preview-card {
+            background: #FFFFFF;
+            border: 1.5px solid #BFDBFE;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin: 16px 0;
+            box-shadow: 0 2px 8px rgba(37,99,235,.08);
+        }
+        .preview-thumb {
+            width: 96px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+            background: #EFF6FF;
+        }
+        .preview-thumb-placeholder {
+            width: 96px;
+            height: 60px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #EFF6FF, #E0E7FF);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .preview-status {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            color: #16A34A;
+            margin: 0 0 4px;
+            text-transform: uppercase;
+        }
+        .preview-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0F172A;
+            margin: 0 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 520px;
+        }
+        .preview-hint {
+            font-size: 12px;
+            color: #64748B;
+            margin: 0;
         }
 
         /* ── FAQ ──────────────────────────────────────────── */
@@ -1173,28 +1271,56 @@ if clicked:
         st.warning("Paste a cap.so or cap.link URL above.")
     elif not url.startswith(("http://", "https://")):
         st.error("Please enter a URL that starts with https://")
-    elif not st.session_state.registered:
-        # Not registered yet — show inline email gate
-        st.session_state.pending_url = url
-        st.session_state.show_gate   = True
-        st.rerun()
-    elif _credits() <= 0:
-        # Registered but out of credits — show pricing
-        st.session_state.show_gate = False
-        pass  # falls through to pricing section below
     else:
-        # Registered and has credits — convert
-        _run_conversion(url)
+        # Fetch metadata with animated spinner
+        with st.spinner("Loading recording info…"):
+            meta = _fetch_cap_metadata(url)
+        st.session_state.video_meta  = meta
+        st.session_state.pending_url = url
+
+        if not st.session_state.registered:
+            st.session_state.show_gate = True
+            st.rerun()
+        elif _credits() <= 0:
+            st.session_state.show_gate = False
+        else:
+            _run_conversion(url)
+
+# ── Video preview card ────────────────────────────────────────────────────────
+if st.session_state.video_meta and (st.session_state.show_gate or st.session_state.registered):
+    meta  = st.session_state.video_meta
+    title = meta.get("title", "cap.so Recording")
+    thumb = meta.get("thumbnail", "")
+
+    if thumb:
+        thumb_html = f'<img src="{thumb}" class="preview-thumb" onerror="this.style.display=\'none\'">'
+    else:
+        thumb_html = '<div class="preview-thumb-placeholder">🎵</div>'
+
+    gate_hint = "" if st.session_state.registered else \
+        '<p class="preview-hint">Enter your email below to start the free download ↓</p>'
+
+    st.markdown(
+        f"""
+        <div class="preview-card">
+            {thumb_html}
+            <div style="min-width:0; flex:1;">
+                <div class="preview-status">✓ Recording found</div>
+                <p class="preview-title">{title}</p>
+                {gate_hint}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # ── Inline email gate ─────────────────────────────────────────────────────────
 if st.session_state.show_gate and not st.session_state.registered:
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(
-        """
+    st.markdown("""
         <div class="gate-card">
             <p class="gate-title">Get your first MP3 free</p>
             <p class="gate-sub">
-                Enter your email to unlock <strong style="color:#F1F5F9;">1 free download</strong>.
+                Enter your email to unlock <strong style="color:#0F172A;">1 free download</strong>.
                 No password, no subscription.
             </p>
         </div>
