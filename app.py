@@ -287,10 +287,13 @@ def _inject_css() -> None:
         }
         .stApp { background: #F8FAFC !important; }
 
-        /* ── Hide sidebar & header clutter ───────────────── */
+        /* ── Hide sidebar, toolbar, header ───────────────── */
         [data-testid="stSidebar"],
         [data-testid="collapsedControl"],
-        header[data-testid="stHeader"] { display: none !important; }
+        header[data-testid="stHeader"],
+        [data-testid="stToolbar"],
+        #MainMenu,
+        .stAppDeployButton { display: none !important; }
 
         /* ── Page wrapper: center & constrain width ──────── */
         .block-container {
@@ -322,12 +325,12 @@ def _inject_css() -> None:
 
         /* ── Hero ─────────────────────────────────────────── */
         .hero-title {
-            font-size: clamp(28px, 5vw, 40px);
-            font-weight: 800;
-            line-height: 1.15;
-            color: #0F172A;
-            margin: 0 0 12px;
-            letter-spacing: -.02em;
+            font-size: clamp(28px, 5vw, 40px) !important;
+            font-weight: 800 !important;
+            line-height: 1.15 !important;
+            color: #0F172A !important;
+            margin: 0 0 12px !important;
+            letter-spacing: -.02em !important;
         }
         .grad {
             background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
@@ -374,9 +377,11 @@ def _inject_css() -> None:
         /* Remove input label space */
         .stTextInput label { display: none !important; }
 
-        /* ── Primary button ───────────────────────────────── */
+        /* ── Primary button (all variants) ───────────────── */
         .stButton > button[kind="primary"],
-        .stFormSubmitButton > button[kind="primary"] {
+        .stFormSubmitButton > button[kind="primary"],
+        [data-testid="stFormSubmitButton"] > button,
+        [data-testid="stBaseButton-primary"] {
             background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
             border: none !important;
             border-radius: 10px !important;
@@ -389,14 +394,12 @@ def _inject_css() -> None:
             box-shadow: 0 2px 12px rgba(37,99,235,.25) !important;
         }
         .stButton > button[kind="primary"]:hover,
-        .stFormSubmitButton > button[kind="primary"]:hover {
+        .stFormSubmitButton > button[kind="primary"]:hover,
+        [data-testid="stFormSubmitButton"] > button:hover,
+        [data-testid="stBaseButton-primary"]:hover {
             opacity: .92 !important;
             transform: translateY(-1px) !important;
             box-shadow: 0 4px 20px rgba(37,99,235,.35) !important;
-        }
-        .stButton > button[kind="primary"]:active,
-        .stFormSubmitButton > button[kind="primary"]:active {
-            transform: translateY(0) !important;
         }
 
         /* ── Secondary / link buttons ─────────────────────── */
