@@ -360,7 +360,7 @@ def _inject_css() -> None:
             font-size: 16px;
         }
         .logo-text {
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 700;
             color: #0F172A;
             letter-spacing: -.02em;
@@ -368,11 +368,11 @@ def _inject_css() -> None:
 
         /* ── Hero ─────────────────────────────────────────── */
         .hero-title {
-            font-size: clamp(28px, 5vw, 40px) !important;
+            font-size: clamp(32px, 5vw, 46px) !important;
             font-weight: 800 !important;
             line-height: 1.15 !important;
             color: #0F172A !important;
-            margin: 0 0 12px !important;
+            margin: 0 0 14px !important;
             letter-spacing: -.02em !important;
         }
         .grad {
@@ -382,10 +382,10 @@ def _inject_css() -> None:
             background-clip: text;
         }
         .hero-sub {
-            font-size: 16px;
+            font-size: 18px;
             color: #64748B;
             margin: 0 0 32px;
-            line-height: 1.6;
+            line-height: 1.65;
         }
 
         /* ── Converter card ───────────────────────────────── */
@@ -404,7 +404,7 @@ def _inject_css() -> None:
             border: 1.5px solid #CBD5E1 !important;
             border-radius: 10px !important;
             color: #0F172A !important;
-            font-size: 15px !important;
+            font-size: 16px !important;
             padding: 13px 16px !important;
             transition: border-color .15s, box-shadow .15s;
             font-family: 'Inter', sans-serif !important;
@@ -430,8 +430,8 @@ def _inject_css() -> None:
             border-radius: 10px !important;
             color: #fff !important;
             font-weight: 600 !important;
-            font-size: 15px !important;
-            padding: 13px 24px !important;
+            font-size: 16px !important;
+            padding: 14px 24px !important;
             letter-spacing: -.01em !important;
             transition: opacity .15s, transform .1s, box-shadow .15s !important;
             box-shadow: 0 2px 12px rgba(37,99,235,.25) !important;
@@ -454,6 +454,7 @@ def _inject_css() -> None:
             border-radius: 10px !important;
             color: #475569 !important;
             font-weight: 500 !important;
+            font-size: 15px !important;
             transition: border-color .15s, color .15s !important;
         }
         .stButton > button[kind="secondary"]:hover,
@@ -474,7 +475,7 @@ def _inject_css() -> None:
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
+            font-size: 13px;
             color: #94A3B8;
             font-weight: 500;
         }
@@ -494,21 +495,21 @@ def _inject_css() -> None:
             box-shadow: 0 1px 4px rgba(15,23,42,.06);
         }
         .gate-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             color: #0F172A;
             margin: 0 0 6px;
             letter-spacing: -.02em;
         }
         .gate-sub {
-            font-size: 14px;
+            font-size: 16px;
             color: #64748B;
             margin: 0 0 20px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
         .privacy-note {
             text-align: center;
-            font-size: 12px;
+            font-size: 13px;
             color: #94A3B8;
             margin: 8px 0 0;
         }
@@ -522,7 +523,7 @@ def _inject_css() -> None:
             border: 1px solid #BFDBFE;
             border-radius: 999px;
             padding: 5px 12px;
-            font-size: 12px;
+            font-size: 13px;
             color: #2563EB;
             font-weight: 500;
             margin-bottom: 16px;
@@ -539,21 +540,21 @@ def _inject_css() -> None:
             text-align: center;
         }
         .pricing-label {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             letter-spacing: .1em;
             color: #2563EB;
             margin: 0 0 6px;
         }
         .pricing-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             color: #0F172A;
             margin: 0 0 6px;
             letter-spacing: -.02em;
         }
         .pricing-sub {
-            font-size: 13px;
+            font-size: 15px;
             color: #64748B;
             margin: 0;
         }
@@ -576,19 +577,19 @@ def _inject_css() -> None:
             transform: translateX(-50%);
             background: linear-gradient(135deg, #2563EB, #7C3AED);
             color: #fff;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 700;
             letter-spacing: .1em;
             padding: 3px 10px;
             border-radius: 999px;
             white-space: nowrap;
         }
-        .plan-name  { font-size: 13px !important; font-weight: 600 !important; color: #64748B !important; -webkit-text-fill-color: #64748B !important; margin: 0 0 8px !important; }
+        .plan-name  { font-size: 14px !important; font-weight: 600 !important; color: #64748B !important; -webkit-text-fill-color: #64748B !important; margin: 0 0 8px !important; }
         .plan-price { font-size: 32px !important; font-weight: 800 !important; color: #0F172A !important; -webkit-text-fill-color: #0F172A !important; margin: 0 !important; line-height: 1 !important; letter-spacing: -.03em !important; }
-        .plan-credits { font-size: 13px !important; color: #2563EB !important; -webkit-text-fill-color: #2563EB !important; font-weight: 600 !important; margin: 5px 0 2px !important; }
-        .plan-unit  { font-size: 11px !important; color: #94A3B8 !important; -webkit-text-fill-color: #94A3B8 !important; margin: 0 0 16px !important; }
+        .plan-credits { font-size: 14px !important; color: #2563EB !important; -webkit-text-fill-color: #2563EB !important; font-weight: 600 !important; margin: 5px 0 2px !important; }
+        .plan-unit  { font-size: 13px !important; color: #94A3B8 !important; -webkit-text-fill-color: #94A3B8 !important; margin: 0 0 16px !important; }
         .plan-features { list-style: none !important; padding: 0 !important; margin: 0 0 20px !important; }
-        .plan-features li { font-size: 12px !important; color: #64748B !important; -webkit-text-fill-color: #64748B !important; padding: 3px 0 !important; }
+        .plan-features li { font-size: 14px !important; color: #64748B !important; -webkit-text-fill-color: #64748B !important; padding: 3px 0 !important; }
 
         /* ── Hide Streamlit heading anchor icons ─────────── */
         [data-testid="stMarkdownContainer"] h1 a,
@@ -600,7 +601,7 @@ def _inject_css() -> None:
 
         /* ── Converter form card ──────────────────────────── */
         .url-label {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             color: #374151;
             margin: 0 0 8px;
@@ -613,16 +614,20 @@ def _inject_css() -> None:
             padding: 20px !important;
             box-shadow: 0 1px 6px rgba(15,23,42,.07);
         }
-        [data-testid="stForm"] [data-testid="stTextInput"] {
+        /* Strip all Streamlit wrappers inside the form so only the outer card border shows */
+        [data-testid="stForm"] [data-testid="stTextInput"],
+        [data-testid="stForm"] [data-testid="stTextInput"] > div,
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div {
             background: transparent !important;
             border: none !important;
-            padding: 0 !important;
             box-shadow: none !important;
+            padding: 0 !important;
             margin-bottom: 0 !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input {
             background: #F8FAFC !important;
             border: 1.5px solid #E2E8F0 !important;
+            font-size: 16px !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input:focus {
             border-color: #2563EB !important;
@@ -661,7 +666,7 @@ def _inject_css() -> None:
             text-transform: uppercase;
         }
         .referral-title {
-            font-size: 20px !important;
+            font-size: 22px !important;
             font-weight: 800 !important;
             color: #0F172A !important;
             -webkit-text-fill-color: #0F172A !important;
@@ -669,17 +674,17 @@ def _inject_css() -> None:
             letter-spacing: -.02em !important;
         }
         .referral-sub {
-            font-size: 14px !important;
+            font-size: 16px !important;
             color: #475569 !important;
             -webkit-text-fill-color: #475569 !important;
             margin: 0 !important;
-            line-height: 1.5 !important;
+            line-height: 1.6 !important;
         }
         .referral-cta {
             display: inline-block;
             background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
             color: #fff !important;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             padding: 12px 24px;
             border-radius: 10px;
@@ -694,7 +699,7 @@ def _inject_css() -> None:
         }
 
         /* ── Alerts ───────────────────────────────────────── */
-        .stAlert { border-radius: 10px !important; font-size: 14px !important; }
+        .stAlert { border-radius: 10px !important; font-size: 16px !important; }
 
         /* ── Status box ───────────────────────────────────── */
         [data-testid="stStatusWidget"] { border-radius: 10px !important; }
@@ -706,8 +711,8 @@ def _inject_css() -> None:
             border-radius: 10px !important;
             color: #fff !important;
             font-weight: 600 !important;
-            font-size: 15px !important;
-            padding: 13px 24px !important;
+            font-size: 16px !important;
+            padding: 14px 24px !important;
             box-shadow: 0 2px 12px rgba(37,99,235,.25) !important;
             width: 100% !important;
         }
@@ -715,7 +720,7 @@ def _inject_css() -> None:
         /* ── Content sections ────────────────────────────── */
         .content-section { margin: 56px 0 0 !important; }
         .content-label {
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
             letter-spacing: .1em !important;
             color: #2563EB !important;
@@ -725,20 +730,20 @@ def _inject_css() -> None:
         }
         /* Use div.content-h2 to avoid Streamlit h2 overrides */
         .content-h2 {
-            font-size: 22px !important;
+            font-size: 26px !important;
             font-weight: 700 !important;
             color: #0F172A !important;
-            margin: 0 0 12px !important;
+            margin: 0 0 14px !important;
             letter-spacing: -.02em !important;
             line-height: 1.3 !important;
             display: block !important;
             -webkit-text-fill-color: #0F172A !important;
         }
         .content-p {
-            font-size: 14px !important;
+            font-size: 16px !important;
             color: #475569 !important;
-            line-height: 1.7 !important;
-            margin: 0 0 12px !important;
+            line-height: 1.75 !important;
+            margin: 0 0 14px !important;
             -webkit-text-fill-color: #475569 !important;
         }
         .feature-list {
@@ -747,15 +752,15 @@ def _inject_css() -> None:
             margin: 0 !important;
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            gap: 8px !important;
+            gap: 10px !important;
         }
         .feature-list li {
-            font-size: 13px !important;
+            font-size: 15px !important;
             color: #374151 !important;
             display: flex !important;
             align-items: flex-start !important;
             gap: 8px !important;
-            line-height: 1.5 !important;
+            line-height: 1.6 !important;
         }
         .feature-list li::before {
             content: "✓" !important;
@@ -781,27 +786,27 @@ def _inject_css() -> None:
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            width: 28px !important; height: 28px !important;
+            width: 30px !important; height: 30px !important;
             background: linear-gradient(135deg, #2563EB, #7C3AED) !important;
             border-radius: 50% !important;
             color: #fff !important;
             -webkit-text-fill-color: #fff !important;
-            font-size: 12px !important;
+            font-size: 13px !important;
             font-weight: 700 !important;
-            margin-bottom: 10px !important;
+            margin-bottom: 12px !important;
         }
         .step-title {
-            font-size: 14px !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
             color: #0F172A !important;
             -webkit-text-fill-color: #0F172A !important;
-            margin: 0 0 4px !important;
+            margin: 0 0 6px !important;
         }
         .step-desc {
-            font-size: 12px !important;
+            font-size: 14px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
-            line-height: 1.5 !important;
+            line-height: 1.6 !important;
             margin: 0 !important;
         }
         .use-cases {
@@ -817,19 +822,19 @@ def _inject_css() -> None:
             padding: 16px !important;
             box-shadow: 0 1px 4px rgba(15,23,42,.05) !important;
         }
-        .use-case-icon { font-size: 20px !important; margin-bottom: 6px !important; }
+        .use-case-icon { font-size: 22px !important; margin-bottom: 8px !important; }
         .use-case-title {
-            font-size: 13px !important;
+            font-size: 15px !important;
             font-weight: 700 !important;
             color: #0F172A !important;
             -webkit-text-fill-color: #0F172A !important;
-            margin: 0 0 4px !important;
+            margin: 0 0 5px !important;
         }
         .use-case-desc {
-            font-size: 12px !important;
+            font-size: 14px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
-            line-height: 1.5 !important;
+            line-height: 1.6 !important;
             margin: 0 !important;
         }
         .divider-line {
@@ -870,7 +875,7 @@ def _inject_css() -> None:
             flex-shrink: 0;
         }
         .preview-status {
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
             letter-spacing: .06em !important;
             color: #16A34A !important;
@@ -879,7 +884,7 @@ def _inject_css() -> None:
             text-transform: uppercase !important;
         }
         .preview-title {
-            font-size: 15px !important;
+            font-size: 16px !important;
             font-weight: 600 !important;
             color: #0F172A !important;
             -webkit-text-fill-color: #0F172A !important;
@@ -890,7 +895,7 @@ def _inject_css() -> None:
             max-width: 520px !important;
         }
         .preview-hint {
-            font-size: 12px !important;
+            font-size: 13px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
             margin: 0 !important;
@@ -905,21 +910,21 @@ def _inject_css() -> None:
             box-shadow: none !important;
         }
         [data-testid="stExpander"] summary {
-            font-size: 14px !important;
+            font-size: 16px !important;
             font-weight: 600 !important;
             color: #0F172A !important;
         }
         [data-testid="stExpanderDetails"] p {
-            font-size: 13px !important;
+            font-size: 15px !important;
             color: #475569 !important;
-            line-height: 1.65 !important;
+            line-height: 1.7 !important;
         }
 
         /* ── Footer ───────────────────────────────────────── */
         .footer {
             text-align: center;
             padding: 48px 0 0;
-            font-size: 12px;
+            font-size: 13px;
             color: #CBD5E1;
         }
         .footer a { color: #CBD5E1; text-decoration: none; }
@@ -1284,19 +1289,19 @@ def _render_terms() -> None:
     st.markdown(
         """
         <style>
-        .tos-h1  { font-size:28px; font-weight:800; color:#0F172A; margin:0 0 4px; letter-spacing:-.02em; }
-        .tos-updated { font-size:13px; color:#94A3B8; margin:0 0 40px; }
+        .tos-h1  { font-size:32px; font-weight:800; color:#0F172A; margin:0 0 4px; letter-spacing:-.02em; }
+        .tos-updated { font-size:14px; color:#94A3B8; margin:0 0 40px; }
         .tos-disclaimer {
             background:#FFF7ED; border:1.5px solid #FED7AA; border-radius:12px;
             padding:20px 24px; margin-bottom:32px;
         }
         .tos-disclaimer strong { color:#C2410C; }
-        .tos-disclaimer p { font-size:13px; color:#78350F; margin:4px 0 0; line-height:1.6; }
-        .tos-h2  { font-size:18px; font-weight:700; color:#0F172A; margin:32px 0 8px; letter-spacing:-.01em; }
-        .tos-p   { font-size:14px; color:#374151; line-height:1.75; margin:0 0 10px; }
-        .tos-ul  { padding-left:20px; margin:0 0 12px; }
-        .tos-ul li { font-size:14px; color:#374151; line-height:1.75; }
-        .tos-risk { background:#FEF2F2; border:1px solid #FECACA; border-radius:8px; padding:12px 16px; margin:8px 0; font-size:13px; color:#991B1B; }
+        .tos-disclaimer p { font-size:15px; color:#78350F; margin:4px 0 0; line-height:1.65; }
+        .tos-h2  { font-size:22px; font-weight:700; color:#0F172A; margin:36px 0 10px; letter-spacing:-.01em; }
+        .tos-p   { font-size:16px; color:#374151; line-height:1.75; margin:0 0 12px; }
+        .tos-ul  { padding-left:20px; margin:0 0 14px; }
+        .tos-ul li { font-size:16px; color:#374151; line-height:1.75; }
+        .tos-risk { background:#FEF2F2; border:1px solid #FECACA; border-radius:8px; padding:12px 16px; margin:8px 0; font-size:15px; color:#991B1B; }
         </style>
         """,
         unsafe_allow_html=True,
