@@ -544,6 +544,33 @@ def _inject_css() -> None:
         .plan-features { list-style: none; padding: 0; margin: 0 0 20px; }
         .plan-features li { font-size: 12px; color: #64748B; padding: 3px 0; }
 
+        /* ── Hide Streamlit heading anchor icons ─────────── */
+        [data-testid="stMarkdownContainer"] h1 a,
+        [data-testid="stMarkdownContainer"] h2 a,
+        [data-testid="stMarkdownContainer"] h3 a,
+        .stMarkdown h1 a, .stMarkdown h2 a, .stMarkdown h3 a {
+            display: none !important;
+        }
+
+        /* ── Input area: card styling via native container ── */
+        [data-testid="stTextInput"] {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px 16px 0 0;
+            padding: 24px 24px 12px;
+            margin-bottom: 0 !important;
+            box-shadow: 0 1px 4px rgba(15,23,42,.06);
+        }
+        [data-testid="stButton"]:has(button[kind="primary"]) {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            padding: 0 24px 24px;
+            box-shadow: 0 1px 4px rgba(15,23,42,.06);
+            margin-top: 0 !important;
+        }
+
         /* ── Progress bar ─────────────────────────────────── */
         .stProgress > div > div > div {
             background: linear-gradient(90deg, #2563EB, #7C3AED) !important;
@@ -780,15 +807,15 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Converter card ────────────────────────────────────────────────────────────
-st.markdown('<div class="converter-card">', unsafe_allow_html=True)
-
+# ── Converter ─────────────────────────────────────────────────────────────────
 url_input = st.text_input(
     "url",
     placeholder="https://cap.so/s/...  or  https://cap.link/...",
     label_visibility="collapsed",
     key="url_input",
 )
+
+clicked = st.button("Convert to MP3 →", type="primary", use_container_width=True, key="convert_btn")
 
 # Credit pill — only shown when registered
 if st.session_state.registered:
@@ -799,10 +826,6 @@ if st.session_state.registered:
             f'<div class="credit-pill">✦ {credits} {label} remaining</div>',
             unsafe_allow_html=True,
         )
-
-clicked = st.button("Convert to MP3 →", type="primary", use_container_width=True, key="convert_btn")
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 # ── Trust bar ─────────────────────────────────────────────────────────────────
 st.markdown(
