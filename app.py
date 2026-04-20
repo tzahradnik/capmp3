@@ -73,20 +73,69 @@ def _make_fingerprint() -> str:
     return hashlib.sha256(raw.encode()).hexdigest()[:24]
 
 
+def _get_cookie_device_id() -> str:
+    """
+    Read the capmp3_did cookie injected by client-side JS.
+    Cookie persists across page refreshes and IP changes, making it a
+    more reliable device identifier than IP+UA alone.
+    Returns empty string if cookie is absent or malformed.
+    """
+    try:
+        cookie_header = st.context.headers.get("Cookie", "")
+        for part in cookie_header.split(";"):
+            k, _, v = part.strip().partition("=")
+            if k.strip() == "capmp3_did":
+                val = v.strip()
+                if re.match(r"^[0-9a-f]{32}$", val):
+                    return val
+    except Exception:
+        pass
+    return ""
+
+
 def _has_used_free_credit(email: str) -> bool:
-    """In-memory check (fast) + persistent Supabase check (cross-restart)."""
-    fp = _make_fingerprint()
-    if email in _used_emails or fp in _used_fingerprints:
+    """
+    Check whether this email address or device already consumed a free credit.
+    Two independent signals:
+      - IP+UA fingerprint  (fast, works even without cookie)
+      - Cookie device ID   (reliable across IP changes, set by JS)
+    Each is checked in-memory first, then in Supabase.
+    """
+    fp  = _make_fingerprint()
+    did = _get_cookie_device_id()
+
+    if email in _used_emails:
         return True
-    # Persistent check — catches new sessions after server restart
-    return _is_fingerprint_used_in_supabase(fp)
+    if fp in _used_fingerprints:
+        return True
+    if did and ("c:" + did) in _used_fingerprints:
+        return True
+
+    # Persistent DB checks (survive server restarts and multi-worker deployments)
+    if _is_fingerprint_used_in_supabase(fp):
+        return True
+    if did and _is_fingerprint_used_in_supabase("c:" + did):
+        return True
+
+    return False
 
 
 def _mark_free_credit_used(email: str) -> None:
-    fp = _make_fingerprint()
+    """
+    Persist both the IP+UA fingerprint and the cookie device ID so that
+    subsequent attempts from the same device — even with a different email
+    or after an IP change — are blocked.
+    """
+    fp  = _make_fingerprint()
+    did = _get_cookie_device_id()
+
     _used_emails.add(email.lower().strip())
     _used_fingerprints.add(fp)
     _save_fingerprint_to_supabase(fp, email)
+
+    if did:
+        _used_fingerprints.add("c:" + did)
+        _save_fingerprint_to_supabase("c:" + did, email)
 
 
 def _is_rate_limited() -> bool:
@@ -1972,6 +2021,33 @@ st.set_page_config(
 _init_session()
 _inject_css()
 
+# ── Device ID cookie — injected on every page load via component iframe ───────
+# The iframe runs on the same domain (capmp3.com), so document.cookie applies
+# to capmp3.com and will be sent in the Cookie header on subsequent WS upgrades.
+# Python reads it via st.context.headers → _get_cookie_device_id().
+_components.html(
+    """
+    <script>
+    (function () {
+        try {
+            var K = 'capmp3_did';
+            var did = localStorage.getItem(K);
+            if (!did || !/^[0-9a-f]{32}$/.test(did)) {
+                var a = new Uint8Array(16);
+                crypto.getRandomValues(a);
+                did = Array.from(a, function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+                localStorage.setItem(K, did);
+            }
+            // 2-year cookie on root path — sent with every request to this domain
+            var exp = new Date(Date.now() + 730 * 86400000).toUTCString();
+            document.cookie = K + '=' + did + '; expires=' + exp + '; path=/; SameSite=Lax';
+        } catch (e) {}
+    })();
+    </script>
+    """,
+    height=0,
+)
+
 # ── Page routing ──────────────────────────────────────────────────────────────
 if st.query_params.get("page") == "terms":
     _render_terms()
@@ -2162,6 +2238,11 @@ if st.session_state.show_gate and not st.session_state.registered:
         st.session_state.do_convert         = (assigned > 0)
         # Persist: upsert user row (preserves existing balance on conflict)
         _save_email_to_supabase(clean_email)
+        # KEY: lock the fingerprint + cookie device ID immediately when the free
+        # credit is reserved — even if the conversion later fails, the same device
+        # cannot claim another free credit with a different email address.
+        if assigned == FREE_CREDITS:
+            _mark_free_credit_used(clean_email)
         st.rerun()
 
 # ── Post-registration: auto-trigger conversion ────────────────────────────────
