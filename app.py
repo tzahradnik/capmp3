@@ -6,11 +6,12 @@ Run: streamlit run app.py
 import gc
 import os
 import re
+import socket
 import time
 import tempfile
 import subprocess
 from collections import defaultdict
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 import hashlib
 import html as html_lib
@@ -152,6 +153,32 @@ def _is_rate_limited() -> bool:
         return True
     _request_log[ip].append(now)
     return False
+
+
+def _email_domain_is_real(email: str) -> bool:
+    """
+    Verify that the email domain exists in DNS (A/AAAA or MX record).
+    Catches nonsense domains like khjbr@khtr.khe that have no DNS entry.
+    Returns True (allow) on any timeout/network error so legit users
+    are never blocked by a flaky DNS server.
+    """
+    try:
+        domain = email.split("@", 1)[1].lower().rstrip(".")
+        tld = domain.rsplit(".", 1)[-1]
+        # Reject structurally impossible TLDs (< 2 or > 13 chars)
+        if len(tld) < 2 or len(tld) > 13:
+            return False
+        socket.setdefaulttimeout(3)
+        socket.getaddrinfo(domain, None)
+        return True
+    except socket.gaierror:
+        # NXDOMAIN or similar — domain does not exist
+        return False
+    except Exception:
+        # Network error, timeout, etc. — fail open (don't block real users)
+        return True
+    finally:
+        socket.setdefaulttimeout(None)
 
 
 # ---------------------------------------------------------------------------
@@ -1122,6 +1149,23 @@ def _inject_css() -> None:
             margin: 8px 0 !important;
         }
 
+        /* ── Success box ──────────────────────────────────── */
+        .success-box {
+            background: #F0FDF4 !important;
+            border: 1.5px solid #BBF7D0 !important;
+            border-radius: 12px !important;
+            padding: 16px 20px !important;
+            font-size: 15px !important;
+            color: #14532D !important;
+            -webkit-text-fill-color: #14532D !important;
+            line-height: 1.6 !important;
+            margin: 0 0 16px !important;
+        }
+        .success-box strong {
+            color: #14532D !important;
+            -webkit-text-fill-color: #14532D !important;
+        }
+
         /* ── Status box ───────────────────────────────────── */
         [data-testid="stStatusWidget"] { border-radius: 10px !important; }
 
@@ -1477,6 +1521,17 @@ def _render_pricing() -> None:
         unsafe_allow_html=True,
     )
 
+    # Build Stripe URLs — pre-fill email + pass it as client_reference_id so the
+    # webhook can credit the right account without the user typing it twice.
+    email = st.session_state.get("email", "")
+    if email and not STRIPE_BASIC_URL.endswith("REPLACE_BASIC") and not STRIPE_PRO_URL.endswith("REPLACE_PRO"):
+        _params = urlencode({"client_reference_id": email, "prefilled_email": email})
+        _basic_url = f"{STRIPE_BASIC_URL}?{_params}"
+        _pro_url   = f"{STRIPE_PRO_URL}?{_params}"
+    else:
+        _basic_url = STRIPE_BASIC_URL
+        _pro_url   = STRIPE_PRO_URL
+
     col1, col2, col3 = st.columns(3, gap="small")
 
     with col1:
@@ -1492,7 +1547,7 @@ def _render_pricing() -> None:
                     <li>190 kbps quality</li>
                     <li>cap.so &amp; cap.link</li>
                 </ul>
-                <a href="{STRIPE_BASIC_URL}" target="_blank" rel="noopener" class="plan-btn">Get Starter →</a>
+                <a href="{_basic_url}" target="_blank" rel="noopener" class="plan-btn">Get Starter →</a>
             </div>
             """,
             unsafe_allow_html=True,
@@ -1513,7 +1568,7 @@ def _render_pricing() -> None:
                     <li>cap.so &amp; cap.link</li>
                     <li>Priority processing</li>
                 </ul>
-                <a href="{STRIPE_PRO_URL}" target="_blank" rel="noopener" class="plan-btn plan-btn-primary">Get Pro →</a>
+                <a href="{_pro_url}" target="_blank" rel="noopener" class="plan-btn plan-btn-primary">Get Pro →</a>
             </div>
             """,
             unsafe_allow_html=True,
@@ -2128,6 +2183,19 @@ if st.query_params.get("page") == "terms":
     _render_terms()
     st.stop()
 
+# ── Payment success handler ───────────────────────────────────────────────────
+if st.query_params.get("payment") == "success":
+    # Reload credits from DB — Stripe webhook may have already credited the account
+    email = st.session_state.get("email", "")
+    if email:
+        fresh = _load_credits_from_supabase(email)
+        if fresh is not None:
+            st.session_state.credits = fresh
+    # Show success banner (cleared after rerun by removing the query param)
+    st.session_state["_payment_success"] = True
+    # Remove the ?payment=success param so a reload doesn't show it again
+    st.query_params.clear()
+
 # ── ffmpeg guard ─────────────────────────────────────────────────────────────
 if not check_ffmpeg():
     st.error(
@@ -2161,6 +2229,18 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# ── Payment success banner ────────────────────────────────────────────────────
+if st.session_state.pop("_payment_success", False):
+    credits = _credits()
+    label   = "credit" if credits == 1 else "credits"
+    st.markdown(
+        f'<div class="success-box">'
+        f'🎉 <strong>Payment successful!</strong> '
+        f'Your account has been topped up. You now have <strong>{credits} {label}</strong> available.'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
 # ── Converter ─────────────────────────────────────────────────────────────────
 with st.form("converter_form", clear_on_submit=False):
@@ -2290,7 +2370,20 @@ if st.session_state.show_gate and not st.session_state.registered:
     if go:
         clean_email = email_input.strip().lower()
         if not clean_email or "@" not in clean_email or "." not in clean_email.split("@")[-1]:
-            st.error("Please enter a valid email address.")
+            st.markdown(
+                '<div class="error-box">Please enter a valid email address.</div>',
+                unsafe_allow_html=True,
+            )
+            st.stop()
+
+        # DNS check — reject domains that don't exist (e.g. khjbr@khtr.khe)
+        if not _email_domain_is_real(clean_email):
+            st.markdown(
+                '<div class="error-box"><strong>Invalid email domain.</strong> '
+                "The domain in your email address doesn't exist. "
+                "Please use a real email address to claim your free download.</div>",
+                unsafe_allow_html=True,
+            )
             st.stop()
 
         db_credits = _load_credits_from_supabase(clean_email)
