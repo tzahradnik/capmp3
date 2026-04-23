@@ -40,6 +40,12 @@ RATE_LIMIT_REQUESTS = 5
 RATE_LIMIT_WINDOW   = 60
 
 # ---------------------------------------------------------------------------
+# Analytics — public IDs (safe to commit, appear in HTML source anyway)
+# ---------------------------------------------------------------------------
+GA4_MEASUREMENT_ID = "G-JE9JPT9V86"
+CLARITY_PROJECT_ID = "wgaot1z1em"
+
+# ---------------------------------------------------------------------------
 # Rate limiting
 # ---------------------------------------------------------------------------
 
@@ -564,6 +570,74 @@ def _save_fingerprint_to_supabase(fp_hash: str, email: str) -> None:
 
 # ---------------------------------------------------------------------------
 # CSS — clean, minimal, trustworthy
+# ---------------------------------------------------------------------------
+# Analytics injection
+# ---------------------------------------------------------------------------
+
+def _inject_analytics() -> None:
+    """
+    Inject GA4 + Microsoft Clarity into the PARENT frame (top-level window).
+
+    Streamlit components run inside a same-origin iframe so we can reach
+    window.parent.document and append <script> tags directly to <head>.
+    Guards (__ga4_injected / __clarity_injected) prevent duplicate injection
+    on Streamlit reruns.
+    """
+    ga4_ready     = GA4_MEASUREMENT_ID     and not GA4_MEASUREMENT_ID.endswith("XXXXXXXXXX")
+    clarity_ready = CLARITY_PROJECT_ID     and not CLARITY_PROJECT_ID.endswith("XXXXXXXXXX")
+
+    if not ga4_ready and not clarity_ready:
+        return  # neither configured — skip silently
+
+    ga4_block = ""
+    if ga4_ready:
+        ga4_block = f"""
+                // ── Google Analytics 4 ──────────────────────────────────────
+                if (!p.__ga4_injected) {{
+                    p.__ga4_injected = true;
+                    var ga = p.document.createElement('script');
+                    ga.async = true;
+                    ga.src = 'https://www.googletagmanager.com/gtag/js?id={GA4_MEASUREMENT_ID}';
+                    p.document.head.appendChild(ga);
+                    p.dataLayer = p.dataLayer || [];
+                    p.gtag = function() {{ p.dataLayer.push(arguments); }};
+                    p.gtag('js', new Date());
+                    p.gtag('config', '{GA4_MEASUREMENT_ID}', {{
+                        send_page_view: true,
+                        anonymize_ip: true
+                    }});
+                }}"""
+
+    clarity_block = ""
+    if clarity_ready:
+        clarity_block = f"""
+                // ── Microsoft Clarity ────────────────────────────────────────
+                if (!p.__clarity_injected) {{
+                    p.__clarity_injected = true;
+                    (function(c,l,a,r,i,t,y){{
+                        c[a]=c[a]||function(){{(c[a].q=c[a].q||[]).push(arguments)}};
+                        t=l.createElement(r);t.async=1;
+                        t.src='https://www.clarity.ms/tag/'+i;
+                        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                    }})(p,p.document,'clarity','script','{CLARITY_PROJECT_ID}');
+                }}"""
+
+    _components.html(
+        f"""
+        <script>
+        (function() {{
+            try {{
+                var p = window.parent;
+                {ga4_block}
+                {clarity_block}
+            }} catch(e) {{}}
+        }})();
+        </script>
+        """,
+        height=0,
+    )
+
+
 # ---------------------------------------------------------------------------
 
 def _inject_css() -> None:
@@ -2020,6 +2094,7 @@ st.set_page_config(
 
 _init_session()
 _inject_css()
+_inject_analytics()
 
 # ── Device ID cookie — injected on every page load via component iframe ───────
 # The iframe runs on the same domain (capmp3.com), so document.cookie applies
