@@ -1957,7 +1957,7 @@ def _render_terms() -> None:
             <span class="logo-text">CapMP3</span>
         </div>
         <h1 class="tos-h1">Terms of Service</h1>
-        <p class="tos-updated">Last updated: April 19, 2026</p>
+        <p class="tos-updated">Last updated: April 23, 2026</p>
 
         <div class="tos-disclaimer">
             <strong>⚠ Legal Disclaimer</strong>
@@ -1973,12 +1973,22 @@ def _render_terms() -> None:
             which may affect or disable CapMP3 without notice.</p>
         </div>
 
-        <h2 class="tos-h2">1. General Provisions</h2>
+        <h2 class="tos-h2">1. Operator Identification</h2>
+        <p class="tos-p">The Service capmp3.com is operated by:</p>
+        <p class="tos-p">
+            <strong>Tomáš Zahradník</strong><br>
+            Business ID (IČO): 00731447<br>
+            Kounicova 509/54, 602 00 Brno, Czech Republic<br>
+            Email: info@capmp3.com
+        </p>
+        <p class="tos-p">(hereinafter referred to as "CapMP3", "we", "us", or "our")</p>
+
+        <h2 class="tos-h2">2. General Provisions</h2>
         <p class="tos-p">Welcome to CapMP3 (capmp3.com) — a browser-based tool that converts cap.so and cap.link
         screen recordings to MP3 audio files. By accessing or using the Service, you agree to be bound
         by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.</p>
 
-        <h2 class="tos-h2">2. Service Description</h2>
+        <h2 class="tos-h2">3. Service Description</h2>
         <p class="tos-p">CapMP3 provides a technical conversion utility that:</p>
         <ul class="tos-ul">
             <li>Accepts a publicly accessible cap.so or cap.link URL submitted by the user</li>
@@ -1989,12 +1999,12 @@ def _render_terms() -> None:
         <p class="tos-p">CapMP3 does not index, archive, cache, or redistribute any recording content.
         All temporary files are permanently deleted within seconds of the user's download completing.</p>
 
-        <h2 class="tos-h2">3. User Eligibility</h2>
-        <p class="tos-p">You must be at least 13 years of age (or the applicable age of digital consent in your
-        jurisdiction, which may be higher) to use the Service. By using the Service, you represent and
-        warrant that you meet this requirement.</p>
+        <h2 class="tos-h2">4. User Eligibility</h2>
+        <p class="tos-p">You must be at least <strong>18 years of age</strong> to use the Service,
+        particularly to make any purchase. By using the Service, you represent and warrant that you
+        meet this requirement and are legally capable of entering into a binding contract.</p>
 
-        <h2 class="tos-h2">4. Acceptable Use & User Responsibilities</h2>
+        <h2 class="tos-h2">5. Acceptable Use & User Responsibilities</h2>
         <p class="tos-p">By using the Service, you represent, warrant, and agree that:</p>
         <ul class="tos-ul">
             <li>You are the owner of the cap.so or cap.link recording you are converting,
@@ -2013,28 +2023,47 @@ def _render_terms() -> None:
             with all applicable laws in your jurisdiction.</li>
         </ul>
 
-        <h2 class="tos-h2">5. Intellectual Property</h2>
+        <h2 class="tos-h2">6. Intellectual Property</h2>
         <p class="tos-p">CapMP3 does not claim ownership of any recordings processed through the Service.
         All cap.so recordings remain the property of their respective creators and rights holders.</p>
         <p class="tos-p">CapMP3 operates solely as a technical conversion utility. The responsibility
         for ensuring that the conversion and use of any audio file complies with applicable copyright
         law rests entirely with the user.</p>
 
-        <h2 class="tos-h2">6. Credits, Payments & Refunds</h2>
-        <ul class="tos-ul">
-            <li><strong>Free credit:</strong> One (1) free conversion credit is provided upon email
-            registration. This credit carries no monetary value and cannot be transferred or
-            exchanged for cash.</li>
-            <li><strong>Paid credits:</strong> Additional credits are available for purchase via
-            Stripe. All prices are listed in USD. By purchasing credits, you also agree to
-            <a href="https://stripe.com/legal/ssa" target="_blank">Stripe's Terms of Service</a>.</li>
-            <li><strong>No refunds:</strong> Credits are non-refundable once purchased, as they
-            represent access to a digital service consumed on demand. If a conversion fails due
-            to a verified error on our part, the credit will be restored to your account.</li>
-            <li><strong>Credit expiry:</strong> Purchased credits do not expire.</li>
-        </ul>
+        <h2 class="tos-h2">7. Credits, Payments & Refund Policy</h2>
+        <p class="tos-p"><strong>Free credit:</strong> One (1) free conversion credit is provided upon email
+        registration. This credit carries no monetary value and cannot be transferred or exchanged for cash.</p>
 
-        <h2 class="tos-h2">7. Privacy & Data Processing</h2>
+        <p class="tos-p"><strong>Paid credits:</strong> Additional credits are available for purchase via Stripe.
+        All prices are listed in USD and are inclusive of any applicable taxes unless stated otherwise.
+        By completing a purchase, you also agree to
+        <a href="https://stripe.com/legal/ssa" target="_blank" rel="noopener">Stripe's Terms of Service</a>.</p>
+
+        <p class="tos-p"><strong>Delivery of digital goods:</strong> Credits are a digital product.
+        Upon successful payment confirmation by Stripe, credits are credited to your account
+        <strong>immediately and automatically</strong>. By initiating a purchase, you explicitly request
+        immediate access to the digital content and acknowledge that the service begins at the moment
+        of payment confirmation.</p>
+
+        <div class="tos-risk">
+            <strong>No Refund Policy</strong><br>
+            All credit purchases are <strong>final and non-refundable</strong>. Because credits represent
+            access to a digital service that is made available immediately upon payment and is consumed
+            on demand, no right of withdrawal or refund applies after the payment is confirmed.<br><br>
+            The sole exception: if a technical error verifiably attributable to CapMP3 causes a credit
+            to be deducted without a successful conversion, that credit will be restored to your account.
+            To report such an issue, contact info@capmp3.com within 14 days of the failed transaction,
+            including your registered email address and the approximate date and time of the attempt.
+        </div>
+
+        <p class="tos-p" style="margin-top:12px;"><strong>Credit expiry:</strong> Purchased credits do not expire.</p>
+
+        <p class="tos-p"><strong>Payment disputes (chargebacks):</strong> We take payment disputes seriously.
+        If you believe an unauthorised charge has occurred, contact us at info@capmp3.com before
+        initiating a chargeback with your card issuer. Fraudulent or unjustified chargebacks may result
+        in permanent suspension of your account.</p>
+
+        <h2 class="tos-h2">8. Privacy & Data Processing</h2>
         <p class="tos-p">We collect and process the following personal data:</p>
         <ul class="tos-ul">
             <li><strong>Email address</strong> — collected voluntarily at registration, used solely
@@ -2042,23 +2071,27 @@ def _render_terms() -> None:
             any time by contacting us.</li>
             <li><strong>IP address</strong> — processed ephemerally for rate limiting and abuse
             prevention. Not stored beyond the current session window.</li>
+            <li><strong>Payment data</strong> — processed exclusively by Stripe. CapMP3 does not
+            store or have access to your card number or other payment credentials.</li>
         </ul>
         <p class="tos-p">We do not collect, store, or process the content of any recording submitted
-        to the Service. We do not sell, rent, or share personal data with third parties.</p>
+        to the Service. We do not sell, rent, or share personal data with third parties, except
+        as necessary to process payments (Stripe) or as required by law.</p>
         <p class="tos-p"><strong>EU/EEA users (GDPR):</strong> You have the right to access, rectify,
         erase, and port your personal data, and to withdraw consent at any time. To exercise these
         rights, contact us at info@capmp3.com. You also have the right to lodge a complaint
-        with your local supervisory authority.</p>
+        with your local supervisory authority (in the Czech Republic: Úřad pro ochranu osobních
+        údajů, uoou.cz).</p>
 
-        <h2 class="tos-h2">8. Disclaimer of Warranties</h2>
+        <h2 class="tos-h2">9. Disclaimer of Warranties</h2>
         <p class="tos-p">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICE IS PROVIDED
         "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
         BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE,
         OR NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE,
         OR THAT ANY SPECIFIC RECORDING WILL BE PROCESSABLE.</p>
 
-        <h2 class="tos-h2">9. Limitation of Liability</h2>
-        <p class="tos-p">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CAPMP3 AND ITS OPERATORS
+        <h2 class="tos-h2">10. Limitation of Liability</h2>
+        <p class="tos-p">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CAPMP3 AND ITS OPERATOR
         SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES,
         INCLUDING BUT NOT LIMITED TO LOSS OF DATA, REVENUE, OR PROFITS, ARISING OUT OF OR IN CONNECTION
         WITH THE USE OF THE SERVICE.</p>
@@ -2067,7 +2100,7 @@ def _render_terms() -> None:
         the claim. Users in jurisdictions that do not allow limitation of liability for personal
         injury or consequential damages may not be subject to this limitation.</p>
 
-        <h2 class="tos-h2">10. DMCA & Copyright Complaints</h2>
+        <h2 class="tos-h2">11. DMCA & Copyright Complaints</h2>
         <p class="tos-p">If you believe that a recording processed through CapMP3 infringes your
         copyright, please send a written notice to:</p>
         <p class="tos-p">
@@ -2082,19 +2115,17 @@ def _render_terms() -> None:
         <p class="tos-p">Note: CapMP3 does not store or host any recording content. DMCA notices may
         be forwarded to cap.so or the relevant CDN provider as appropriate.</p>
 
-        <h2 class="tos-h2">11. Third-Party Services</h2>
+        <h2 class="tos-h2">12. Third-Party Services</h2>
         <p class="tos-p">The Service integrates with:</p>
         <ul class="tos-ul">
             <li><strong>cap.so / Cap Software, Inc.</strong> — for accessing publicly shared
             recordings. CapMP3 is not affiliated with or endorsed by Cap Software, Inc.</li>
-            <li><strong>Stripe</strong> — for payment processing. Credit purchases are subject to
-            Stripe's Terms of Service and Privacy Policy.</li>
+            <li><strong>Stripe, Inc.</strong> — for payment processing. CapMP3 does not store
+            payment card data. Stripe processes payments in accordance with PCI-DSS standards.
+            See <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a>
+            and <a href="https://stripe.com/legal/ssa" target="_blank" rel="noopener">Terms of Service</a>.</li>
+            <li><strong>Supabase</strong> — for secure storage of email addresses and credit balances.</li>
         </ul>
-
-        <h2 class="tos-h2">12. Changes to Terms</h2>
-        <p class="tos-p">We reserve the right to modify these Terms at any time. Material changes
-        will be notified via the Service. Continued use of the Service after changes are posted
-        constitutes acceptance of the revised Terms.</p>
 
         <h2 class="tos-h2">13. Anti-Spam Policy</h2>
         <p class="tos-p">We commit to the following:</p>
@@ -2107,20 +2138,32 @@ def _render_terms() -> None:
         <p class="tos-p">If you receive an unsolicited message appearing to promote CapMP3, please
         contact info@capmp3.com immediately.</p>
 
-        <h2 class="tos-h2">14. Governing Law & Dispute Resolution</h2>
+        <h2 class="tos-h2">14. Changes to Terms</h2>
+        <p class="tos-p">We reserve the right to modify these Terms at any time. Material changes
+        will be communicated via the Service. Continued use of the Service after changes are posted
+        constitutes acceptance of the revised Terms.</p>
+
+        <h2 class="tos-h2">15. Governing Law & Dispute Resolution</h2>
         <p class="tos-p">These Terms shall be governed by and construed in accordance with the laws
         of the Czech Republic, without regard to its conflict of law provisions. Any disputes arising
         under these Terms shall be subject to the exclusive jurisdiction of the competent courts of
         the Czech Republic.</p>
         <p class="tos-p">For users in the European Union, mandatory consumer protection provisions
         of your country of residence apply in addition to the above, and nothing in these Terms
-        limits rights you have under EU consumer law.</p>
+        limits rights you have under EU consumer law. EU users may also use the European Commission's
+        Online Dispute Resolution platform:
+        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</p>
 
-        <h2 class="tos-h2">15. Contact Information</h2>
-        <p class="tos-p">For questions, complaints, or requests relating to these Terms:</p>
+        <h2 class="tos-h2">16. Contact Information</h2>
+        <p class="tos-p">For questions, complaints, refund requests, or data-related inquiries:</p>
         <p class="tos-p">
+            <strong>Tomáš Zahradník</strong><br>
+            Kounicova 509/54, 602 00 Brno, Czech Republic<br>
             <strong>Email:</strong> info@capmp3.com<br>
             <strong>Website:</strong> capmp3.com
+        </p>
+        <p class="tos-p" style="color:#94A3B8;font-size:14px;">
+            We aim to respond to all enquiries within 3 business days.
         </p>
         """,
         unsafe_allow_html=True,
