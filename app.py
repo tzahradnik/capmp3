@@ -811,7 +811,7 @@ def _inject_css() -> None:
             border-radius: 10px !important;
             color: #475569 !important;
             font-weight: 500 !important;
-            font-size: 15px !important;
+            font-size: 16px !important;
             transition: border-color .15s, color .15s !important;
         }
         .stButton > button[kind="secondary"]:hover,
@@ -832,7 +832,7 @@ def _inject_css() -> None:
             display: inline-flex !important;
             align-items: center !important;
             gap: 6px !important;
-            font-size: 13px !important;
+            font-size: 16px !important;
             color: #94A3B8 !important;
             -webkit-text-fill-color: #94A3B8 !important;
             font-weight: 500 !important;
@@ -871,7 +871,7 @@ def _inject_css() -> None:
         }
         .privacy-note {
             text-align: center !important;
-            font-size: 13px !important;
+            font-size: 16px !important;
             color: #94A3B8 !important;
             -webkit-text-fill-color: #94A3B8 !important;
             margin: 8px 0 0 !important;
@@ -891,7 +891,7 @@ def _inject_css() -> None:
             border: 1px solid #BFDBFE;
             border-radius: 999px;
             padding: 5px 12px;
-            font-size: 13px;
+            font-size: 16px;
             color: #2563EB;
             font-weight: 500;
             margin-bottom: 16px;
@@ -908,9 +908,9 @@ def _inject_css() -> None:
             text-align: center;
         }
         .pricing-label {
-            font-size: 12px !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
-            letter-spacing: .1em !important;
+            letter-spacing: .06em !important;
             color: #2563EB !important;
             -webkit-text-fill-color: #2563EB !important;
             margin: 0 0 6px !important;
@@ -924,7 +924,7 @@ def _inject_css() -> None:
             letter-spacing: -.02em !important;
         }
         .pricing-sub {
-            font-size: 15px !important;
+            font-size: 16px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
             margin: 0 !important;
@@ -948,19 +948,19 @@ def _inject_css() -> None:
             transform: translateX(-50%);
             background: linear-gradient(135deg, #2563EB, #7C3AED);
             color: #fff;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: .1em;
-            padding: 3px 10px;
+            letter-spacing: .08em;
+            padding: 4px 12px;
             border-radius: 999px;
             white-space: nowrap;
         }
-        .plan-name  { font-size: 14px !important; font-weight: 600 !important; color: #64748B !important; -webkit-text-fill-color: #64748B !important; margin: 0 0 8px !important; }
+        .plan-name  { font-size: 16px !important; font-weight: 600 !important; color: #64748B !important; -webkit-text-fill-color: #64748B !important; margin: 0 0 8px !important; }
         .plan-price { font-size: 32px !important; font-weight: 800 !important; color: #0F172A !important; -webkit-text-fill-color: #0F172A !important; margin: 0 !important; line-height: 1 !important; letter-spacing: -.03em !important; }
-        .plan-credits { font-size: 14px !important; color: #2563EB !important; -webkit-text-fill-color: #2563EB !important; font-weight: 600 !important; margin: 5px 0 2px !important; }
-        .plan-unit  { font-size: 13px !important; color: #94A3B8 !important; -webkit-text-fill-color: #94A3B8 !important; margin: 0 0 16px !important; }
+        .plan-credits { font-size: 16px !important; color: #2563EB !important; -webkit-text-fill-color: #2563EB !important; font-weight: 600 !important; margin: 5px 0 2px !important; }
+        .plan-unit  { font-size: 16px !important; color: #94A3B8 !important; -webkit-text-fill-color: #94A3B8 !important; margin: 0 0 16px !important; }
         .plan-features { list-style: none !important; padding: 0 !important; margin: 0 0 20px !important; }
-        .plan-features li { font-size: 14px !important; color: #64748B !important; -webkit-text-fill-color: #64748B !important; padding: 3px 0 !important; }
+        .plan-features li { font-size: 16px !important; color: #64748B !important; -webkit-text-fill-color: #64748B !important; padding: 3px 0 !important; }
 
         /* ── Hide Streamlit heading anchor icons ─────────── */
         [data-testid="stMarkdownContainer"] h1 a,
@@ -972,7 +972,7 @@ def _inject_css() -> None:
 
         /* ── Converter form card ──────────────────────────── */
         .url-label {
-            font-size: 14px !important;
+            font-size: 16px !important;
             font-weight: 600 !important;
             color: #374151 !important;
             -webkit-text-fill-color: #374151 !important;
@@ -1045,7 +1045,7 @@ def _inject_css() -> None:
         }
         .stProgress > div > div > p,
         [data-testid="stProgressBarMessage"] {
-            font-size: 13px !important;
+            font-size: 16px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
             font-weight: 500 !important;
@@ -1070,10 +1070,10 @@ def _inject_css() -> None:
             display: inline-block;
             background: linear-gradient(135deg, #2563EB, #7C3AED);
             color: #fff;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: .1em;
-            padding: 3px 10px;
+            letter-spacing: .08em;
+            padding: 4px 12px;
             border-radius: 999px;
             margin-bottom: 10px;
             text-transform: uppercase;
@@ -1112,9 +1112,9 @@ def _inject_css() -> None:
         }
 
         /* ── Alerts ───────────────────────────────────────── */
-        .stAlert { border-radius: 12px !important; font-size: 15px !important; }
+        .stAlert { border-radius: 12px !important; font-size: 16px !important; }
         [data-testid="stAlert"] p {
-            font-size: 15px !important;
+            font-size: 16px !important;
             color: inherit !important;
             -webkit-text-fill-color: inherit !important;
             line-height: 1.6 !important;
@@ -1127,7 +1127,7 @@ def _inject_css() -> None:
             border: 1.5px solid #FECACA !important;
             border-radius: 12px !important;
             padding: 16px 20px !important;
-            font-size: 15px !important;
+            font-size: 16px !important;
             color: #991B1B !important;
             -webkit-text-fill-color: #991B1B !important;
             line-height: 1.6 !important;
@@ -1142,7 +1142,7 @@ def _inject_css() -> None:
             border: 1.5px solid #FDE68A !important;
             border-radius: 12px !important;
             padding: 16px 20px !important;
-            font-size: 15px !important;
+            font-size: 16px !important;
             color: #92400E !important;
             -webkit-text-fill-color: #92400E !important;
             line-height: 1.6 !important;
@@ -1155,7 +1155,7 @@ def _inject_css() -> None:
             border: 1.5px solid #BBF7D0 !important;
             border-radius: 12px !important;
             padding: 16px 20px !important;
-            font-size: 15px !important;
+            font-size: 16px !important;
             color: #14532D !important;
             -webkit-text-fill-color: #14532D !important;
             line-height: 1.6 !important;
@@ -1185,9 +1185,9 @@ def _inject_css() -> None:
         /* ── Content sections ────────────────────────────── */
         .content-section { margin: 56px 0 0 !important; }
         .content-label {
-            font-size: 12px !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
-            letter-spacing: .1em !important;
+            letter-spacing: .06em !important;
             color: #2563EB !important;
             margin: 0 0 6px !important;
             text-transform: uppercase !important;
@@ -1220,7 +1220,7 @@ def _inject_css() -> None:
             gap: 10px !important;
         }
         .feature-list li {
-            font-size: 15px !important;
+            font-size: 16px !important;
             color: #374151 !important;
             display: flex !important;
             align-items: flex-start !important;
@@ -1251,12 +1251,12 @@ def _inject_css() -> None:
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            width: 30px !important; height: 30px !important;
+            width: 32px !important; height: 32px !important;
             background: linear-gradient(135deg, #2563EB, #7C3AED) !important;
             border-radius: 50% !important;
             color: #fff !important;
             -webkit-text-fill-color: #fff !important;
-            font-size: 13px !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
             margin-bottom: 12px !important;
         }
@@ -1268,7 +1268,7 @@ def _inject_css() -> None:
             margin: 0 0 6px !important;
         }
         .step-desc {
-            font-size: 14px !important;
+            font-size: 16px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
             line-height: 1.6 !important;
@@ -1289,14 +1289,14 @@ def _inject_css() -> None:
         }
         .use-case-icon { font-size: 22px !important; margin-bottom: 8px !important; }
         .use-case-title {
-            font-size: 15px !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
             color: #0F172A !important;
             -webkit-text-fill-color: #0F172A !important;
             margin: 0 0 5px !important;
         }
         .use-case-desc {
-            font-size: 14px !important;
+            font-size: 16px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
             line-height: 1.6 !important;
@@ -1351,7 +1351,7 @@ def _inject_css() -> None:
         .preview-status {
             grid-column: 2 !important;
             grid-row: 1 !important;
-            font-size: 11px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
             letter-spacing: .07em !important;
             color: #16A34A !important;
@@ -1362,7 +1362,7 @@ def _inject_css() -> None:
         .preview-title {
             grid-column: 2 !important;
             grid-row: 2 !important;
-            font-size: 15px !important;
+            font-size: 16px !important;
             font-weight: 600 !important;
             color: #0F172A !important;
             -webkit-text-fill-color: #0F172A !important;
@@ -1374,7 +1374,7 @@ def _inject_css() -> None:
         .preview-hint {
             grid-column: 2 !important;
             grid-row: 3 !important;
-            font-size: 13px !important;
+            font-size: 16px !important;
             color: #64748B !important;
             -webkit-text-fill-color: #64748B !important;
             margin: 0 !important;
@@ -1404,7 +1404,7 @@ def _inject_css() -> None:
             letter-spacing: -.02em !important;
         }
         .success-sub {
-            font-size: 14px !important;
+            font-size: 16px !important;
             color: #065F46 !important;
             -webkit-text-fill-color: #065F46 !important;
             margin: 0 !important;
@@ -1419,7 +1419,7 @@ def _inject_css() -> None:
             border-radius: 10px !important;
             color: #374151 !important;
             -webkit-text-fill-color: #374151 !important;
-            font-size: 15px !important;
+            font-size: 16px !important;
             font-weight: 600 !important;
             padding: 13px 20px !important;
             text-align: center !important;
@@ -1474,7 +1474,7 @@ def _inject_css() -> None:
             color: #0F172A !important;
         }
         [data-testid="stExpanderDetails"] p {
-            font-size: 15px !important;
+            font-size: 16px !important;
             color: #475569 !important;
             line-height: 1.7 !important;
         }
@@ -1483,7 +1483,7 @@ def _inject_css() -> None:
         .footer {
             text-align: center;
             padding: 48px 0 0;
-            font-size: 13px;
+            font-size: 16px;
             color: #CBD5E1;
         }
         .footer a { color: #CBD5E1; text-decoration: none; }
@@ -1932,19 +1932,19 @@ def _render_terms() -> None:
     st.markdown(
         """
         <style>
-        .tos-h1  { font-size:32px; font-weight:800; color:#0F172A; margin:0 0 4px; letter-spacing:-.02em; }
-        .tos-updated { font-size:14px; color:#94A3B8; margin:0 0 40px; }
+        .tos-h1  { font-size:30px; font-weight:800; color:#0F172A; margin:0 0 4px; letter-spacing:-.02em; }
+        .tos-updated { font-size:16px; color:#94A3B8; margin:0 0 20px; }
         .tos-disclaimer {
             background:#FFF7ED; border:1.5px solid #FED7AA; border-radius:12px;
-            padding:20px 24px; margin-bottom:32px;
+            padding:16px 20px; margin-bottom:16px;
         }
         .tos-disclaimer strong { color:#C2410C; }
-        .tos-disclaimer p { font-size:15px; color:#78350F; margin:4px 0 0; line-height:1.65; }
-        .tos-h2  { font-size:22px; font-weight:700; color:#0F172A; margin:36px 0 10px; letter-spacing:-.01em; }
-        .tos-p   { font-size:16px; color:#374151; line-height:1.75; margin:0 0 12px; }
-        .tos-ul  { padding-left:20px; margin:0 0 14px; }
-        .tos-ul li { font-size:16px; color:#374151; line-height:1.75; }
-        .tos-risk { background:#FEF2F2; border:1px solid #FECACA; border-radius:8px; padding:12px 16px; margin:8px 0; font-size:15px; color:#991B1B; }
+        .tos-disclaimer p { font-size:16px; color:#78350F; margin:4px 0 0; line-height:1.6; }
+        .tos-h2  { font-size:20px; font-weight:700; color:#0F172A; margin:20px 0 6px; letter-spacing:-.01em; }
+        .tos-p   { font-size:16px; color:#374151; line-height:1.7; margin:0 0 8px; }
+        .tos-ul  { padding-left:20px; margin:0 0 8px; }
+        .tos-ul li { font-size:16px; color:#374151; line-height:1.7; margin-bottom:3px; }
+        .tos-risk { background:#FEF2F2; border:1px solid #FECACA; border-radius:8px; padding:12px 16px; margin:8px 0; font-size:16px; color:#991B1B; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -1973,22 +1973,13 @@ def _render_terms() -> None:
             which may affect or disable CapMP3 without notice.</p>
         </div>
 
-        <h2 class="tos-h2">1. Operator Identification</h2>
-        <p class="tos-p">The Service capmp3.com is operated by:</p>
-        <p class="tos-p">
-            <strong>Tomáš Zahradník</strong><br>
-            Business ID (IČO): 00731447<br>
-            Kounicova 509/54, 602 00 Brno, Czech Republic<br>
-            Email: info@capmp3.com
-        </p>
-        <p class="tos-p">(hereinafter referred to as "CapMP3", "we", "us", or "our")</p>
-
-        <h2 class="tos-h2">2. General Provisions</h2>
+        <h2 class="tos-h2">1. General Provisions</h2>
         <p class="tos-p">Welcome to CapMP3 (capmp3.com) — a browser-based tool that converts cap.so and cap.link
-        screen recordings to MP3 audio files. By accessing or using the Service, you agree to be bound
-        by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.</p>
+        screen recordings to MP3 audio files. The Service is operated by Tomáš Zahradník (IČO: 00731447),
+        hereinafter referred to as "CapMP3", "we", "us", or "our". By accessing or using the Service,
+        you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the Service.</p>
 
-        <h2 class="tos-h2">3. Service Description</h2>
+        <h2 class="tos-h2">2. Service Description</h2>
         <p class="tos-p">CapMP3 provides a technical conversion utility that:</p>
         <ul class="tos-ul">
             <li>Accepts a publicly accessible cap.so or cap.link URL submitted by the user</li>
@@ -1999,12 +1990,12 @@ def _render_terms() -> None:
         <p class="tos-p">CapMP3 does not index, archive, cache, or redistribute any recording content.
         All temporary files are permanently deleted within seconds of the user's download completing.</p>
 
-        <h2 class="tos-h2">4. User Eligibility</h2>
+        <h2 class="tos-h2">3. User Eligibility</h2>
         <p class="tos-p">You must be at least <strong>18 years of age</strong> to use the Service,
         particularly to make any purchase. By using the Service, you represent and warrant that you
         meet this requirement and are legally capable of entering into a binding contract.</p>
 
-        <h2 class="tos-h2">5. Acceptable Use & User Responsibilities</h2>
+        <h2 class="tos-h2">4. Acceptable Use & User Responsibilities</h2>
         <p class="tos-p">By using the Service, you represent, warrant, and agree that:</p>
         <ul class="tos-ul">
             <li>You are the owner of the cap.so or cap.link recording you are converting,
@@ -2023,14 +2014,14 @@ def _render_terms() -> None:
             with all applicable laws in your jurisdiction.</li>
         </ul>
 
-        <h2 class="tos-h2">6. Intellectual Property</h2>
+        <h2 class="tos-h2">5. Intellectual Property</h2>
         <p class="tos-p">CapMP3 does not claim ownership of any recordings processed through the Service.
         All cap.so recordings remain the property of their respective creators and rights holders.</p>
         <p class="tos-p">CapMP3 operates solely as a technical conversion utility. The responsibility
         for ensuring that the conversion and use of any audio file complies with applicable copyright
         law rests entirely with the user.</p>
 
-        <h2 class="tos-h2">7. Credits, Payments & Refund Policy</h2>
+        <h2 class="tos-h2">6. Credits, Payments & Refund Policy</h2>
         <p class="tos-p"><strong>Free credit:</strong> One (1) free conversion credit is provided upon email
         registration. This credit carries no monetary value and cannot be transferred or exchanged for cash.</p>
 
@@ -2063,7 +2054,7 @@ def _render_terms() -> None:
         initiating a chargeback with your card issuer. Fraudulent or unjustified chargebacks may result
         in permanent suspension of your account.</p>
 
-        <h2 class="tos-h2">8. Privacy & Data Processing</h2>
+        <h2 class="tos-h2">7. Privacy & Data Processing</h2>
         <p class="tos-p">We collect and process the following personal data:</p>
         <ul class="tos-ul">
             <li><strong>Email address</strong> — collected voluntarily at registration, used solely
@@ -2083,14 +2074,14 @@ def _render_terms() -> None:
         with your local supervisory authority (in the Czech Republic: Úřad pro ochranu osobních
         údajů, uoou.cz).</p>
 
-        <h2 class="tos-h2">9. Disclaimer of Warranties</h2>
+        <h2 class="tos-h2">8. Disclaimer of Warranties</h2>
         <p class="tos-p">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICE IS PROVIDED
         "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
         BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE,
         OR NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE,
         OR THAT ANY SPECIFIC RECORDING WILL BE PROCESSABLE.</p>
 
-        <h2 class="tos-h2">10. Limitation of Liability</h2>
+        <h2 class="tos-h2">9. Limitation of Liability</h2>
         <p class="tos-p">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CAPMP3 AND ITS OPERATOR
         SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES,
         INCLUDING BUT NOT LIMITED TO LOSS OF DATA, REVENUE, OR PROFITS, ARISING OUT OF OR IN CONNECTION
@@ -2100,7 +2091,7 @@ def _render_terms() -> None:
         the claim. Users in jurisdictions that do not allow limitation of liability for personal
         injury or consequential damages may not be subject to this limitation.</p>
 
-        <h2 class="tos-h2">11. DMCA & Copyright Complaints</h2>
+        <h2 class="tos-h2">10. DMCA & Copyright Complaints</h2>
         <p class="tos-p">If you believe that a recording processed through CapMP3 infringes your
         copyright, please send a written notice to:</p>
         <p class="tos-p">
@@ -2115,7 +2106,7 @@ def _render_terms() -> None:
         <p class="tos-p">Note: CapMP3 does not store or host any recording content. DMCA notices may
         be forwarded to cap.so or the relevant CDN provider as appropriate.</p>
 
-        <h2 class="tos-h2">12. Third-Party Services</h2>
+        <h2 class="tos-h2">11. Third-Party Services</h2>
         <p class="tos-p">The Service integrates with:</p>
         <ul class="tos-ul">
             <li><strong>cap.so / Cap Software, Inc.</strong> — for accessing publicly shared
@@ -2127,7 +2118,7 @@ def _render_terms() -> None:
             <li><strong>Supabase</strong> — for secure storage of email addresses and credit balances.</li>
         </ul>
 
-        <h2 class="tos-h2">13. Anti-Spam Policy</h2>
+        <h2 class="tos-h2">12. Anti-Spam Policy</h2>
         <p class="tos-p">We commit to the following:</p>
         <ul class="tos-ul">
             <li>CapMP3 will never be promoted through unsolicited messages of any kind</li>
@@ -2138,12 +2129,12 @@ def _render_terms() -> None:
         <p class="tos-p">If you receive an unsolicited message appearing to promote CapMP3, please
         contact info@capmp3.com immediately.</p>
 
-        <h2 class="tos-h2">14. Changes to Terms</h2>
+        <h2 class="tos-h2">13. Changes to Terms</h2>
         <p class="tos-p">We reserve the right to modify these Terms at any time. Material changes
         will be communicated via the Service. Continued use of the Service after changes are posted
         constitutes acceptance of the revised Terms.</p>
 
-        <h2 class="tos-h2">15. Governing Law & Dispute Resolution</h2>
+        <h2 class="tos-h2">14. Governing Law & Dispute Resolution</h2>
         <p class="tos-p">These Terms shall be governed by and construed in accordance with the laws
         of the Czech Republic, without regard to its conflict of law provisions. Any disputes arising
         under these Terms shall be subject to the exclusive jurisdiction of the competent courts of
@@ -2154,15 +2145,16 @@ def _render_terms() -> None:
         Online Dispute Resolution platform:
         <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</p>
 
-        <h2 class="tos-h2">16. Contact Information</h2>
+        <h2 class="tos-h2">15. Contact & Operator Information</h2>
         <p class="tos-p">For questions, complaints, refund requests, or data-related inquiries:</p>
         <p class="tos-p">
             <strong>Tomáš Zahradník</strong><br>
+            Business ID (IČO): 00731447<br>
             Kounicova 509/54, 602 00 Brno, Czech Republic<br>
             <strong>Email:</strong> info@capmp3.com<br>
             <strong>Website:</strong> capmp3.com
         </p>
-        <p class="tos-p" style="color:#94A3B8;font-size:14px;">
+        <p class="tos-p" style="color:#94A3B8;">
             We aim to respond to all enquiries within 3 business days.
         </p>
         """,
