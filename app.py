@@ -2150,12 +2150,8 @@ def _render_terms() -> None:
         <p class="tos-p">
             <strong>Tozame s.r.o.</strong><br>
             Nové sady 988/2, 602 00 Brno, Czech Republic<br>
-            IČO: 11726938 · DIČ: CZ11726938<br>
-            Registered in the Commercial Register maintained by the Regional Court in Brno,
-            file no. C 124382<br>
-            Not registered as a VAT payer in the Czech Republic.<br>
-            <strong>Email:</strong> info@capmp3.com<br>
-            <strong>Website:</strong> capmp3.com
+            IČO: 11726938<br>
+            <strong>Email:</strong> info@capmp3.com
         </p>
         <p class="tos-p" style="color:#94A3B8;">
             We aim to respond to all enquiries within 3 business days.
