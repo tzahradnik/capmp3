@@ -1957,7 +1957,7 @@ def _render_terms() -> None:
             <span class="logo-text">CapMP3</span>
         </div>
         <h1 class="tos-h1">Terms of Service</h1>
-        <p class="tos-updated">Last updated: April 23, 2026</p>
+        <p class="tos-updated">Last updated: April 24, 2026</p>
 
         <div class="tos-disclaimer">
             <strong>⚠ Legal Disclaimer</strong>
@@ -1975,7 +1975,7 @@ def _render_terms() -> None:
 
         <h2 class="tos-h2">1. General Provisions</h2>
         <p class="tos-p">Welcome to CapMP3 (capmp3.com) — a browser-based tool that converts cap.so and cap.link
-        screen recordings to MP3 audio files. The Service is operated by Tomáš Zahradník (IČO: 00731447),
+        screen recordings to MP3 audio files. The Service is operated by Tozame s.r.o. (IČO: 11726938),
         hereinafter referred to as "CapMP3", "we", "us", or "our". By accessing or using the Service,
         you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the Service.</p>
 
@@ -2148,9 +2148,12 @@ def _render_terms() -> None:
         <h2 class="tos-h2">15. Contact & Operator Information</h2>
         <p class="tos-p">For questions, complaints, refund requests, or data-related inquiries:</p>
         <p class="tos-p">
-            <strong>Tomáš Zahradník</strong><br>
-            Business ID (IČO): 00731447<br>
-            Kounicova 509/54, 602 00 Brno, Czech Republic<br>
+            <strong>Tozame s.r.o.</strong><br>
+            Nové sady 988/2, 602 00 Brno, Czech Republic<br>
+            IČO: 11726938 · DIČ: CZ11726938<br>
+            Registered in the Commercial Register maintained by the Regional Court in Brno,
+            file no. C 124382<br>
+            Not registered as a VAT payer in the Czech Republic.<br>
             <strong>Email:</strong> info@capmp3.com<br>
             <strong>Website:</strong> capmp3.com
         </p>
