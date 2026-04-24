@@ -2212,6 +2212,23 @@ _components.html(
     height=0,
 )
 
+# ── Persist email in cookie so it survives the Stripe redirect ────────────────
+_em = st.session_state.get("email", "")
+if _em:
+    _components.html(
+        f"""
+        <script>
+        (function() {{
+            try {{
+                var exp = new Date(Date.now() + 30 * 86400000).toUTCString();
+                document.cookie = 'capmp3_em={html_lib.escape(_em)}; expires=' + exp + '; path=/; SameSite=Lax';
+            }} catch (e) {{}}
+        }})();
+        </script>
+        """,
+        height=0,
+    )
+
 # ── Page routing ──────────────────────────────────────────────────────────────
 if st.query_params.get("page") == "terms":
     _render_terms()
@@ -2219,15 +2236,28 @@ if st.query_params.get("page") == "terms":
 
 # ── Payment success handler ───────────────────────────────────────────────────
 if st.query_params.get("payment") == "success":
-    # Reload credits from DB — Stripe webhook may have already credited the account
+    # Email may be missing — session is fresh after Stripe redirect.
+    # Fall back to the capmp3_em cookie stored before the user left for Stripe.
     email = st.session_state.get("email", "")
+    if not email:
+        try:
+            cookie_header = st.context.headers.get("Cookie", "")
+            for _part in cookie_header.split(";"):
+                _k, _, _v = _part.strip().partition("=")
+                if _k.strip() == "capmp3_em":
+                    _candidate = _v.strip()
+                    if "@" in _candidate and len(_candidate) <= 254:
+                        email = _candidate
+                    break
+        except Exception:
+            pass
     if email:
         fresh = _load_credits_from_supabase(email)
         if fresh is not None:
-            st.session_state.credits = fresh
-    # Show success banner (cleared after rerun by removing the query param)
+            st.session_state.email      = email
+            st.session_state.registered = True
+            st.session_state.credits    = fresh
     st.session_state["_payment_success"] = True
-    # Remove the ?payment=success param so a reload doesn't show it again
     st.query_params.clear()
 
 # ── ffmpeg guard ─────────────────────────────────────────────────────────────
