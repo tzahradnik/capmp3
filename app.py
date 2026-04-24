@@ -33,8 +33,8 @@ except ImportError:
 MAX_VIDEO_MB = 1500
 FREE_CREDITS = 1
 
-STRIPE_BASIC_URL = "https://buy.stripe.com/REPLACE_BASIC"
-STRIPE_PRO_URL   = "https://buy.stripe.com/REPLACE_PRO"
+STRIPE_BASIC_URL = "https://buy.stripe.com/5kQeVdaHV20cd871mvdMI00"
+STRIPE_PRO_URL   = "https://buy.stripe.com/8x26oHaHV48kecbaX5dMI01"
 CONTACT_EMAIL    = "info@capmp3.com"
 
 RATE_LIMIT_REQUESTS = 5
