@@ -2452,7 +2452,7 @@ if st.session_state.do_convert and st.session_state.registered and st.session_st
     st.session_state.do_convert = False
     _run_conversion(st.session_state.pending_url)
 
-# ── Out of credits → show pricing ─────────────────────────────────────────────
+# ── Out of credits warning ────────────────────────────────────────────────────
 if st.session_state.registered and _credits() <= 0 and not st.session_state.do_convert:
     st.markdown(
         '<div class="warn-box" style="margin-top:12px;">'
@@ -2462,10 +2462,12 @@ if st.session_state.registered and _credits() <= 0 and not st.session_state.do_c
         '</div>',
         unsafe_allow_html=True,
     )
-    _render_pricing()
 
 # ── Content & FAQ ─────────────────────────────────────────────────────────────
 _render_content()
+
+# ── Pricing ───────────────────────────────────────────────────────────────────
+_render_pricing()
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown(
