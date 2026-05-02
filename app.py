@@ -2142,19 +2142,39 @@ def _render_terms() -> None:
     st.markdown(
         """
         <style>
-        .tos-h1  { font-size:30px; font-weight:800; color:#0F172A; margin:0 0 4px; letter-spacing:-.02em; }
-        .tos-updated { font-size:16px; color:#94A3B8; margin:0 0 20px; }
-        .tos-disclaimer {
-            background:#FFF7ED; border:1.5px solid #FED7AA; border-radius:12px;
-            padding:16px 20px; margin-bottom:16px;
+        .tos-h1  {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size:30px; font-weight:700; color:#F1F5F9;
+            -webkit-text-fill-color:#F1F5F9;
+            margin:0 0 4px; letter-spacing:-.025em;
         }
-        .tos-disclaimer strong { color:#C2410C; }
-        .tos-disclaimer p { font-size:16px; color:#78350F; margin:4px 0 0; line-height:1.6; }
-        .tos-h2  { font-size:20px; font-weight:700; color:#0F172A; margin:20px 0 6px; letter-spacing:-.01em; }
-        .tos-p   { font-size:16px; color:#374151; line-height:1.7; margin:0 0 8px; }
+        .tos-updated { font-size:16px; color:rgba(148,163,184,.70); -webkit-text-fill-color:rgba(148,163,184,.70); margin:0 0 20px; }
+        .tos-disclaimer {
+            background:rgba(245,158,11,.08); border:1.5px solid rgba(245,158,11,.25);
+            border-radius:12px; padding:16px 20px; margin-bottom:16px;
+        }
+        .tos-disclaimer strong { color:#FDE68A; -webkit-text-fill-color:#FDE68A; }
+        .tos-disclaimer p { font-size:16px; color:rgba(253,230,138,.85); -webkit-text-fill-color:rgba(253,230,138,.85); margin:4px 0 0; line-height:1.6; }
+        .tos-h2  {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size:18px; font-weight:700; color:#F1F5F9;
+            -webkit-text-fill-color:#F1F5F9;
+            margin:24px 0 6px; letter-spacing:-.01em;
+        }
+        .tos-p   { font-size:16px; color:rgba(203,213,225,.78); -webkit-text-fill-color:rgba(203,213,225,.78); line-height:1.7; margin:0 0 8px; }
+        .tos-p a { color:#67E8F9 !important; -webkit-text-fill-color:#67E8F9 !important; }
+        .tos-p strong { color:#F1F5F9; -webkit-text-fill-color:#F1F5F9; }
         .tos-ul  { padding-left:20px; margin:0 0 8px; }
-        .tos-ul li { font-size:16px; color:#374151; line-height:1.7; margin-bottom:3px; }
-        .tos-risk { background:#FEF2F2; border:1px solid #FECACA; border-radius:8px; padding:12px 16px; margin:8px 0; font-size:16px; color:#991B1B; }
+        .tos-ul li { font-size:16px; color:rgba(203,213,225,.78); -webkit-text-fill-color:rgba(203,213,225,.78); line-height:1.7; margin-bottom:3px; }
+        .tos-ul li strong { color:#F1F5F9; -webkit-text-fill-color:#F1F5F9; }
+        .tos-ul a { color:#67E8F9 !important; -webkit-text-fill-color:#67E8F9 !important; }
+        .tos-risk {
+            background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.22);
+            border-radius:10px; padding:14px 18px; margin:10px 0;
+            font-size:16px; color:#FCA5A5; -webkit-text-fill-color:#FCA5A5;
+            line-height:1.65;
+        }
+        .tos-risk strong { color:#FECACA; -webkit-text-fill-color:#FECACA; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -2163,8 +2183,19 @@ def _render_terms() -> None:
     st.markdown(
         """
         <div class="logo" style="margin-bottom:32px;">
-            <div class="logo-mark">🎵</div>
-            <span class="logo-text">CapMP3</span>
+            <svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+                <defs>
+                    <linearGradient id="cap-grad-tos" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#7C3AED"/>
+                        <stop offset="1" stop-color="#06B6D4"/>
+                    </linearGradient>
+                </defs>
+                <path d="M44 14a22 22 0 1 0 0 36" stroke="url(#cap-grad-tos)" stroke-width="6" stroke-linecap="round" fill="none"/>
+                <rect x="42" y="26" width="5" height="12" rx="2.5" fill="url(#cap-grad-tos)"/>
+                <rect x="50" y="20" width="5" height="24" rx="2.5" fill="url(#cap-grad-tos)"/>
+                <rect x="58" y="28" width="5" height="8"  rx="2.5" fill="url(#cap-grad-tos)"/>
+            </svg>
+            <span class="logo-text">cap<span class="logo-mp3">mp3</span></span>
         </div>
         <h1 class="tos-h1">Terms of Service</h1>
         <p class="tos-updated">Last updated: April 24, 2026</p>
@@ -2363,7 +2394,7 @@ def _render_terms() -> None:
             IČO: 11726938<br>
             <strong>Email:</strong> info@capmp3.com
         </p>
-        <p class="tos-p" style="color:#94A3B8;">
+        <p class="tos-p" style="color:rgba(148,163,184,.60); -webkit-text-fill-color:rgba(148,163,184,.60);">
             We aim to respond to all enquiries within 3 business days.
         </p>
         """,
@@ -2372,9 +2403,11 @@ def _render_terms() -> None:
 
     st.markdown(
         """
-        <div style="margin-top:48px; padding-top:24px; border-top:1px solid #F1F5F9;
-                    text-align:center; font-size:13px; color:#CBD5E1;">
-            capmp3.com · <a href="/" style="color:#CBD5E1; text-decoration:none;">← Back to converter</a>
+        <div style="margin-top:48px; padding-top:24px;
+                    border-top:1px solid rgba(148,163,184,.10);
+                    text-align:center; font-size:13px;
+                    color:rgba(148,163,184,.60);">
+            capmp3.com &middot; <a href="/" style="color:rgba(148,163,184,.60); text-decoration:none;">← Back to converter</a>
         </div>
         """,
         unsafe_allow_html=True,
