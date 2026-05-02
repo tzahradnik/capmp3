@@ -953,12 +953,12 @@ def _inject_css() -> None:
 
         /* ── Hero ─────────────────────────────────────────── */
         .hero-title {
-            font-size: clamp(36px, 5.6vw, 60px) !important;
+            font-size: clamp(28px, 4.2vw, 48px) !important;
             font-weight: 700 !important;
             line-height: 1.05 !important;
             color: #F1F5F9 !important;
             -webkit-text-fill-color: #F1F5F9 !important;
-            margin: 0 0 16px !important;
+            margin: 0 0 12px !important;
             letter-spacing: -.03em !important;
         }
         .grad {
@@ -968,10 +968,10 @@ def _inject_css() -> None:
             background-clip: text;
         }
         .hero-sub {
-            font-size: 18px !important;
+            font-size: 16px !important;
             color: rgba(203,213,225,.78) !important;
             -webkit-text-fill-color: rgba(203,213,225,.78) !important;
-            margin: 0 0 32px !important;
+            margin: 0 0 24px !important;
             line-height: 1.55 !important;
         }
 
@@ -1269,13 +1269,13 @@ def _inject_css() -> None:
             overflow: hidden !important;
         }
 
-        /* 2 — Inner flex row (padding 6, gap 10 per spec) */
+        /* 2 — Inner flex row */
         [data-testid="stForm"] [data-testid="stVerticalBlock"] {
             display: flex !important;
             flex-direction: row !important;
             align-items: center !important;
-            gap: 10px !important;
-            padding: 6px !important;
+            gap: 8px !important;
+            padding: 5px !important;
             margin: 0 !important;
         }
 
@@ -1298,8 +1298,8 @@ def _inject_css() -> None:
         [data-testid="stForm"] [data-baseweb="input"] {
             display: flex !important;
             align-items: center !important;
-            height: 60px !important;
-            border-radius: 16px !important;
+            height: 48px !important;
+            border-radius: 13px !important;
             background: rgba(2,6,23,.35) !important;
             border: 1px solid rgba(148,163,184,.10) !important;
             box-shadow: none !important;
@@ -1355,9 +1355,9 @@ def _inject_css() -> None:
             margin: 0 !important;
         }
         [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button {
-            height: 60px !important;
-            padding: 0 28px !important;
-            border-radius: 16px !important;
+            height: 48px !important;
+            padding: 0 24px !important;
+            border-radius: 13px !important;
             border: none !important;
             white-space: nowrap !important;
             font-size: 15px !important;
@@ -2796,7 +2796,7 @@ with st.form("converter_form", clear_on_submit=False):
         placeholder="Paste a cap.so video URL",
         label_visibility="collapsed",
     )
-    clicked = st.form_submit_button("Convert now →", type="primary", use_container_width=False)
+    clicked = st.form_submit_button("Convert →", type="primary", use_container_width=False)
 
 # Credit pill — only shown when registered
 if st.session_state.registered:
