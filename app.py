@@ -1034,9 +1034,10 @@ def _inject_css() -> None:
         .stFormSubmitButton > button[kind="primary"]:hover,
         [data-testid="stFormSubmitButton"] > button:hover,
         [data-testid="stBaseButton-primary"]:hover {
-            transform: scale(1.03) !important;
-            box-shadow: 0 12px 32px rgba(124,58,237,.40),
-                        inset 0 0 0 1px rgba(255,255,255,.18) !important;
+            transform: translateY(-1px) !important;
+            filter: brightness(1.12) !important;
+            box-shadow: 0 16px 40px rgba(124,58,237,.50),
+                        inset 0 0 0 1px rgba(255,255,255,.20) !important;
         }
 
         /* ── Secondary / link buttons ─────────────────────── */
@@ -1075,12 +1076,13 @@ def _inject_css() -> None:
             gap: 12px;
         }
         .trust-tile {
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            background: rgba(15,23,42,.50);
-            border: 1px solid rgba(148,163,184,.12);
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: rgba(15,23,42,.60);
+            border: 1px solid rgba(148,163,184,.14);
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
+            backdrop-filter: blur(8px);
         }
         .trust-text {
             display: flex;
@@ -1167,21 +1169,15 @@ def _inject_css() -> None:
             max-width: 720px;
             text-align: center;
         }
-        .pricing-label {
-            font-size: 12.5px !important;
-            font-weight: 500 !important;
-            letter-spacing: 0 !important;
-            color: #67E8F9 !important;
-            -webkit-text-fill-color: #67E8F9 !important;
-            margin: 0 0 6px !important;
-        }
+        /* pricing-label shares pill style with content-label (defined above) */
         .pricing-title {
-            font-size: 26px !important;
-            font-weight: 700 !important;
+            font-size: 40px !important;
+            font-weight: 800 !important;
             color: #F1F5F9 !important;
             -webkit-text-fill-color: #F1F5F9 !important;
-            margin: 0 0 6px !important;
-            letter-spacing: -.025em !important;
+            margin: 0 0 8px !important;
+            letter-spacing: -.035em !important;
+            line-height: 1.1 !important;
         }
         .pricing-sub {
             font-size: 16px !important;
@@ -1246,26 +1242,24 @@ def _inject_css() -> None:
         }
         /* ── Form card — glass + single row layout ────────── */
         [data-testid="stForm"] {
-            background: rgba(15,23,42,.60);
-            border: 1px solid rgba(148,163,184,.20);
+            background: rgba(8,12,28,.82) !important;
+            border: 1px solid rgba(148,163,184,.14) !important;
             border-radius: 22px;
-            padding: 8px !important;
-            backdrop-filter: blur(26px);
-            -webkit-backdrop-filter: blur(26px);
-            box-shadow: 0 20px 60px -20px rgba(124,58,237,.35),
-                        inset 0 0 0 1px rgba(255,255,255,.04);
+            padding: 7px !important;
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
             max-width: 720px !important;
             margin-left: auto !important;
             margin-right: auto !important;
             overflow: hidden !important;
-            transition: border-color .25s, box-shadow .25s;
+            transition: border-color .22s, box-shadow .22s;
         }
         /* Glow on focus-within — matches design inputFocusRing */
         [data-testid="stForm"]:focus-within {
-            border-color: rgba(6,182,212,.40) !important;
-            box-shadow: 0 20px 60px -20px rgba(124,58,237,.35),
-                        0 0 0 3px rgba(6,182,212,.13),
-                        inset 0 0 28px rgba(6,182,212,.06) !important;
+            border-color: rgba(6,182,212,.50) !important;
+            box-shadow: 0 0 0 3px rgba(6,182,212,.14),
+                        inset 0 0 32px rgba(6,182,212,.07) !important;
         }
         /* Horizontal row: input + button */
         [data-testid="stForm"] [data-testid="stVerticalBlock"] {
@@ -1286,10 +1280,13 @@ def _inject_css() -> None:
         [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button {
             white-space: nowrap !important;
             width: auto !important;
-            padding: 0 28px !important;
-            height: 52px !important;
-            border-radius: 16px !important;
+            padding: 0 32px !important;
+            height: 54px !important;
+            border-radius: 15px !important;
             margin: 0 !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            letter-spacing: .01em !important;
         }
         /* Hide "Press Enter to submit form" Streamlit hint */
         [data-testid="InputInstructions"],
@@ -1309,9 +1306,9 @@ def _inject_css() -> None:
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input {
             background: transparent !important;
             border: none !important;
-            font-size: 16px !important;
-            height: 52px !important;
-            line-height: 52px !important;
+            font-size: 15.5px !important;
+            height: 54px !important;
+            line-height: 54px !important;
             padding: 0 18px 0 44px !important;
             color: #F1F5F9 !important;
             -webkit-text-fill-color: #F1F5F9 !important;
@@ -1522,25 +1519,30 @@ def _inject_css() -> None:
         .content-section {
             margin: 56px auto 0 !important;
             max-width: 720px !important;
-        }
-        .content-label {
-            font-size: 12.5px !important;
-            font-weight: 500 !important;
-            letter-spacing: 0 !important;
-            color: #67E8F9 !important;
-            -webkit-text-fill-color: #67E8F9 !important;
-            margin: 0 0 6px !important;
-            text-transform: uppercase !important;
-            display: block !important;
             text-align: center !important;
         }
+        /* ── Section pill badge ───────────────────────────── */
+        .content-label, .pricing-label {
+            display: inline-block !important;
+            padding: 5px 16px !important;
+            border-radius: 999px !important;
+            border: 1px solid rgba(6,182,212,.30) !important;
+            background: rgba(6,182,212,.07) !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            letter-spacing: .10em !important;
+            color: #67E8F9 !important;
+            -webkit-text-fill-color: #67E8F9 !important;
+            text-transform: uppercase !important;
+            margin: 0 0 18px !important;
+        }
         .content-h2 {
-            font-size: 26px !important;
-            font-weight: 700 !important;
+            font-size: 40px !important;
+            font-weight: 800 !important;
             color: #F1F5F9 !important;
             -webkit-text-fill-color: #F1F5F9 !important;
-            margin: 0 0 14px !important;
-            letter-spacing: -.025em !important;
+            margin: 0 0 20px !important;
+            letter-spacing: -.035em !important;
             line-height: 1.1 !important;
             display: block !important;
             text-align: center !important;
@@ -1592,19 +1594,25 @@ def _inject_css() -> None:
             padding: 20px 16px !important;
             backdrop-filter: blur(14px) !important;
             -webkit-backdrop-filter: blur(14px) !important;
+            transition: border-color .22s, box-shadow .22s !important;
+        }
+        .step-card:hover {
+            border-color: rgba(6,182,212,.35) !important;
+            box-shadow: 0 8px 32px rgba(6,182,212,.10) !important;
         }
         .step-num {
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            width: 32px !important; height: 32px !important;
+            width: 40px !important; height: 40px !important;
             background: linear-gradient(135deg, #7C3AED, #06B6D4) !important;
             border-radius: 50% !important;
             color: #fff !important;
             -webkit-text-fill-color: #fff !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
-            margin-bottom: 12px !important;
+            font-size: 17px !important;
+            font-weight: 800 !important;
+            margin-bottom: 14px !important;
+            box-shadow: 0 4px 16px rgba(124,58,237,.35) !important;
         }
         .step-title {
             font-size: 16px !important;
@@ -1631,11 +1639,27 @@ def _inject_css() -> None:
             background: rgba(15,23,42,.50) !important;
             border: 1px solid rgba(148,163,184,.12) !important;
             border-radius: 18px !important;
-            padding: 16px !important;
+            padding: 20px !important;
             backdrop-filter: blur(14px) !important;
             -webkit-backdrop-filter: blur(14px) !important;
+            transition: border-color .22s, box-shadow .22s !important;
+            text-align: left !important;
         }
-        .use-case-icon { font-size: 22px !important; margin-bottom: 8px !important; }
+        .use-case:hover {
+            border-color: rgba(6,182,212,.35) !important;
+            box-shadow: 0 8px 32px rgba(6,182,212,.10) !important;
+        }
+        /* ── Icon tile (use-cases + trust-bar style) ─────── */
+        .icon-tile {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(124,58,237,.22), rgba(6,182,212,.18));
+            border: 1px solid rgba(148,163,184,.15);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+        .use-case-icon { margin-bottom: 0 !important; }
         .use-case-title {
             font-size: 16px !important;
             font-weight: 700 !important;
@@ -2037,22 +2061,38 @@ def _render_content() -> None:
             <h2 class="content-h2">Why extract audio from cap.so recordings?</h2>
             <div class="use-cases">
                 <div class="use-case">
-                    <div class="use-case-icon">🎙️</div>
+                    <div class="use-case-icon">
+                        <div class="icon-tile">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#67E8F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        </div>
+                    </div>
                     <p class="use-case-title">Transcription</p>
                     <p class="use-case-desc">Feed the MP3 into Whisper, Otter.ai, Descript, or Notion AI for automatic transcription of meetings, demos, and walkthroughs.</p>
                 </div>
                 <div class="use-case">
-                    <div class="use-case-icon">🎧</div>
+                    <div class="use-case-icon">
+                        <div class="icon-tile">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#67E8F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+                        </div>
+                    </div>
                     <p class="use-case-title">Offline listening</p>
                     <p class="use-case-desc">Play back meeting recaps and briefings without an internet connection or the cap.so app — on any device that supports MP3.</p>
                 </div>
                 <div class="use-case">
-                    <div class="use-case-icon">🎚️</div>
+                    <div class="use-case-icon">
+                        <div class="icon-tile">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#67E8F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+                        </div>
+                    </div>
                     <p class="use-case-title">Podcast &amp; video production</p>
                     <p class="use-case-desc">Use interview or presentation audio as raw material in your podcast editor, Premiere Pro, or DaVinci Resolve.</p>
                 </div>
                 <div class="use-case">
-                    <div class="use-case-icon">🗄️</div>
+                    <div class="use-case-icon">
+                        <div class="icon-tile">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#67E8F9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                        </div>
+                    </div>
                     <p class="use-case-title">Archiving</p>
                     <p class="use-case-desc">Create lightweight audio backups of important cap.so sessions — much smaller than the original video file.</p>
                 </div>
