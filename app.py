@@ -928,10 +928,11 @@ def _inject_css() -> None:
             .feature-list { grid-template-columns: 1fr !important; }
         }
 
-        /* ── Logo ─────────────────────────────────────────── */
+        /* ── Logo — centered ─────────────────────────────── */
         .logo {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 9px;
             margin-bottom: 24px;
         }
@@ -1062,25 +1063,42 @@ def _inject_css() -> None:
         .trust-bar {
             display: flex;
             justify-content: center;
-            gap: 24px;
+            align-items: center;
+            gap: 36px;
             flex-wrap: wrap;
-            margin: 20px 0 0;
+            margin: 28px auto 0;
+            max-width: 720px;
         }
-        .trust-item {
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-            font-size: 16px !important;
+        .trust-tile-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .trust-tile {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: rgba(15,23,42,.50);
+            border: 1px solid rgba(148,163,184,.12);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .trust-text {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .trust-label {
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+            color: #F1F5F9 !important;
+            -webkit-text-fill-color: #F1F5F9 !important;
+            line-height: 1.2 !important;
+        }
+        .trust-sub {
+            font-size: 11.5px !important;
             color: rgba(148,163,184,.70) !important;
             -webkit-text-fill-color: rgba(148,163,184,.70) !important;
-            font-weight: 500 !important;
-        }
-        .trust-dot {
-            display: inline-block !important;
-            width: 3px !important; height: 3px !important;
-            border-radius: 50% !important;
-            background: rgba(148,163,184,.40) !important;
-            flex-shrink: 0 !important;
+            line-height: 1.2 !important;
         }
 
         /* ── Email gate ───────────────────────────────────── */
@@ -1145,7 +1163,8 @@ def _inject_css() -> None:
 
         /* ── Pricing ──────────────────────────────────────── */
         .pricing-header {
-            margin: 40px 0 24px;
+            margin: 40px auto 24px;
+            max-width: 720px;
             text-align: center;
         }
         .pricing-label {
@@ -1225,15 +1244,42 @@ def _inject_css() -> None:
             letter-spacing: -.01em !important;
             display: block !important;
         }
+        /* ── Form card — glass + single row layout ────────── */
         [data-testid="stForm"] {
             background: rgba(15,23,42,.60);
             border: 1px solid rgba(148,163,184,.20);
             border-radius: 22px;
-            padding: 24px !important;
+            padding: 10px !important;
             backdrop-filter: blur(26px);
             -webkit-backdrop-filter: blur(26px);
             box-shadow: 0 20px 60px -20px rgba(124,58,237,.35),
                         inset 0 0 0 1px rgba(255,255,255,.04);
+            max-width: 720px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        /* Horizontal row: input + button */
+        [data-testid="stForm"] [data-testid="stVerticalBlock"] {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+        [data-testid="stForm"] [data-testid="stTextInput"] {
+            flex: 1 !important;
+            min-width: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        [data-testid="stForm"] [data-testid="stFormSubmitButton"] {
+            flex-shrink: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button {
+            white-space: nowrap !important;
+            width: auto !important;
+            padding: 0 28px !important;
+            height: 52px !important;
+            border-radius: 14px !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"],
         [data-testid="stForm"] [data-testid="stTextInput"] > div,
@@ -1245,14 +1291,33 @@ def _inject_css() -> None:
             margin-bottom: 0 !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input {
-            background: rgba(2,6,23,.35) !important;
-            border: 1px solid rgba(148,163,184,.10) !important;
+            background: transparent !important;
+            border: none !important;
             font-size: 16px !important;
+            height: 52px !important;
+            padding: 0 18px 0 44px !important;
+            color: #F1F5F9 !important;
+            -webkit-text-fill-color: #F1F5F9 !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input:focus {
-            border-color: rgba(6,182,212,.40) !important;
-            box-shadow: 0 0 0 3px rgba(6,182,212,.13),
-                        inset 0 0 28px rgba(6,182,212,.10) !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+        /* Link icon left of input */
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div {
+            position: relative !important;
+        }
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div::before {
+            content: '' !important;
+            position: absolute !important;
+            left: 14px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 20px !important; height: 20px !important;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='rgba(148,163,184,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E") no-repeat center !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
         }
 
         /* ── Progress bar ─────────────────────────────────── */
@@ -1301,7 +1366,8 @@ def _inject_css() -> None:
             align-items: center;
             justify-content: space-between;
             gap: 24px;
-            margin: 56px 0 0;
+            margin: 56px auto 0;
+            max-width: 720px;
             flex-wrap: wrap;
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
@@ -1430,8 +1496,11 @@ def _inject_css() -> None:
             box-shadow: 0 12px 28px rgba(124,58,237,.45) !important;
         }
 
-        /* ── Content sections ────────────────────────────── */
-        .content-section { margin: 56px 0 0 !important; }
+        /* ── Content sections — centered at 720px ───────── */
+        .content-section {
+            margin: 56px auto 0 !important;
+            max-width: 720px !important;
+        }
         .content-label {
             font-size: 12.5px !important;
             font-weight: 500 !important;
@@ -1441,6 +1510,7 @@ def _inject_css() -> None:
             margin: 0 0 6px !important;
             text-transform: uppercase !important;
             display: block !important;
+            text-align: center !important;
         }
         .content-h2 {
             font-size: 26px !important;
@@ -1451,6 +1521,7 @@ def _inject_css() -> None:
             letter-spacing: -.025em !important;
             line-height: 1.1 !important;
             display: block !important;
+            text-align: center !important;
         }
         .content-p {
             font-size: 16px !important;
@@ -1462,10 +1533,11 @@ def _inject_css() -> None:
         .feature-list {
             list-style: none !important;
             padding: 0 !important;
-            margin: 0 !important;
+            margin: 0 auto !important;
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
             gap: 10px !important;
+            max-width: 720px !important;
         }
         .feature-list li {
             font-size: 16px !important;
@@ -1488,7 +1560,8 @@ def _inject_css() -> None:
             display: grid !important;
             grid-template-columns: 1fr 1fr 1fr !important;
             gap: 16px !important;
-            margin: 20px 0 0 !important;
+            margin: 20px auto 0 !important;
+            max-width: 720px !important;
         }
         .step-card {
             background: rgba(15,23,42,.50) !important;
@@ -1529,7 +1602,8 @@ def _inject_css() -> None:
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
             gap: 12px !important;
-            margin: 16px 0 0 !important;
+            margin: 16px auto 0 !important;
+            max-width: 720px !important;
         }
         .use-case {
             background: rgba(15,23,42,.50) !important;
@@ -1557,7 +1631,8 @@ def _inject_css() -> None:
         .divider-line {
             border: none;
             border-top: 1px solid rgba(148,163,184,.10);
-            margin: 48px 0;
+            margin: 48px auto;
+            max-width: 720px;
         }
 
         /* ── Video preview card ──────────────────────────── */
@@ -2602,13 +2677,12 @@ if st.session_state.pop("_payment_success", False):
 
 # ── Converter ─────────────────────────────────────────────────────────────────
 with st.form("converter_form", clear_on_submit=False):
-    st.markdown('<p class="url-label">Paste your cap.so or cap.link recording URL</p>', unsafe_allow_html=True)
     url_input = st.text_input(
         "url",
         placeholder="https://cap.so/s/xxxxxxxx  ·  https://cap.link/xxxxxxxx",
         label_visibility="collapsed",
     )
-    clicked = st.form_submit_button("Convert to MP3 →", type="primary", use_container_width=True)
+    clicked = st.form_submit_button("Convert to MP3 →", type="primary", use_container_width=False)
 
 # Credit pill — only shown when registered
 if st.session_state.registered:
@@ -2624,11 +2698,40 @@ if st.session_state.registered:
 st.markdown(
     """
     <div class="trust-bar">
-        <span class="trust-item">🔒 No account needed</span>
-        <span class="trust-dot"></span>
-        <span class="trust-item">⚡ ~30 second conversion</span>
-        <span class="trust-dot"></span>
-        <span class="trust-item">🗑 Files auto-deleted</span>
+        <div class="trust-tile-item">
+            <div class="trust-tile">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+            </div>
+            <div class="trust-text">
+                <span class="trust-label">No account needed</span>
+                <span class="trust-sub">Free · no signup</span>
+            </div>
+        </div>
+        <div class="trust-tile-item">
+            <div class="trust-tile">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+            </div>
+            <div class="trust-text">
+                <span class="trust-label">~30 second conversion</span>
+                <span class="trust-sub">Fast · server-side</span>
+            </div>
+        </div>
+        <div class="trust-tile-item">
+            <div class="trust-tile">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 11 14 15 10"/>
+                </svg>
+            </div>
+            <div class="trust-text">
+                <span class="trust-label">Files auto-deleted</span>
+                <span class="trust-sub">Privacy · no storage</span>
+            </div>
+        </div>
     </div>
     """,
     unsafe_allow_html=True,
