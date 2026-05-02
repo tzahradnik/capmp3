@@ -879,14 +879,50 @@ def _inject_css() -> None:
 
         /* ── Page wrapper: center & constrain width ──────── */
         .block-container {
-            max-width: 720px !important;
-            padding: 48px 40px 64px !important;
+            max-width: 1240px !important;
+            padding: 40px 48px 80px !important;
             margin: 0 auto !important;
             position: relative;
             z-index: 1;
         }
-        @media (max-width: 768px) {
-            .block-container { padding: 32px 20px 48px !important; }
+        /* Hero content stays centered at 720px, full-bleed bg */
+        .hero-wrap {
+            max-width: 720px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        /* Converter card centered at 720px */
+        .converter-wrap {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        [data-testid="stForm"] {
+            max-width: 720px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        /* Center narrow elements within wide layout */
+        .trust-bar, .credit-pill, .success-box, .warn-box,
+        .error-box, .success-card, .gate-card, .preview-card {
+            max-width: 720px;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        /* Download button stays within centered column */
+        [data-testid="stDownloadButton"] {
+            max-width: 720px;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        /* Progress bar centered */
+        [data-testid="stProgressBarContainer"],
+        .stProgress {
+            max-width: 720px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        @media (max-width: 900px) {
+            .block-container { padding: 32px 24px 48px !important; }
             .steps-grid { grid-template-columns: 1fr !important; }
             .use-cases  { grid-template-columns: 1fr !important; }
             .feature-list { grid-template-columns: 1fr !important; }
@@ -897,7 +933,7 @@ def _inject_css() -> None:
             display: flex;
             align-items: center;
             gap: 9px;
-            margin-bottom: 48px;
+            margin-bottom: 24px;
         }
         .logo-text {
             font-size: 18.7px !important;
@@ -2421,7 +2457,7 @@ def _render_terms() -> None:
 st.set_page_config(
     page_title="CapMP3 – Download cap.so & cap.link Recordings as MP3",
     page_icon="🎵",
-    layout="centered",
+    layout="wide",
 )
 
 _init_session()
@@ -2540,12 +2576,14 @@ st.markdown(
 # ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown(
     """
-    <h1 class="hero-title">
-        Convert cap.so &amp; cap.link<br>recordings to <span class="grad">MP3</span>
-    </h1>
-    <p class="hero-sub">
-        Paste any cap.so or cap.link URL and download a clean MP3 in under 30 seconds. Free to try — no install needed.
-    </p>
+    <div style="max-width:720px; margin:0 auto; text-align:center; padding:40px 0 8px;">
+        <h1 class="hero-title">
+            Convert cap.so &amp; cap.link<br>recordings to <span class="grad">MP3</span>
+        </h1>
+        <p class="hero-sub">
+            Paste any cap.so or cap.link URL and download a clean MP3 in under 30 seconds. Free to try — no install needed.
+        </p>
+    </div>
     """,
     unsafe_allow_html=True,
 )
