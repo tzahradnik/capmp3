@@ -1240,129 +1240,137 @@ def _inject_css() -> None:
             letter-spacing: -.01em !important;
             display: block !important;
         }
-        /* ── Form card — glass + single row layout ────────── */
+        /* ══════════════════════════════════════════════════
+           FORM — pixel-matched to landing.jsx design spec
+           cardBg  = rgba(15,23,42,.60)
+           cardBorder = rgba(148,163,184,.30)
+           cardShadow = 0 20px 60px -20px rgba(124,58,237,.35), inset 0 0 0 1px rgba(255,255,255,.04)
+           blur    = 26px
+           innerRow: padding 6px, gap 10px
+           inputBg = rgba(2,6,23,.35), focus rgba(2,6,23,.65)
+           inputBorder = rgba(148,163,184,.10), focus rgba(6,182,212,.40)
+           inputFocusRing = 0 0 0 3px rgba(6,182,212,.13), inset 0 0 28px rgba(6,182,212,.27)
+           height  = 60px, borderRadius = 16px
+        ═══════════════════════════════════════════════════ */
+
+        /* 1 — Outer glass card */
         [data-testid="stForm"] {
-            background: rgba(8,12,28,.82) !important;
-            border: 1px solid rgba(148,163,184,.14) !important;
-            border-radius: 40px !important;
-            padding: 7px !important;
-            backdrop-filter: blur(32px) !important;
-            -webkit-backdrop-filter: blur(32px) !important;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,.04) !important;
+            background: rgba(15,23,42,.60) !important;
+            border: 1px solid rgba(148,163,184,.30) !important;
+            border-radius: 22px !important;
+            padding: 8px !important;
+            backdrop-filter: blur(26px) !important;
+            -webkit-backdrop-filter: blur(26px) !important;
+            box-shadow: 0 20px 60px -20px rgba(124,58,237,.35),
+                        inset 0 0 0 1px rgba(255,255,255,.04) !important;
             max-width: 720px !important;
             margin-left: auto !important;
             margin-right: auto !important;
             overflow: hidden !important;
-            transition: border-color .22s, box-shadow .22s !important;
         }
-        /* Glow on focus-within — matches design inputFocusRing */
-        [data-testid="stForm"]:focus-within {
-            border-color: rgba(6,182,212,.50) !important;
-            box-shadow: 0 0 0 3px rgba(6,182,212,.14),
-                        inset 0 0 32px rgba(6,182,212,.07) !important;
-        }
-        /* Input + button: absolute-position button inside the form */
+
+        /* 2 — Inner flex row (padding 6, gap 10 per spec) */
         [data-testid="stForm"] [data-testid="stVerticalBlock"] {
-            position: relative !important;
-            display: block !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 6px !important;
             margin: 0 !important;
-            padding: 0 !important;
         }
+
+        /* 3 — TextInput flex item */
         [data-testid="stForm"] [data-testid="stTextInput"] {
-            width: 100% !important;
+            flex: 1 !important;
+            min-width: 0 !important;
             margin-bottom: 0 !important;
         }
-        /* Push input text right so it doesn't go under the button */
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input {
-            padding-right: 176px !important;
-        }
-        [data-testid="stForm"] [data-testid="stFormSubmitButton"] {
-            position: absolute !important;
-            right: 0 !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            margin: 0 !important;
-        }
-        [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button {
-            white-space: nowrap !important;
-            width: auto !important;
-            padding: 0 28px !important;
-            height: 54px !important;
-            border-radius: 32px !important;
-            margin: 0 !important;
-            font-size: 15px !important;
-            font-weight: 700 !important;
-            letter-spacing: .01em !important;
-        }
-        /* Hide "Press Enter to submit form" Streamlit hint */
-        [data-testid="InputInstructions"],
-        small[data-testid="InputInstructions"],
-        .stTextInput small {
-            display: none !important;
-        }
-        /* Strip wrapper padding/margin, keep input area clean */
-        [data-testid="stForm"] [data-testid="stTextInput"],
         [data-testid="stForm"] [data-testid="stTextInput"] > div {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
-            margin-bottom: 0 !important;
+            margin: 0 !important;
         }
-        /* Inner input container — styled dark oval */
-        [data-testid="stForm"] [data-baseweb="input"],
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div {
-            background: rgba(4,8,22,.65) !important;
-            border: 1px solid rgba(148,163,184,.15) !important;
-            border-radius: 24px !important;
-            box-shadow: none !important;
-            outline: none !important;
-            position: relative !important;
+
+        /* 4 — Inner input label (the styled dark box) */
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div,
+        [data-testid="stForm"] [data-baseweb="input"] {
             display: flex !important;
             align-items: center !important;
-        }
-        /* Remove BaseWeb's own focus ring */
-        [data-testid="stForm"] [data-baseweb="input"]:focus-within {
-            border-color: rgba(148,163,184,.22) !important;
+            height: 60px !important;
+            border-radius: 16px !important;
+            background: rgba(2,6,23,.35) !important;
+            border: 1px solid rgba(148,163,184,.10) !important;
             box-shadow: none !important;
+            padding: 0 18px 0 14px !important;
+            gap: 10px !important;
+            transition: background .25s ease, border-color .25s ease, box-shadow .25s ease !important;
+            box-sizing: border-box !important;
         }
+        /* Focus state on inner input label */
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div:focus-within,
+        [data-testid="stForm"] [data-baseweb="input"]:focus-within {
+            background: rgba(2,6,23,.65) !important;
+            border-color: rgba(6,182,212,.40) !important;
+            box-shadow: 0 0 0 3px rgba(6,182,212,.13),
+                        inset 0 0 28px rgba(6,182,212,.27) !important;
+        }
+
+        /* 5 — Link icon (inline SVG via ::before) */
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div::before {
+            content: '' !important;
+            width: 20px !important; height: 20px !important;
+            flex-shrink: 0 !important;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='rgba(148,163,184,0.55)' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1'/%3E%3Cpath d='M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1'/%3E%3C/svg%3E") no-repeat center !important;
+            pointer-events: none !important;
+        }
+
+        /* 6 — Actual <input> element */
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input {
+            flex: 1 !important;
             background: transparent !important;
             border: none !important;
-            box-shadow: none !important;
             outline: none !important;
-            font-size: 15.5px !important;
-            height: 54px !important;
-            line-height: 54px !important;
-            padding: 0 18px 0 44px !important;
+            box-shadow: none !important;
             color: #F1F5F9 !important;
             -webkit-text-fill-color: #F1F5F9 !important;
-            vertical-align: middle !important;
-            box-sizing: border-box !important;
+            font-size: 16px !important;
+            font-family: inherit !important;
+            letter-spacing: -.005em !important;
+            height: 100% !important;
+            padding: 0 !important;
+            min-width: 0 !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input:focus,
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input:focus-visible {
             border: none !important;
-            box-shadow: none !important;
             outline: none !important;
+            box-shadow: none !important;
         }
-        /* Link icon left of input */
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div {
-            position: relative !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div::before {
-            content: '' !important;
-            position: absolute !important;
-            left: 14px !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            width: 20px !important; height: 20px !important;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='rgba(148,163,184,0.45)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E") no-repeat center !important;
-            pointer-events: none !important;
-            z-index: 1 !important;
+
+        /* 7 — Submit button */
+        [data-testid="stForm"] [data-testid="stFormSubmitButton"] {
             flex-shrink: 0 !important;
+            margin: 0 !important;
+        }
+        [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button {
+            height: 60px !important;
+            padding: 0 28px !important;
+            border-radius: 16px !important;
+            border: none !important;
+            white-space: nowrap !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            letter-spacing: .005em !important;
+            margin: 0 !important;
+        }
+
+        /* Hide "Press Enter to submit form" Streamlit hint */
+        [data-testid="InputInstructions"],
+        small[data-testid="InputInstructions"],
+        .stTextInput small {
+            display: none !important;
         }
 
         /* ── Progress bar ─────────────────────────────────── */
