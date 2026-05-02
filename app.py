@@ -778,11 +778,11 @@ def _inject_effects() -> None:
                   '@keyframes aurora1{0%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,-40px) scale(1.12)}66%{transform:translate(-30px,50px) scale(.93)}100%{transform:translate(0,0) scale(1)}}',
                   '@keyframes aurora2{0%{transform:translate(0,0) scale(1)}40%{transform:translate(-70px,30px) scale(1.08)}75%{transform:translate(40px,-55px) scale(.95)}100%{transform:translate(0,0) scale(1)}}',
                   '@keyframes aurora3{0%{transform:translate(0,0) scale(1)}30%{transform:translate(50px,60px) scale(1.15)}70%{transform:translate(-40px,-30px) scale(.9)}100%{transform:translate(0,0) scale(1)}}',
-                  '#cap-aurora{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;overflow:hidden;}',
+                  '#cap-aurora{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;}',
                   '#cap-aurora .a1{position:absolute;top:-10%;left:-5%;width:60vw;height:60vw;border-radius:50%;background:radial-gradient(ellipse,rgba(124,58,237,.38) 0%,transparent 70%);filter:blur(60px);animation:aurora1 18s ease-in-out infinite;}',
                   '#cap-aurora .a2{position:absolute;top:30%;right:-10%;width:50vw;height:50vw;border-radius:50%;background:radial-gradient(ellipse,rgba(6,182,212,.28) 0%,transparent 70%);filter:blur(60px);animation:aurora2 22s ease-in-out infinite;}',
                   '#cap-aurora .a3{position:absolute;bottom:-15%;left:25%;width:45vw;height:45vw;border-radius:50%;background:radial-gradient(ellipse,rgba(124,58,237,.22) 0%,transparent 70%);filter:blur(60px);animation:aurora3 26s ease-in-out infinite;}',
-                  '#cap-grid{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;background-image:linear-gradient(rgba(148,163,184,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.04) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);}'
+                  '#cap-grid{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(148,163,184,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.04) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);}'
                 ].join('');
                 d.head.appendChild(style);
 
@@ -796,7 +796,7 @@ def _inject_effects() -> None:
                 /* ── Particle canvas ─────────────────────── */
                 var canvas = d.createElement('canvas');
                 canvas.id = 'cap-particles';
-                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;';
+                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
                 d.body.insertBefore(canvas, d.body.firstChild);
 
                 var ctx = canvas.getContext('2d');
@@ -847,25 +847,26 @@ def _inject_css() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
 
         /* ── Reset & base ─────────────────────────────────── */
-        html, body, [class*="css"] {
+        html, body {
+            background: #0F172A !important;
             font-family: 'Inter', sans-serif !important;
         }
+        [class*="css"] { font-family: 'Inter', sans-serif !important; }
         h1, h2, h3, .hero-title, .gate-title, .pricing-title,
         .content-h2, .referral-title, .success-title, .logo-text {
             font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
         }
+        /* stApp must be transparent so the fixed background effects show through */
         .stApp {
-            background: #0F172A !important;
-            position: relative;
-            z-index: 0;
+            background: transparent !important;
         }
-        /* Ensure Streamlit's main content wrappers sit above background effects */
+        /* Content sits above the z-index:0 effect layers */
         [data-testid="stAppViewContainer"],
         [data-testid="stMain"],
-        [data-testid="stMainBlockContainer"],
-        .main .block-container {
+        [data-testid="stMainBlockContainer"] {
             position: relative !important;
             z-index: 1 !important;
+            background: transparent !important;
         }
 
         /* ── Hide sidebar, toolbar, header ───────────────── */
