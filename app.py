@@ -1244,7 +1244,7 @@ def _inject_css() -> None:
         [data-testid="stForm"] {
             background: rgba(8,12,28,.82) !important;
             border: 1px solid rgba(148,163,184,.14) !important;
-            border-radius: 22px;
+            border-radius: 40px;
             padding: 7px !important;
             backdrop-filter: blur(32px);
             -webkit-backdrop-filter: blur(32px);
@@ -1282,7 +1282,7 @@ def _inject_css() -> None:
             width: auto !important;
             padding: 0 32px !important;
             height: 54px !important;
-            border-radius: 15px !important;
+            border-radius: 32px !important;
             margin: 0 !important;
             font-size: 15px !important;
             font-weight: 700 !important;
