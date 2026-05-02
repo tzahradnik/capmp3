@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /_stcore/
+Disallow: /static/
+
+Sitemap: https://capmp3.com/sitemap.xml
