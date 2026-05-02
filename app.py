@@ -1249,7 +1249,7 @@ def _inject_css() -> None:
             background: rgba(15,23,42,.60);
             border: 1px solid rgba(148,163,184,.20);
             border-radius: 22px;
-            padding: 10px !important;
+            padding: 8px !important;
             backdrop-filter: blur(26px);
             -webkit-backdrop-filter: blur(26px);
             box-shadow: 0 20px 60px -20px rgba(124,58,237,.35),
@@ -1257,6 +1257,15 @@ def _inject_css() -> None:
             max-width: 720px !important;
             margin-left: auto !important;
             margin-right: auto !important;
+            overflow: hidden !important;
+            transition: border-color .25s, box-shadow .25s;
+        }
+        /* Glow on focus-within — matches design inputFocusRing */
+        [data-testid="stForm"]:focus-within {
+            border-color: rgba(6,182,212,.40) !important;
+            box-shadow: 0 20px 60px -20px rgba(124,58,237,.35),
+                        0 0 0 3px rgba(6,182,212,.13),
+                        inset 0 0 28px rgba(6,182,212,.06) !important;
         }
         /* Horizontal row: input + button */
         [data-testid="stForm"] [data-testid="stVerticalBlock"] {
@@ -1279,7 +1288,14 @@ def _inject_css() -> None:
             width: auto !important;
             padding: 0 28px !important;
             height: 52px !important;
-            border-radius: 14px !important;
+            border-radius: 16px !important;
+            margin: 0 !important;
+        }
+        /* Hide "Press Enter to submit form" Streamlit hint */
+        [data-testid="InputInstructions"],
+        small[data-testid="InputInstructions"],
+        .stTextInput small {
+            display: none !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"],
         [data-testid="stForm"] [data-testid="stTextInput"] > div,
@@ -1295,9 +1311,12 @@ def _inject_css() -> None:
             border: none !important;
             font-size: 16px !important;
             height: 52px !important;
+            line-height: 52px !important;
             padding: 0 18px 0 44px !important;
             color: #F1F5F9 !important;
             -webkit-text-fill-color: #F1F5F9 !important;
+            vertical-align: middle !important;
+            box-sizing: border-box !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input:focus {
             border: none !important;
@@ -1307,6 +1326,8 @@ def _inject_css() -> None:
         /* Link icon left of input */
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div {
             position: relative !important;
+            display: flex !important;
+            align-items: center !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div::before {
             content: '' !important;
@@ -1315,9 +1336,10 @@ def _inject_css() -> None:
             top: 50% !important;
             transform: translateY(-50%) !important;
             width: 20px !important; height: 20px !important;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='rgba(148,163,184,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E") no-repeat center !important;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='rgba(148,163,184,0.45)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E") no-repeat center !important;
             pointer-events: none !important;
             z-index: 1 !important;
+            flex-shrink: 0 !important;
         }
 
         /* ── Progress bar ─────────────────────────────────── */
@@ -1804,7 +1826,25 @@ def _inject_css() -> None:
         .footer a:hover { color: #67E8F9; }
 
         /* ── Divider ──────────────────────────────────────── */
-        hr { border-color: rgba(148,163,184,.10) !important; margin: 32px 0 !important; }
+        hr {
+            border-color: rgba(148,163,184,.10) !important;
+            margin: 32px auto !important;
+            max-width: 720px !important;
+        }
+
+        /* ── Pricing cards — constrain to 720px ──────────── */
+        [data-testid="stHorizontalBlock"] {
+            max-width: 720px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        /* ── FAQ expanders — constrain to 720px ──────────── */
+        [data-testid="stExpander"] {
+            max-width: 720px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
