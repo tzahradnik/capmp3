@@ -2793,10 +2793,10 @@ if st.session_state.pop("_payment_success", False):
 with st.form("converter_form", clear_on_submit=False):
     url_input = st.text_input(
         "url",
-        placeholder="https://cap.so/s/xxxxxxxx  ·  https://cap.link/xxxxxxxx",
+        placeholder="Paste a cap.so video URL",
         label_visibility="collapsed",
     )
-    clicked = st.form_submit_button("Convert to MP3 →", type="primary", use_container_width=False)
+    clicked = st.form_submit_button("Convert now →", type="primary", use_container_width=False)
 
 # Credit pill — only shown when registered
 if st.session_state.registered:
