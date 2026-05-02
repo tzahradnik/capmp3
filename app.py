@@ -1104,17 +1104,60 @@ def _inject_css() -> None:
         }
 
         /* ── Email gate ───────────────────────────────────── */
-        .gate-card {
-            background: rgba(15,23,42,.60);
-            border: 1px solid rgba(148,163,184,.20);
-            border-radius: 22px;
-            padding: 28px 24px 8px;
-            margin-bottom: 4px;
-            backdrop-filter: blur(26px);
-            -webkit-backdrop-filter: blur(26px);
-            box-shadow: 0 20px 60px -20px rgba(124,58,237,.35),
-                        inset 0 0 0 1px rgba(255,255,255,.04);
+        /* ── Gate form — email capture card ──────────────────
+           Differentiated from converter form via :has() —
+           gate form contains a stMarkdownContainer (title+sub)
+           while converter form does not.
+        ────────────────────────────────────────────────────── */
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) {
+            padding: 28px 28px 20px !important;
         }
+        /* Vertical layout — NOT flex row */
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stVerticalBlock"] {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            padding: 0 !important;
+        }
+        /* Title + sub above the input row */
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stMarkdownContainer"] {
+            margin-bottom: 4px !important;
+        }
+        /* Email input row: input + button side by side */
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stTextInput"] {
+            flex: 1 !important;
+        }
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stFormSubmitButton"] {
+            position: static !important;
+            transform: none !important;
+            width: 100% !important;
+        }
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stFormSubmitButton"] > button {
+            width: 100% !important;
+            height: 48px !important;
+            border-radius: 13px !important;
+            padding: 0 24px !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            letter-spacing: .005em !important;
+        }
+        /* Email input inner label — same spec as converter */
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stTextInput"] > div > div,
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-baseweb="input"] {
+            height: 48px !important;
+            border-radius: 13px !important;
+            background: rgba(2,6,23,.35) !important;
+            border: 1px solid rgba(148,163,184,.10) !important;
+            padding: 0 18px 0 14px !important;
+            gap: 10px !important;
+            transition: background .25s, border-color .25s, box-shadow .25s !important;
+        }
+        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stTextInput"] > div > div:focus-within {
+            background: rgba(2,6,23,.65) !important;
+            border-color: rgba(6,182,212,.40) !important;
+            box-shadow: 0 0 0 3px rgba(6,182,212,.13), inset 0 0 28px rgba(6,182,212,.27) !important;
+        }
+
         .gate-title {
             font-size: 20px !important;
             font-weight: 700 !important;
@@ -1124,18 +1167,18 @@ def _inject_css() -> None:
             letter-spacing: -.02em !important;
         }
         .gate-sub {
-            font-size: 16px !important;
+            font-size: 15px !important;
             color: rgba(203,213,225,.78) !important;
             -webkit-text-fill-color: rgba(203,213,225,.78) !important;
-            margin: 0 0 20px !important;
+            margin: 0 !important;
             line-height: 1.6 !important;
         }
         .privacy-note {
             text-align: center !important;
-            font-size: 16px !important;
-            color: rgba(148,163,184,.70) !important;
-            -webkit-text-fill-color: rgba(148,163,184,.70) !important;
-            margin: 8px 0 0 !important;
+            font-size: 13px !important;
+            color: rgba(148,163,184,.60) !important;
+            -webkit-text-fill-color: rgba(148,163,184,.60) !important;
+            margin: 6px 0 0 !important;
         }
         .gate-strong {
             color: #F1F5F9 !important;
@@ -1482,17 +1525,36 @@ def _inject_css() -> None:
             margin: 0 !important;
         }
 
-        /* ── Custom error / warn boxes ────────────────────── */
+        /* ── Status boxes — error / warn / success ────────── */
+        .error-box, .warn-box, .success-box {
+            border-radius: 14px !important;
+            padding: 14px 18px !important;
+            font-size: 15px !important;
+            line-height: 1.55 !important;
+            max-width: 720px !important;
+            margin: 10px auto !important;
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+        }
         .error-box {
             background: rgba(239,68,68,.10) !important;
-            border: 1.5px solid rgba(239,68,68,.25) !important;
-            border-radius: 12px !important;
-            padding: 16px 20px !important;
-            font-size: 16px !important;
+            border: 1px solid rgba(239,68,68,.28) !important;
             color: #FCA5A5 !important;
             -webkit-text-fill-color: #FCA5A5 !important;
-            line-height: 1.6 !important;
-            margin: 8px 0 !important;
+        }
+        .error-box::before {
+            content: '✕' !important;
+            flex-shrink: 0 !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            width: 20px !important; height: 20px !important;
+            border-radius: 50% !important;
+            background: rgba(239,68,68,.20) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-top: 1px !important;
         }
         .error-box strong {
             color: #FECACA !important;
@@ -1500,27 +1562,42 @@ def _inject_css() -> None:
         }
         .warn-box {
             background: rgba(245,158,11,.10) !important;
-            border: 1.5px solid rgba(245,158,11,.25) !important;
-            border-radius: 12px !important;
-            padding: 16px 20px !important;
-            font-size: 16px !important;
+            border: 1px solid rgba(245,158,11,.28) !important;
             color: #FDE68A !important;
             -webkit-text-fill-color: #FDE68A !important;
-            line-height: 1.6 !important;
-            margin: 8px 0 !important;
         }
-
-        /* ── Success box ──────────────────────────────────── */
+        .warn-box::before {
+            content: '!' !important;
+            flex-shrink: 0 !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+            width: 20px !important; height: 20px !important;
+            border-radius: 50% !important;
+            background: rgba(245,158,11,.20) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-top: 1px !important;
+        }
         .success-box {
             background: rgba(16,185,129,.10) !important;
-            border: 1.5px solid rgba(16,185,129,.25) !important;
-            border-radius: 12px !important;
-            padding: 16px 20px !important;
-            font-size: 16px !important;
+            border: 1px solid rgba(16,185,129,.28) !important;
             color: #6EE7B7 !important;
             -webkit-text-fill-color: #6EE7B7 !important;
-            line-height: 1.6 !important;
             margin: 0 0 16px !important;
+        }
+        .success-box::before {
+            content: '✓' !important;
+            flex-shrink: 0 !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            width: 20px !important; height: 20px !important;
+            border-radius: 50% !important;
+            background: rgba(16,185,129,.20) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-top: 1px !important;
         }
         .success-box strong {
             color: #A7F3D0 !important;
@@ -1718,19 +1795,20 @@ def _inject_css() -> None:
         /* ── Video preview card ──────────────────────────── */
         .preview-card {
             background: rgba(15,23,42,.60) !important;
-            border: 1px solid rgba(6,182,212,.25) !important;
+            border: 1px solid rgba(148,163,184,.22) !important;
             border-radius: 18px !important;
-            padding: 16px !important;
+            padding: 16px 20px !important;
             display: grid !important;
-            grid-template-columns: 100px 1fr !important;
+            grid-template-columns: 96px 1fr !important;
             grid-template-rows: auto auto auto !important;
             column-gap: 16px !important;
             row-gap: 3px !important;
             align-items: center !important;
-            margin: 16px 0 !important;
-            backdrop-filter: blur(14px) !important;
-            -webkit-backdrop-filter: blur(14px) !important;
-            box-shadow: 0 0 28px rgba(6,182,212,.15) !important;
+            margin: 12px 0 !important;
+            backdrop-filter: blur(26px) !important;
+            -webkit-backdrop-filter: blur(26px) !important;
+            box-shadow: 0 20px 60px -20px rgba(124,58,237,.20),
+                        inset 0 0 0 1px rgba(255,255,255,.04) !important;
         }
         .preview-thumb {
             grid-column: 1 !important; grid-row: 1 / 4 !important;
