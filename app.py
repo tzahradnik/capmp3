@@ -694,6 +694,70 @@ def _inject_analytics() -> None:
 
 # ---------------------------------------------------------------------------
 
+_SEO_TITLE       = "CapMP3 – Download cap.so & cap.link Recordings as MP3"
+_SEO_DESCRIPTION = (
+    "Convert any cap.so or cap.link screen recording to MP3 in one click. "
+    "Free to try — no software install needed. Just paste the URL and download."
+)
+_SEO_URL         = "https://capmp3.com"
+_SEO_OG_IMAGE    = "https://capmp3.com/og-image.png"   # replace once image exists
+
+
+def _inject_seo_meta() -> None:
+    """
+    Inject <meta> / <link> SEO tags into the parent document <head>.
+    Streamlit doesn't expose head injection natively; we reach it via
+    window.parent.document from a same-origin component iframe.
+    """
+    _components.html(
+        f"""
+        <script>
+        (function() {{
+            try {{
+                var p = window.parent;
+                var d = p.document;
+                if (p.__seo_injected) return;
+                p.__seo_injected = true;
+
+                function meta(attrs) {{
+                    var el = d.createElement('meta');
+                    for (var k in attrs) el.setAttribute(k, attrs[k]);
+                    d.head.appendChild(el);
+                }}
+                function link(attrs) {{
+                    var el = d.createElement('link');
+                    for (var k in attrs) el.setAttribute(k, attrs[k]);
+                    d.head.appendChild(el);
+                }}
+
+                // Primary meta
+                meta({{"name":"description", "content":{_SEO_DESCRIPTION!r}}});
+
+                // Open Graph
+                meta({{"property":"og:type",        "content":"website"}});
+                meta({{"property":"og:url",         "content":{_SEO_URL!r}}});
+                meta({{"property":"og:title",       "content":{_SEO_TITLE!r}}});
+                meta({{"property":"og:description", "content":{_SEO_DESCRIPTION!r}}});
+                meta({{"property":"og:image",       "content":{_SEO_OG_IMAGE!r}}});
+
+                // Twitter card
+                meta({{"name":"twitter:card",        "content":"summary_large_image"}});
+                meta({{"name":"twitter:title",       "content":{_SEO_TITLE!r}}});
+                meta({{"name":"twitter:description", "content":{_SEO_DESCRIPTION!r}}});
+
+                // Canonical
+                link({{"rel":"canonical", "href":{_SEO_URL!r}}});
+
+            }} catch(e) {{}}
+        }})();
+        </script>
+        """,
+        height=0,
+    )
+
+
+# ---------------------------------------------------------------------------
+
 def _inject_css() -> None:
     st.markdown(
         """
@@ -2210,7 +2274,7 @@ def _render_terms() -> None:
 # ---------------------------------------------------------------------------
 
 st.set_page_config(
-    page_title="CapMP3 — cap.so to MP3",
+    page_title="CapMP3 – Download cap.so & cap.link Recordings as MP3",
     page_icon="🎵",
     layout="centered",
 )
@@ -2218,6 +2282,7 @@ st.set_page_config(
 _init_session()
 _inject_css()
 _inject_analytics()
+_inject_seo_meta()
 
 # ── Device ID cookie — injected on every page load via component iframe ───────
 # The iframe runs on the same domain (capmp3.com), so document.cookie applies
@@ -2319,10 +2384,10 @@ st.markdown(
 st.markdown(
     """
     <h1 class="hero-title">
-        cap.so recordings<br>to <span class="grad">MP3</span>, instantly.
+        Convert cap.so &amp; cap.link<br>recordings to <span class="grad">MP3</span>
     </h1>
     <p class="hero-sub">
-        Paste any cap.so or cap.link URL and download a clean MP3 in under 30 seconds.
+        Paste any cap.so or cap.link URL and download a clean MP3 in under 30 seconds. Free to try — no install needed.
     </p>
     """,
     unsafe_allow_html=True,
