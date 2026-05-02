@@ -1294,14 +1294,27 @@ def _inject_css() -> None:
         .stTextInput small {
             display: none !important;
         }
+        /* Strip ALL Streamlit/BaseWeb borders from input inside form */
         [data-testid="stForm"] [data-testid="stTextInput"],
         [data-testid="stForm"] [data-testid="stTextInput"] > div,
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div {
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div,
+        [data-testid="stForm"] [data-baseweb="input"],
+        [data-testid="stForm"] [data-baseweb="base-input"],
+        [data-testid="stForm"] [data-baseweb="input"] > div {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
+            outline: none !important;
             padding: 0 !important;
             margin-bottom: 0 !important;
+        }
+        [data-testid="stForm"] [data-baseweb="input"]:focus-within,
+        [data-testid="stForm"] [data-baseweb="input"]:focus,
+        [data-testid="stForm"] [data-baseweb="input"][aria-expanded],
+        [data-testid="stForm"] [data-baseweb="input"] * {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input {
             background: transparent !important;
@@ -1315,7 +1328,8 @@ def _inject_css() -> None:
             vertical-align: middle !important;
             box-sizing: border-box !important;
         }
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input:focus {
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input:focus,
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input:focus-visible {
             border: none !important;
             box-shadow: none !important;
             outline: none !important;
