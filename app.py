@@ -1294,31 +1294,37 @@ def _inject_css() -> None:
         .stTextInput small {
             display: none !important;
         }
-        /* Strip ALL Streamlit/BaseWeb borders from input inside form */
+        /* Strip wrapper padding/margin, keep input area clean */
         [data-testid="stForm"] [data-testid="stTextInput"],
-        [data-testid="stForm"] [data-testid="stTextInput"] > div,
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div,
-        [data-testid="stForm"] [data-baseweb="input"],
-        [data-testid="stForm"] [data-baseweb="base-input"],
-        [data-testid="stForm"] [data-baseweb="input"] > div {
+        [data-testid="stForm"] [data-testid="stTextInput"] > div {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            outline: none !important;
             padding: 0 !important;
             margin-bottom: 0 !important;
         }
-        [data-testid="stForm"] [data-baseweb="input"]:focus-within,
-        [data-testid="stForm"] [data-baseweb="input"]:focus,
-        [data-testid="stForm"] [data-baseweb="input"][aria-expanded],
-        [data-testid="stForm"] [data-baseweb="input"] * {
-            border: none !important;
+        /* Inner input container — styled dark oval */
+        [data-testid="stForm"] [data-baseweb="input"],
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div {
+            background: rgba(4,8,22,.65) !important;
+            border: 1px solid rgba(148,163,184,.15) !important;
+            border-radius: 24px !important;
             box-shadow: none !important;
             outline: none !important;
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        /* Remove BaseWeb's own focus ring */
+        [data-testid="stForm"] [data-baseweb="input"]:focus-within {
+            border-color: rgba(148,163,184,.22) !important;
+            box-shadow: none !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input {
             background: transparent !important;
             border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
             font-size: 15.5px !important;
             height: 54px !important;
             line-height: 54px !important;
