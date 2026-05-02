@@ -1244,16 +1244,16 @@ def _inject_css() -> None:
         [data-testid="stForm"] {
             background: rgba(8,12,28,.82) !important;
             border: 1px solid rgba(148,163,184,.14) !important;
-            border-radius: 40px;
+            border-radius: 40px !important;
             padding: 7px !important;
-            backdrop-filter: blur(32px);
-            -webkit-backdrop-filter: blur(32px);
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+            backdrop-filter: blur(32px) !important;
+            -webkit-backdrop-filter: blur(32px) !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.04) !important;
             max-width: 720px !important;
             margin-left: auto !important;
             margin-right: auto !important;
             overflow: hidden !important;
-            transition: border-color .22s, box-shadow .22s;
+            transition: border-color .22s, box-shadow .22s !important;
         }
         /* Glow on focus-within — matches design inputFocusRing */
         [data-testid="stForm"]:focus-within {
@@ -2756,7 +2756,7 @@ st.markdown(
             Convert cap.so &amp; cap.link<br>recordings to <span class="grad">MP3</span>
         </h1>
         <p class="hero-sub">
-            Paste any cap.so or cap.link URL and download a clean MP3 in under 30 seconds. Free to try — no install needed.
+            Paste any cap.so or cap.link URL and download a clean MP3 in under 30 seconds.<br>Free to try — no install needed.
         </p>
     </div>
     """,
