@@ -1261,26 +1261,32 @@ def _inject_css() -> None:
             box-shadow: 0 0 0 3px rgba(6,182,212,.14),
                         inset 0 0 32px rgba(6,182,212,.07) !important;
         }
-        /* Horizontal row: input + button */
+        /* Input + button: absolute-position button inside the form */
         [data-testid="stForm"] [data-testid="stVerticalBlock"] {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 8px !important;
+            position: relative !important;
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
         [data-testid="stForm"] [data-testid="stTextInput"] {
-            flex: 1 !important;
-            min-width: 0 !important;
+            width: 100% !important;
             margin-bottom: 0 !important;
         }
+        /* Push input text right so it doesn't go under the button */
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div > input {
+            padding-right: 176px !important;
+        }
         [data-testid="stForm"] [data-testid="stFormSubmitButton"] {
-            flex-shrink: 0 !important;
-            margin-bottom: 0 !important;
+            position: absolute !important;
+            right: 0 !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            margin: 0 !important;
         }
         [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button {
             white-space: nowrap !important;
             width: auto !important;
-            padding: 0 32px !important;
+            padding: 0 28px !important;
             height: 54px !important;
             border-radius: 32px !important;
             margin: 0 !important;
