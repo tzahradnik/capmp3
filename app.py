@@ -258,6 +258,20 @@ def _validate_user_url(url: str) -> None:
     if not allowed:
         raise ValueError("Only cap.so and cap.link URLs are supported.")
 
+    # DNS rebinding protection — verify the resolved IP is not private.
+    # Validates AFTER whitelist so we only resolve whitelisted domains.
+    try:
+        addrs = socket.getaddrinfo(host, None)
+        for (_, _, _, _, sockaddr) in addrs:
+            resolved_ip = sockaddr[0]
+            for pattern in _PRIVATE_IP_PATTERNS:
+                if pattern.search(resolved_ip):
+                    raise ValueError("Only cap.so and cap.link URLs are supported.")
+    except ValueError:
+        raise  # re-raise our own error
+    except Exception:
+        pass  # DNS failure — let the downstream request fail naturally
+
 
 # ---------------------------------------------------------------------------
 # cap.so API
@@ -485,6 +499,19 @@ def _deduct_credit() -> None:
         _deduct_credit_in_supabase(email)       # persistent DB decrement
 
 
+def _refund_credit() -> None:
+    """Restore one credit when conversion fails after deduction."""
+    st.session_state.credits = st.session_state.credits + 1
+    email = st.session_state.get("email", "")
+    if email:
+        try:
+            db = _get_supabase()
+            if db:
+                db.rpc("increment_credits", {"user_email": email}).execute()
+        except Exception:
+            pass
+
+
 def _add_credits(amount: int) -> None:
     # TODO: Validate Stripe Webhook before calling —
     # use stripe.Webhook.construct_event(payload, sig, secret)
@@ -579,7 +606,7 @@ def _is_fingerprint_used_in_supabase(fp_hash: str) -> bool:
         )
         return bool(res.data)
     except Exception:
-        return False
+        return True   # fail-closed: block on DB error
 
 
 def _save_fingerprint_to_supabase(fp_hash: str, email: str) -> None:
@@ -1835,6 +1862,10 @@ def _run_conversion(url: str) -> None:
         )
         return
 
+    # Deduct credit BEFORE conversion starts so the server can't be abused
+    # by cancelling mid-flight. On any failure we call _refund_credit().
+    _deduct_credit()
+
     with tempfile.TemporaryDirectory() as tmpdir:
         src_path    = os.path.join(tmpdir, "source")
         audio_path  = os.path.join(tmpdir, "audio.mp3")
@@ -1866,6 +1897,7 @@ def _run_conversion(url: str) -> None:
         except requests.HTTPError as e:
             # Log full detail server-side; show generic message to user
             print(f"[CAPMP3 ERROR] HTTPError for {url!r}: {e}", flush=True)
+            _refund_credit()
             st.markdown(
                 '<div class="error-box"><strong>Connection error.</strong> '
                 "Could not retrieve the recording. Check that the URL is correct "
@@ -1875,6 +1907,7 @@ def _run_conversion(url: str) -> None:
             return
         except ValueError as e:
             # ValueError messages are written by us — safe to surface
+            _refund_credit()
             st.markdown(
                 f'<div class="error-box">{html_lib.escape(str(e))}</div>',
                 unsafe_allow_html=True,
@@ -1883,6 +1916,7 @@ def _run_conversion(url: str) -> None:
         except RuntimeError as e:
             # May contain ffmpeg paths / internal details — log only
             print(f"[CAPMP3 ERROR] RuntimeError for {url!r}: {e}", flush=True)
+            _refund_credit()
             st.markdown(
                 '<div class="error-box"><strong>Conversion failed.</strong> '
                 "An error occurred during processing. Please try again or contact support.</div>",
@@ -1891,6 +1925,7 @@ def _run_conversion(url: str) -> None:
             return
         except Exception as e:
             print(f"[CAPMP3 ERROR] Unexpected error for {url!r}: {type(e).__name__}: {e}", flush=True)
+            _refund_credit()
             st.markdown(
                 '<div class="error-box"><strong>Unexpected error.</strong> '
                 "Something went wrong. Please try again or contact support.</div>",
@@ -1899,7 +1934,6 @@ def _run_conversion(url: str) -> None:
             return
 
     if audio_bytes:
-        _deduct_credit()
         st.markdown(
             """
             <div class="success-card">
