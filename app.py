@@ -1801,7 +1801,7 @@ def _inject_css() -> None:
             column-gap: 16px !important;
             row-gap: 3px !important;
             align-items: center !important;
-            margin: 12px 0 !important;
+            margin: 12px auto !important;
             backdrop-filter: blur(26px) !important;
             -webkit-backdrop-filter: blur(26px) !important;
             box-shadow: 0 20px 60px -20px rgba(124,58,237,.20),
@@ -2883,9 +2883,8 @@ if st.session_state.registered:
             unsafe_allow_html=True,
         )
 
-# ── Trust bar ─────────────────────────────────────────────────────────────────
-st.markdown(
-    """
+# ── Trust bar (shown before Convert is clicked) ───────────────────────────────
+_trust_bar_html = """
     <div class="trust-bar">
         <div class="trust-tile-item">
             <div class="trust-tile">
@@ -2922,9 +2921,10 @@ st.markdown(
             </div>
         </div>
     </div>
-    """,
-    unsafe_allow_html=True,
-)
+"""
+
+if not (st.session_state.video_meta or st.session_state.show_gate):
+    st.markdown(_trust_bar_html, unsafe_allow_html=True)
 
 # ── Handle Convert click ──────────────────────────────────────────────────────
 if clicked:
@@ -3067,6 +3067,10 @@ if st.session_state.show_gate and not st.session_state.registered:
 if st.session_state.do_convert and st.session_state.registered and st.session_state.pending_url:
     st.session_state.do_convert = False
     _run_conversion(st.session_state.pending_url)
+
+# ── Trust bar below cards (shown after Convert is clicked) ───────────────────
+if st.session_state.video_meta or st.session_state.show_gate:
+    st.markdown(_trust_bar_html, unsafe_allow_html=True)
 
 # ── Out of credits warning ────────────────────────────────────────────────────
 if st.session_state.registered and _credits() <= 0 and not st.session_state.do_convert:
