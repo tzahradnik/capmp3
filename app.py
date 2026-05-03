@@ -1567,12 +1567,22 @@ def _inject_css() -> None:
             filter: none !important;
         }
 
-        /* Converter button — center text */
-        [data-testid="stForm"]:not(:has(.gate-title)) [data-testid="stFormSubmitButton"] > button {
-            text-align: center !important;
-            justify-content: center !important;
+        /* Converter button — center text (vertical + horizontal) */
+        [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button {
             display: flex !important;
             align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            line-height: 1 !important;
+        }
+        [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button > div,
+        [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button p {
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
         /* ── Unified converter block ──────────────────────────── */
