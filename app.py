@@ -1277,6 +1277,132 @@ def _inject_css() -> None:
         .plan-features { list-style: none !important; padding: 0 !important; margin: 0 0 20px !important; }
         .plan-features li { font-size: 16px !important; color: rgba(203,213,225,.78) !important; -webkit-text-fill-color: rgba(203,213,225,.78) !important; padding: 3px 0 !important; }
 
+        /* ── Inline upsell card (shown after free credit used) ── */
+        .upsell-card {
+            max-width: 720px;
+            margin: 16px auto 0;
+            background: rgba(15,23,42,.60);
+            border: 1px solid rgba(124,58,237,.35);
+            border-radius: 18px;
+            padding: 24px 28px 20px;
+            backdrop-filter: blur(26px);
+            -webkit-backdrop-filter: blur(26px);
+            box-shadow: 0 20px 60px -20px rgba(124,58,237,.30),
+                        inset 0 0 0 1px rgba(255,255,255,.04);
+        }
+        .upsell-title {
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            color: #F1F5F9 !important;
+            -webkit-text-fill-color: #F1F5F9 !important;
+            margin: 0 0 4px !important;
+            letter-spacing: -.02em !important;
+        }
+        .upsell-sub {
+            font-size: 14px !important;
+            color: rgba(148,163,184,.75) !important;
+            -webkit-text-fill-color: rgba(148,163,184,.75) !important;
+            margin: 0 0 18px !important;
+        }
+        .upsell-plans {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .upsell-plan {
+            background: rgba(2,6,23,.35);
+            border: 1px solid rgba(148,163,184,.12);
+            border-radius: 13px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            position: relative;
+        }
+        .upsell-plan--featured {
+            border-color: rgba(124,58,237,.50);
+            background: rgba(124,58,237,.10);
+        }
+        .upsell-plan-badge {
+            position: absolute;
+            top: -10px; right: 14px;
+            background: linear-gradient(135deg, #7C3AED, #06B6D4);
+            color: #fff !important;
+            -webkit-text-fill-color: #fff !important;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+        .upsell-plan-name {
+            font-size: 13px !important;
+            color: rgba(148,163,184,.70) !important;
+            -webkit-text-fill-color: rgba(148,163,184,.70) !important;
+            font-weight: 600 !important;
+            letter-spacing: .06em !important;
+            text-transform: uppercase !important;
+            margin: 0 !important;
+        }
+        .upsell-plan-price {
+            font-size: 26px !important;
+            font-weight: 700 !important;
+            color: #F1F5F9 !important;
+            -webkit-text-fill-color: #F1F5F9 !important;
+            letter-spacing: -.03em !important;
+            margin: 4px 0 2px !important;
+            line-height: 1 !important;
+        }
+        .upsell-plan-credits {
+            font-size: 14px !important;
+            color: #67E8F9 !important;
+            -webkit-text-fill-color: #67E8F9 !important;
+            font-weight: 600 !important;
+            margin: 0 0 12px !important;
+        }
+        .upsell-plan-unit {
+            font-size: 12px !important;
+            color: rgba(148,163,184,.55) !important;
+            -webkit-text-fill-color: rgba(148,163,184,.55) !important;
+            margin: 0 0 14px !important;
+        }
+        .upsell-btn {
+            display: block;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1.5px solid rgba(148,163,184,.22);
+            color: #CBD5E1 !important;
+            -webkit-text-fill-color: #CBD5E1 !important;
+            background: rgba(148,163,184,.08);
+            transition: border-color .18s, background .18s;
+            margin-top: auto;
+        }
+        .upsell-btn:hover {
+            border-color: rgba(6,182,212,.50);
+            background: rgba(6,182,212,.10);
+            color: #67E8F9 !important;
+            -webkit-text-fill-color: #67E8F9 !important;
+            text-decoration: none;
+        }
+        .upsell-btn--primary {
+            background: linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%);
+            border-color: transparent;
+            color: #fff !important;
+            -webkit-text-fill-color: #fff !important;
+            box-shadow: 0 4px 16px rgba(124,58,237,.30);
+        }
+        .upsell-btn--primary:hover {
+            filter: brightness(1.10);
+            background: linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%);
+            border-color: transparent;
+            color: #fff !important;
+            -webkit-text-fill-color: #fff !important;
+        }
+
         /* ── Hide Streamlit heading anchor icons ─────────── */
         [data-testid="stMarkdownContainer"] h1 a,
         [data-testid="stMarkdownContainer"] h2 a,
@@ -2053,6 +2179,45 @@ def _inject_css() -> None:
 # ---------------------------------------------------------------------------
 # Pricing section
 # ---------------------------------------------------------------------------
+
+def _render_inline_upsell() -> None:
+    """Compact 2-plan upsell card shown inline after free credit is exhausted."""
+    email = st.session_state.get("email", "")
+    if email:
+        _params  = urlencode({"client_reference_id": email, "prefilled_email": email})
+        _basic   = f"{STRIPE_BASIC_URL}?{_params}"
+        _pro     = f"{STRIPE_PRO_URL}?{_params}"
+    else:
+        _basic = STRIPE_BASIC_URL
+        _pro   = STRIPE_PRO_URL
+
+    st.markdown(
+        f"""
+        <div class="upsell-card">
+            <p class="upsell-title">Get more downloads</p>
+            <p class="upsell-sub">One-time payment · Credits never expire · Instant Stripe checkout</p>
+            <div class="upsell-plans">
+                <div class="upsell-plan">
+                    <p class="upsell-plan-name">Starter</p>
+                    <p class="upsell-plan-price">$4.99</p>
+                    <p class="upsell-plan-credits">10 credits</p>
+                    <p class="upsell-plan-unit">$0.50 / download</p>
+                    <a href="{_basic}" target="_blank" rel="noopener" class="upsell-btn">Buy Starter →</a>
+                </div>
+                <div class="upsell-plan upsell-plan--featured">
+                    <span class="upsell-plan-badge">BEST VALUE</span>
+                    <p class="upsell-plan-name">Pro</p>
+                    <p class="upsell-plan-price">$9.99</p>
+                    <p class="upsell-plan-credits">30 credits</p>
+                    <p class="upsell-plan-unit">$0.33 / download</p>
+                    <a href="{_pro}" target="_blank" rel="noopener" class="upsell-btn upsell-btn--primary">Buy Pro →</a>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 def _render_pricing() -> None:
     # Auto-scroll here when triggered after a successful download
@@ -3180,16 +3345,16 @@ if st.session_state.do_convert and st.session_state.registered and st.session_st
 if st.session_state.video_meta or st.session_state.show_gate:
     st.markdown(_trust_bar_html, unsafe_allow_html=True)
 
-# ── Out of credits warning ────────────────────────────────────────────────────
+# ── Out of credits: warning + inline upsell ──────────────────────────────────
 if st.session_state.registered and _credits() <= 0 and not st.session_state.do_convert:
     st.markdown(
         '<div class="warn-box" style="margin-top:12px;">'
         '⚠ <strong>Free credit already used.</strong> '
-        'Each email address and device is limited to 1 free download. '
-        'Top up below to continue.'
+        'Each email address and device is limited to 1 free download.'
         '</div>',
         unsafe_allow_html=True,
     )
+    _render_inline_upsell()
 
 # ── Content & FAQ ─────────────────────────────────────────────────────────────
 _render_content()
