@@ -694,13 +694,13 @@ def _inject_analytics() -> None:
 
 # ---------------------------------------------------------------------------
 
-_SEO_TITLE       = "CapMP3 – Download cap.so & cap.link Recordings as MP3"
+_SEO_TITLE       = "Cap.so to MP3 Converter: Fast & Free Audio Downloader | CapMP3"
 _SEO_DESCRIPTION = (
-    "Convert any cap.so or cap.link screen recording to MP3 in one click. "
-    "Free to try — no software install needed. Just paste the URL and download."
+    "Convert cap.so and cap.link recordings to high-quality MP3 instantly. "
+    "Free, secure, and no signup required. The best audio downloader for Cap.so. Try CapMP3!"
 )
 _SEO_URL         = "https://capmp3.com"
-_SEO_OG_IMAGE    = "https://capmp3.com/og-image.png"   # replace once image exists
+_SEO_OG_IMAGE    = "https://capmp3.com/og-image.png"   # replace with actual screenshot
 
 
 def _inject_seo_meta() -> None:
@@ -747,6 +747,36 @@ def _inject_seo_meta() -> None:
 
                 // Canonical
                 link({{"rel":"canonical", "href":{_SEO_URL!r}}});
+
+                // Robots
+                meta({{"name":"robots", "content":"index, follow"}});
+
+                // JSON-LD — WebApplication structured data for AI search engines
+                var ld = d.createElement('script');
+                ld.type = 'application/ld+json';
+                ld.textContent = JSON.stringify({{
+                    "@context": "https://schema.org",
+                    "@type": "WebApplication",
+                    "name": "CapMP3",
+                    "alternateName": "Cap.so to MP3 Converter",
+                    "url": {_SEO_URL!r},
+                    "description": "Online tool to convert cap.so and cap.link video recordings to MP3 audio files. Free, instant, no signup required.",
+                    "applicationCategory": "MultimediaApplication",
+                    "operatingSystem": "Any",
+                    "offers": {{
+                        "@type": "Offer",
+                        "price": "0.00",
+                        "priceCurrency": "USD"
+                    }},
+                    "featureList": "Free conversion, No signup required, High-quality MP3 export, Fast processing, cap.so support, cap.link support",
+                    "browserRequirements": "Requires JavaScript. Works in any modern browser.",
+                    "creator": {{
+                        "@type": "Organization",
+                        "name": "CapMP3",
+                        "url": {_SEO_URL!r}
+                    }}
+                }});
+                d.head.appendChild(ld);
 
             }} catch(e) {{}}
         }})();
@@ -2755,7 +2785,7 @@ def _render_terms() -> None:
 # ---------------------------------------------------------------------------
 
 st.set_page_config(
-    page_title="CapMP3 – Download cap.so & cap.link Recordings as MP3",
+    page_title="Cap.so to MP3 Converter: Fast & Free Audio Downloader | CapMP3",
     page_icon="🎵",
     layout="wide",
 )
