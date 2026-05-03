@@ -1105,34 +1105,31 @@ def _inject_css() -> None:
 
         /* ── Email gate ───────────────────────────────────── */
         /* ── Gate form — email capture card ──────────────────
-           Differentiated from converter form via :has() —
-           gate form contains a stMarkdownContainer (title+sub)
-           while converter form does not.
+           :has(.gate-title) targets ONLY the email gate form.
+           Streamlit adds stMarkdownContainer even to plain
+           text inputs (for labels), so that selector is too
+           broad and breaks the converter form flex row.
         ────────────────────────────────────────────────────── */
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) {
+        [data-testid="stForm"]:has(.gate-title) {
             padding: 28px 28px 20px !important;
         }
         /* Vertical layout — NOT flex row */
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stVerticalBlock"] {
+        [data-testid="stForm"]:has(.gate-title) [data-testid="stVerticalBlock"] {
             display: flex !important;
             flex-direction: column !important;
             gap: 12px !important;
             padding: 0 !important;
         }
-        /* Title + sub above the input row */
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stMarkdownContainer"] {
-            margin-bottom: 4px !important;
-        }
         /* Email input row: input + button side by side */
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stTextInput"] {
+        [data-testid="stForm"]:has(.gate-title) [data-testid="stTextInput"] {
             flex: 1 !important;
         }
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stFormSubmitButton"] {
+        [data-testid="stForm"]:has(.gate-title) [data-testid="stFormSubmitButton"] {
             position: static !important;
             transform: none !important;
             width: 100% !important;
         }
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stFormSubmitButton"] > button {
+        [data-testid="stForm"]:has(.gate-title) [data-testid="stFormSubmitButton"] > button {
             width: 100% !important;
             height: 48px !important;
             border-radius: 13px !important;
@@ -1141,9 +1138,9 @@ def _inject_css() -> None:
             font-weight: 600 !important;
             letter-spacing: .005em !important;
         }
-        /* Email input inner label — same spec as converter */
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stTextInput"] > div > div,
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-baseweb="input"] {
+        /* Email input inner label */
+        [data-testid="stForm"]:has(.gate-title) [data-testid="stTextInput"] > div > div,
+        [data-testid="stForm"]:has(.gate-title) [data-baseweb="input"] {
             height: 48px !important;
             border-radius: 13px !important;
             background: rgba(2,6,23,.35) !important;
@@ -1152,10 +1149,10 @@ def _inject_css() -> None:
             gap: 10px !important;
             transition: background .25s, border-color .25s, box-shadow .25s !important;
         }
-        [data-testid="stForm"]:has([data-testid="stMarkdownContainer"]) [data-testid="stTextInput"] > div > div:focus-within {
+        [data-testid="stForm"]:has(.gate-title) [data-testid="stTextInput"] > div > div:focus-within {
             background: rgba(2,6,23,.65) !important;
-            border-color: rgba(6,182,212,.40) !important;
-            box-shadow: 0 0 0 3px rgba(6,182,212,.13), inset 0 0 28px rgba(6,182,212,.27) !important;
+            border-color: rgba(6,182,212,.55) !important;
+            box-shadow: inset 0 0 28px rgba(6,182,212,.22) !important;
         }
 
         .gate-title {
@@ -1351,13 +1348,13 @@ def _inject_css() -> None:
             transition: background .25s ease, border-color .25s ease, box-shadow .25s ease !important;
             box-sizing: border-box !important;
         }
-        /* Focus state on inner input label */
+        /* Focus state on inner input label — inset only, no outer ring
+           (outer ring bleeds past overflow:hidden and creates double-border) */
         [data-testid="stForm"] [data-testid="stTextInput"] > div > div:focus-within,
         [data-testid="stForm"] [data-baseweb="input"]:focus-within {
             background: rgba(2,6,23,.65) !important;
-            border-color: rgba(6,182,212,.40) !important;
-            box-shadow: 0 0 0 3px rgba(6,182,212,.13),
-                        inset 0 0 28px rgba(6,182,212,.27) !important;
+            border-color: rgba(6,182,212,.55) !important;
+            box-shadow: inset 0 0 28px rgba(6,182,212,.22) !important;
         }
 
         /* 5 — Link icon (inline SVG via ::before) */
