@@ -1138,22 +1138,7 @@ def _inject_css() -> None:
             font-weight: 600 !important;
             letter-spacing: .005em !important;
         }
-        /* Email input inner label */
-        [data-testid="stForm"]:has(.gate-title) [data-testid="stTextInput"] > div > div,
-        [data-testid="stForm"]:has(.gate-title) [data-baseweb="input"] {
-            height: 48px !important;
-            border-radius: 13px !important;
-            background: rgba(2,6,23,.35) !important;
-            border: 1px solid rgba(148,163,184,.10) !important;
-            padding: 0 18px 0 14px !important;
-            gap: 10px !important;
-            transition: background .25s, border-color .25s, box-shadow .25s !important;
-        }
-        [data-testid="stForm"]:has(.gate-title) [data-testid="stTextInput"] > div > div:focus-within {
-            background: rgba(2,6,23,.65) !important;
-            border-color: rgba(6,182,212,.55) !important;
-            box-shadow: inset 0 0 28px rgba(6,182,212,.22) !important;
-        }
+        /* Email input inner label — inherits global rule, border on outer div only */
 
         .gate-title {
             font-size: 20px !important;
@@ -1333,9 +1318,8 @@ def _inject_css() -> None:
             margin: 0 !important;
         }
 
-        /* 4 — Inner input label (the styled dark box) */
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div,
-        [data-testid="stForm"] [data-baseweb="input"] {
+        /* 4 — Outer wrapper: layout, bg, border, icon placeholder */
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div {
             display: flex !important;
             align-items: center !important;
             height: 48px !important;
@@ -1348,10 +1332,16 @@ def _inject_css() -> None:
             transition: background .25s ease, border-color .25s ease, box-shadow .25s ease !important;
             box-sizing: border-box !important;
         }
-        /* Focus state on inner input label — inset only, no outer ring
-           (outer ring bleeds past overflow:hidden and creates double-border) */
-        [data-testid="stForm"] [data-testid="stTextInput"] > div > div:focus-within,
-        [data-testid="stForm"] [data-baseweb="input"]:focus-within {
+        /* 4b — BaseWeb inner component: reset so it doesn't add a second border */
+        [data-testid="stForm"] [data-baseweb="input"] {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            height: 100% !important;
+            box-shadow: none !important;
+        }
+        /* Focus state — on the outer wrapper only */
+        [data-testid="stForm"] [data-testid="stTextInput"] > div > div:focus-within {
             background: rgba(2,6,23,.65) !important;
             border-color: rgba(6,182,212,.55) !important;
             box-shadow: inset 0 0 28px rgba(6,182,212,.22) !important;
@@ -1418,6 +1408,38 @@ def _inject_css() -> None:
             [data-testid="stFormSubmitButton"] > button {
             opacity: 1 !important;
             filter: none !important;
+        }
+
+        /* Converter button — center text */
+        [data-testid="stForm"]:not(:has(.gate-title)) [data-testid="stFormSubmitButton"] > button {
+            text-align: center !important;
+            justify-content: center !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        /* ── Unified converter block ──────────────────────────── */
+        @keyframes blockSlideIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        /* Converter form: square off bottom when content follows */
+        body.conv-expanded [data-testid="stForm"]:not(:has(.gate-title)) {
+            border-radius: 22px 22px 0 0 !important;
+            border-bottom-color: rgba(148,163,184,.08) !important;
+        }
+        /* Preview card: square top, no top border, slide in */
+        body.conv-expanded .preview-card {
+            border-radius: 0 !important;
+            border-top: none !important;
+            box-shadow: none !important;
+            animation: blockSlideIn .32s cubic-bezier(.16,1,.3,1) both;
+        }
+        /* Gate form: square top, no top border, slide in */
+        body.conv-expanded [data-testid="stForm"]:has(.gate-title) {
+            border-radius: 0 0 22px 22px !important;
+            border-top: none !important;
+            animation: blockSlideIn .32s cubic-bezier(.16,1,.3,1) .06s both;
         }
 
         /* Hide "Press Enter to submit form" Streamlit hint */
@@ -2886,6 +2908,48 @@ with st.form("converter_form", clear_on_submit=False):
         label_visibility="collapsed",
     )
     clicked = st.form_submit_button("Convert →", type="primary", use_container_width=False)
+
+# Inject body class + gap-closing JS for unified converter block
+_conv_active = bool(st.session_state.get("video_meta") or st.session_state.get("show_gate"))
+st.markdown(f"""
+<script>
+(function(){{
+    var active = {"true" if _conv_active else "false"};
+    document.body.classList.toggle('conv-expanded', active);
+    if (!active) return;
+    function closeGap() {{
+        var allForms = document.querySelectorAll('[data-testid="stForm"]');
+        var converterForm = Array.from(allForms).find(function(f){{ return !f.querySelector('.gate-title'); }});
+        var gateForm     = Array.from(allForms).find(function(f){{ return !!f.querySelector('.gate-title'); }});
+        var previewCard  = document.querySelector('.preview-card');
+        if (!converterForm) return;
+        // Helper: walk up to find element that is a direct child of the main stVerticalBlock
+        function getTopWrapper(el) {{
+            var p = el;
+            while (p && p.parentElement && !p.parentElement.getAttribute('data-testid')?.startsWith('stVerticalBlock')) {{
+                p = p.parentElement;
+            }}
+            return p || el;
+        }}
+        if (previewCard) {{
+            var wrap = getTopWrapper(previewCard);
+            var gap = wrap.getBoundingClientRect().top - converterForm.getBoundingClientRect().bottom;
+            if (gap > 0) wrap.style.marginTop = (-gap) + 'px';
+        }}
+        if (gateForm) {{
+            var above = previewCard ? getTopWrapper(previewCard) : converterForm;
+            var gap2 = gateForm.getBoundingClientRect().top - above.getBoundingClientRect().bottom;
+            if (gap2 > 0) gateForm.style.marginTop = (-gap2) + 'px';
+        }}
+    }}
+    requestAnimationFrame(function(){{ requestAnimationFrame(closeGap); }});
+    var _t = null;
+    new MutationObserver(function(){{
+        clearTimeout(_t); _t = setTimeout(closeGap, 40);
+    }}).observe(document.body, {{childList:true, subtree:false}});
+}})();
+</script>
+""", unsafe_allow_html=True)
 
 # Credit pill — only shown when registered
 if st.session_state.registered:
