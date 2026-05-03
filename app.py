@@ -1098,7 +1098,7 @@ def _inject_css() -> None:
             align-items: center;
             gap: 36px;
             flex-wrap: wrap;
-            margin: 28px auto 0;
+            margin: 20px auto 0;
             max-width: 720px;
         }
         .trust-tile-item {
@@ -1178,6 +1178,7 @@ def _inject_css() -> None:
             -webkit-text-fill-color: #F1F5F9 !important;
             margin: 0 0 6px !important;
             letter-spacing: -.02em !important;
+            text-align: center !important;
         }
         .gate-sub {
             font-size: 15px !important;
@@ -1185,6 +1186,7 @@ def _inject_css() -> None:
             -webkit-text-fill-color: rgba(203,213,225,.78) !important;
             margin: 0 !important;
             line-height: 1.6 !important;
+            text-align: center !important;
         }
         .privacy-note {
             text-align: center !important;
@@ -1281,7 +1283,7 @@ def _inject_css() -> None:
         /* ── Inline upsell card (shown after free credit used) ── */
         .upsell-card {
             max-width: 720px;
-            margin: 16px auto 0;
+            margin: 20px auto 0;
             background: rgba(15,23,42,.60);
             border: 1px solid rgba(124,58,237,.35);
             border-radius: 18px;
@@ -1995,7 +1997,7 @@ def _inject_css() -> None:
             column-gap: 16px !important;
             row-gap: 3px !important;
             align-items: center !important;
-            margin: 12px auto !important;
+            margin: 20px auto !important;
             backdrop-filter: blur(26px) !important;
             -webkit-backdrop-filter: blur(26px) !important;
             box-shadow: 0 20px 60px -20px rgba(124,58,237,.20),
@@ -2120,6 +2122,19 @@ def _inject_css() -> None:
         /* Hide st.status widget entirely */
         [data-testid="stStatusWidget"],
         [data-testid="stStatus"] { display: none !important; }
+
+        /* ── Spinner — center horizontally ───────────────── */
+        [data-testid="stSpinner"] {
+            max-width: 720px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        [data-testid="stSpinner"] > div {
+            justify-content: center !important;
+        }
 
         /* ── FAQ ──────────────────────────────────────────── */
         [data-testid="stExpander"] {
@@ -3350,7 +3365,7 @@ if st.session_state.video_meta or st.session_state.show_gate:
 # ── Out of credits: warning + inline upsell ──────────────────────────────────
 if st.session_state.registered and _credits() <= 0 and not st.session_state.do_convert:
     st.markdown(
-        '<div class="warn-box" style="margin-top:12px;">'
+        '<div class="warn-box" style="margin-top:20px;">'
         '<strong>Free credit already used.</strong>&ensp;'
         'Each email address and device is limited to 1 free download.'
         '</div>',
