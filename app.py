@@ -700,7 +700,7 @@ _SEO_DESCRIPTION = (
     "Free, secure, and no signup required. The best audio downloader for Cap.so. Try CapMP3!"
 )
 _SEO_URL         = "https://capmp3.com"
-_SEO_OG_IMAGE    = "https://capmp3.com/og-image.png"   # replace with actual screenshot
+_SEO_OG_IMAGE    = "https://capmp3.com/og-image.png"
 
 
 def _inject_seo_meta() -> None:
@@ -744,6 +744,7 @@ def _inject_seo_meta() -> None:
                 meta({{"name":"twitter:card",        "content":"summary_large_image"}});
                 meta({{"name":"twitter:title",       "content":{_SEO_TITLE!r}}});
                 meta({{"name":"twitter:description", "content":{_SEO_DESCRIPTION!r}}});
+                meta({{"name":"twitter:image",       "content":{_SEO_OG_IMAGE!r}}});
 
                 // Canonical
                 link({{"rel":"canonical", "href":{_SEO_URL!r}}});
