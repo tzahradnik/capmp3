@@ -1285,106 +1285,111 @@ def _inject_css() -> None:
             background: rgba(15,23,42,.60);
             border: 1px solid rgba(124,58,237,.35);
             border-radius: 18px;
-            padding: 24px 28px 20px;
+            padding: 28px 28px 24px;
             backdrop-filter: blur(26px);
             -webkit-backdrop-filter: blur(26px);
             box-shadow: 0 20px 60px -20px rgba(124,58,237,.30),
                         inset 0 0 0 1px rgba(255,255,255,.04);
+            text-align: center;
         }
         .upsell-title {
-            font-size: 18px !important;
-            font-weight: 700 !important;
+            font-size: 26px !important;
+            font-weight: 800 !important;
             color: #F1F5F9 !important;
             -webkit-text-fill-color: #F1F5F9 !important;
-            margin: 0 0 4px !important;
-            letter-spacing: -.02em !important;
+            margin: 0 0 8px !important;
+            letter-spacing: -.03em !important;
+            line-height: 1.15 !important;
         }
         .upsell-sub {
-            font-size: 14px !important;
-            color: rgba(148,163,184,.75) !important;
-            -webkit-text-fill-color: rgba(148,163,184,.75) !important;
-            margin: 0 0 18px !important;
+            font-size: 15px !important;
+            color: rgba(203,213,225,.70) !important;
+            -webkit-text-fill-color: rgba(203,213,225,.70) !important;
+            margin: 0 0 22px !important;
         }
         .upsell-plans {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
+            text-align: left;
         }
         .upsell-plan {
-            background: rgba(2,6,23,.35);
-            border: 1px solid rgba(148,163,184,.12);
+            background: rgba(30,41,59,.70);
+            border: 1px solid rgba(148,163,184,.18);
             border-radius: 13px;
-            padding: 16px 18px;
+            padding: 18px 20px;
             display: flex;
             flex-direction: column;
             gap: 2px;
             position: relative;
         }
         .upsell-plan--featured {
-            border-color: rgba(124,58,237,.50);
-            background: rgba(124,58,237,.10);
+            border-color: rgba(124,58,237,.55);
+            background: rgba(124,58,237,.14);
+            box-shadow: 0 8px 32px -8px rgba(124,58,237,.25),
+                        inset 0 0 0 1px rgba(255,255,255,.05);
         }
         .upsell-plan-badge {
             position: absolute;
-            top: -10px; right: 14px;
+            top: -11px; right: 14px;
             background: linear-gradient(135deg, #7C3AED, #06B6D4);
             color: #fff !important;
             -webkit-text-fill-color: #fff !important;
             font-size: 10px;
             font-weight: 700;
             letter-spacing: .08em;
-            padding: 3px 10px;
+            padding: 3px 12px;
             border-radius: 999px;
         }
         .upsell-plan-name {
-            font-size: 13px !important;
-            color: rgba(148,163,184,.70) !important;
-            -webkit-text-fill-color: rgba(148,163,184,.70) !important;
-            font-weight: 600 !important;
-            letter-spacing: .06em !important;
+            font-size: 11px !important;
+            color: rgba(148,163,184,.65) !important;
+            -webkit-text-fill-color: rgba(148,163,184,.65) !important;
+            font-weight: 700 !important;
+            letter-spacing: .10em !important;
             text-transform: uppercase !important;
-            margin: 0 !important;
+            margin: 0 0 6px !important;
         }
         .upsell-plan-price {
-            font-size: 26px !important;
-            font-weight: 700 !important;
+            font-size: 30px !important;
+            font-weight: 800 !important;
             color: #F1F5F9 !important;
             -webkit-text-fill-color: #F1F5F9 !important;
             letter-spacing: -.03em !important;
-            margin: 4px 0 2px !important;
+            margin: 0 0 2px !important;
             line-height: 1 !important;
         }
         .upsell-plan-credits {
-            font-size: 14px !important;
+            font-size: 15px !important;
             color: #67E8F9 !important;
             -webkit-text-fill-color: #67E8F9 !important;
             font-weight: 600 !important;
-            margin: 0 0 12px !important;
+            margin: 0 0 4px !important;
         }
         .upsell-plan-unit {
             font-size: 12px !important;
-            color: rgba(148,163,184,.55) !important;
-            -webkit-text-fill-color: rgba(148,163,184,.55) !important;
-            margin: 0 0 14px !important;
+            color: rgba(148,163,184,.50) !important;
+            -webkit-text-fill-color: rgba(148,163,184,.50) !important;
+            margin: 0 0 16px !important;
         }
         .upsell-btn {
             display: block;
             text-align: center;
-            padding: 10px 0;
+            padding: 11px 0;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
-            border: 1.5px solid rgba(148,163,184,.22);
-            color: #CBD5E1 !important;
-            -webkit-text-fill-color: #CBD5E1 !important;
-            background: rgba(148,163,184,.08);
-            transition: border-color .18s, background .18s;
+            border: 1.5px solid rgba(148,163,184,.25);
+            color: #E2E8F0 !important;
+            -webkit-text-fill-color: #E2E8F0 !important;
+            background: rgba(148,163,184,.12);
+            transition: border-color .18s, background .18s, color .18s;
             margin-top: auto;
         }
         .upsell-btn:hover {
-            border-color: rgba(6,182,212,.50);
-            background: rgba(6,182,212,.10);
+            border-color: rgba(6,182,212,.55);
+            background: rgba(6,182,212,.12);
             color: #67E8F9 !important;
             -webkit-text-fill-color: #67E8F9 !important;
             text-decoration: none;
@@ -1394,10 +1399,11 @@ def _inject_css() -> None:
             border-color: transparent;
             color: #fff !important;
             -webkit-text-fill-color: #fff !important;
-            box-shadow: 0 4px 16px rgba(124,58,237,.30);
+            box-shadow: 0 4px 20px rgba(124,58,237,.35);
+            font-size: 15px;
         }
         .upsell-btn--primary:hover {
-            filter: brightness(1.10);
+            filter: brightness(1.12);
             background: linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%);
             border-color: transparent;
             color: #fff !important;
@@ -2190,8 +2196,8 @@ def _render_inline_upsell() -> None:
     st.markdown(
         f"""
         <div class="upsell-card">
-            <p class="upsell-title">Get more downloads</p>
-            <p class="upsell-sub">One-time payment · Credits never expire · Instant Stripe checkout</p>
+            <p class="upsell-title">Unlock more MP3 downloads</p>
+            <p class="upsell-sub">One-time payment — no subscription. Credits never expire. Instant checkout via Stripe.</p>
             <div class="upsell-plans">
                 <div class="upsell-plan">
                     <p class="upsell-plan-name">Starter</p>
