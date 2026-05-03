@@ -1398,7 +1398,8 @@ def _inject_css() -> None:
         }
         .upsell-btn--primary {
             background: linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%);
-            border-color: transparent;
+            border: none !important;
+            outline: none !important;
             color: #fff !important;
             -webkit-text-fill-color: #fff !important;
             box-shadow: 0 4px 20px rgba(124,58,237,.35);
@@ -1407,7 +1408,7 @@ def _inject_css() -> None:
         .upsell-btn--primary:hover {
             filter: brightness(1.12);
             background: linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%);
-            border-color: transparent;
+            border: none !important;
             color: #fff !important;
             -webkit-text-fill-color: #fff !important;
         }
@@ -1776,13 +1777,23 @@ def _inject_css() -> None:
             -webkit-text-fill-color: #FECACA !important;
         }
         .warn-box {
-            background: rgba(245,158,11,.10) !important;
-            border: 1px solid rgba(245,158,11,.28) !important;
+            background: rgba(245,158,11,.16) !important;
+            border: 1.5px solid rgba(245,158,11,.55) !important;
+            color: #FCD34D !important;
+            -webkit-text-fill-color: #FCD34D !important;
+            font-size: 16px !important;
+            font-weight: 500 !important;
+            box-shadow: 0 0 28px rgba(245,158,11,.12),
+                        inset 0 0 0 1px rgba(245,158,11,.08) !important;
+        }
+        .warn-box strong {
             color: #FDE68A !important;
             -webkit-text-fill-color: #FDE68A !important;
+            font-size: 17px !important;
+            font-weight: 700 !important;
         }
-        .warn-box::before  { content: '!' !important; left: 16px !important; background: rgba(245,158,11,.22) !important; }
-        .warn-box::after   { content: '!' !important; right: 16px !important; background: rgba(245,158,11,.22) !important; }
+        .warn-box::before  { content: '!' !important; left: 16px !important; background: rgba(245,158,11,.30) !important; color: #FCD34D !important; -webkit-text-fill-color: #FCD34D !important; font-size: 13px !important; }
+        .warn-box::after   { content: '!' !important; right: 16px !important; background: rgba(245,158,11,.30) !important; color: #FCD34D !important; -webkit-text-fill-color: #FCD34D !important; font-size: 13px !important; }
         .success-box {
             background: rgba(16,185,129,.10) !important;
             border: 1px solid rgba(16,185,129,.28) !important;
@@ -3358,8 +3369,9 @@ if st.session_state.do_convert and st.session_state.registered and st.session_st
     st.session_state.do_convert = False
     _run_conversion(st.session_state.pending_url)
 
-# ── Trust bar below cards (shown after Convert is clicked) ───────────────────
-if st.session_state.video_meta or st.session_state.show_gate:
+# ── Trust bar below cards (hidden when out of credits — upsell takes over) ───
+_out_of_credits = st.session_state.registered and _credits() <= 0
+if (st.session_state.video_meta or st.session_state.show_gate) and not _out_of_credits:
     st.markdown(_trust_bar_html, unsafe_allow_html=True)
 
 # ── Out of credits: warning + inline upsell ──────────────────────────────────
