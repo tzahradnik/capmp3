@@ -1397,7 +1397,6 @@ def _inject_css() -> None:
         [data-testid="stForm"] [data-testid="stFormSubmitButton"] > button {
             height: 48px !important;
             padding: 0 32px !important;
-            min-width: 152px !important;
             border-radius: 13px !important;
             border: none !important;
             white-space: nowrap !important;
@@ -1405,15 +1404,18 @@ def _inject_css() -> None:
             font-weight: 600 !important;
             letter-spacing: .005em !important;
             margin: 0 !important;
-            transition: opacity .25s ease, filter .25s ease,
+            transition: opacity .28s ease, filter .28s ease,
                         transform .18s ease, box-shadow .18s ease !important;
         }
-        /* Converter form button — dimmed until user types */
-        [data-testid="stForm"]:not(:has(.gate-title)) [data-testid="stFormSubmitButton"] > button:not(.btn-active) {
-            opacity: 0.42 !important;
-            filter: grayscale(0.30) brightness(0.85) !important;
+        /* Converter button — dimmed when input is empty (:placeholder-shown = empty) */
+        [data-testid="stForm"]:not(:has(.gate-title)):has(input:placeholder-shown)
+            [data-testid="stFormSubmitButton"] > button {
+            opacity: 0.40 !important;
+            filter: grayscale(0.35) brightness(0.80) !important;
         }
-        [data-testid="stForm"]:not(:has(.gate-title)) [data-testid="stFormSubmitButton"] > button.btn-active {
+        /* Converter button — active when user has typed something */
+        [data-testid="stForm"]:not(:has(.gate-title)):has(input:not(:placeholder-shown))
+            [data-testid="stFormSubmitButton"] > button {
             opacity: 1 !important;
             filter: none !important;
         }
@@ -2884,51 +2886,6 @@ with st.form("converter_form", clear_on_submit=False):
         label_visibility="collapsed",
     )
     clicked = st.form_submit_button("Convert →", type="primary", use_container_width=False)
-
-# JS: activate Convert button only when URL input has content
-st.markdown("""
-<script>
-(function() {
-    function init() {
-        var forms = document.querySelectorAll('[data-testid="stForm"]');
-        var converterForm = null;
-        for (var i = 0; i < forms.length; i++) {
-            if (!forms[i].querySelector('.gate-title')) {
-                converterForm = forms[i];
-                break;
-            }
-        }
-        if (!converterForm) return;
-        var input = converterForm.querySelector('input');
-        var btn = converterForm.querySelector('[data-testid="stFormSubmitButton"] > button');
-        if (!input || !btn) return;
-        function update() {
-            if (input.value.trim().length > 0) {
-                btn.classList.add('btn-active');
-            } else {
-                btn.classList.remove('btn-active');
-            }
-        }
-        input.removeEventListener('input', update);
-        input.addEventListener('input', update);
-        update();
-    }
-    // Run after Streamlit paint and on re-renders
-    var _mo = new MutationObserver(function(muts) {
-        for (var m of muts) {
-            for (var n of m.addedNodes) {
-                if (n.nodeType === 1 && (n.matches('[data-testid="stForm"]') || n.querySelector && n.querySelector('[data-testid="stForm"]'))) {
-                    init(); return;
-                }
-            }
-        }
-    });
-    _mo.observe(document.body, { childList: true, subtree: true });
-    setTimeout(init, 300);
-    setTimeout(init, 900);
-})();
-</script>
-""", unsafe_allow_html=True)
 
 # Credit pill — only shown when registered
 if st.session_state.registered:
