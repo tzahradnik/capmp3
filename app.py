@@ -1728,14 +1728,16 @@ def _inject_css() -> None:
         /* ── Status boxes — error / warn / success ────────── */
         .error-box, .warn-box, .success-box {
             border-radius: 14px !important;
-            padding: 14px 18px !important;
+            padding: 14px 52px !important;
             font-size: 15px !important;
             line-height: 1.55 !important;
             max-width: 720px !important;
             margin: 10px auto !important;
             display: flex !important;
-            align-items: flex-start !important;
-            gap: 10px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            position: relative !important;
         }
         .error-box {
             background: rgba(239,68,68,.10) !important;
@@ -1743,19 +1745,24 @@ def _inject_css() -> None:
             color: #FCA5A5 !important;
             -webkit-text-fill-color: #FCA5A5 !important;
         }
-        .error-box::before {
-            content: '✕' !important;
-            flex-shrink: 0 !important;
-            font-size: 13px !important;
-            font-weight: 700 !important;
-            width: 20px !important; height: 20px !important;
+        /* Shared icon badge mixin — used by ::before and ::after */
+        .error-box::before, .error-box::after,
+        .warn-box::before,  .warn-box::after,
+        .success-box::before, .success-box::after {
+            position: absolute !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+            width: 22px !important; height: 22px !important;
             border-radius: 50% !important;
-            background: rgba(239,68,68,.20) !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            margin-top: 1px !important;
+            flex-shrink: 0 !important;
         }
+        .error-box::before { content: '✕' !important; left: 16px !important; background: rgba(239,68,68,.22) !important; }
+        .error-box::after  { content: '✕' !important; right: 16px !important; background: rgba(239,68,68,.22) !important; }
         .error-box strong {
             color: #FECACA !important;
             -webkit-text-fill-color: #FECACA !important;
@@ -1766,19 +1773,8 @@ def _inject_css() -> None:
             color: #FDE68A !important;
             -webkit-text-fill-color: #FDE68A !important;
         }
-        .warn-box::before {
-            content: '!' !important;
-            flex-shrink: 0 !important;
-            font-size: 12px !important;
-            font-weight: 800 !important;
-            width: 20px !important; height: 20px !important;
-            border-radius: 50% !important;
-            background: rgba(245,158,11,.20) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            margin-top: 1px !important;
-        }
+        .warn-box::before  { content: '!' !important; left: 16px !important; background: rgba(245,158,11,.22) !important; }
+        .warn-box::after   { content: '!' !important; right: 16px !important; background: rgba(245,158,11,.22) !important; }
         .success-box {
             background: rgba(16,185,129,.10) !important;
             border: 1px solid rgba(16,185,129,.28) !important;
@@ -1786,19 +1782,8 @@ def _inject_css() -> None:
             -webkit-text-fill-color: #6EE7B7 !important;
             margin: 0 0 16px !important;
         }
-        .success-box::before {
-            content: '✓' !important;
-            flex-shrink: 0 !important;
-            font-size: 12px !important;
-            font-weight: 700 !important;
-            width: 20px !important; height: 20px !important;
-            border-radius: 50% !important;
-            background: rgba(16,185,129,.20) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            margin-top: 1px !important;
-        }
+        .success-box::before { content: '✓' !important; left: 16px !important; background: rgba(16,185,129,.22) !important; }
+        .success-box::after  { content: '✓' !important; right: 16px !important; background: rgba(16,185,129,.22) !important; }
         .success-box strong {
             color: #A7F3D0 !important;
             -webkit-text-fill-color: #A7F3D0 !important;
@@ -3360,7 +3345,7 @@ if st.session_state.video_meta or st.session_state.show_gate:
 if st.session_state.registered and _credits() <= 0 and not st.session_state.do_convert:
     st.markdown(
         '<div class="warn-box" style="margin-top:12px;">'
-        '⚠ <strong>Free credit already used.</strong> '
+        '<strong>Free credit already used.</strong>&ensp;'
         'Each email address and device is limited to 1 free download.'
         '</div>',
         unsafe_allow_html=True,
