@@ -17,6 +17,7 @@ COPY start.sh .
 RUN chmod +x start.sh
 
 # nginx config — store as template, start.sh injects real PORT at runtime
+RUN mkdir -p /etc/nginx/templates /etc/nginx/sites-enabled
 COPY nginx.conf /etc/nginx/templates/capmp3.template
 RUN rm -f /etc/nginx/sites-enabled/default
 
