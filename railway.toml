@@ -3,6 +3,6 @@ builder = "dockerfile"
 
 [deploy]
 startCommand = "sh /app/start.sh"
-healthcheckPath = "/_stcore/health"
+healthcheckPath = "/healthz"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"

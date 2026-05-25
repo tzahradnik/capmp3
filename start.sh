@@ -7,10 +7,12 @@ PORT_VAL="${PORT:-8080}"
 sed "s/__PORT__/${PORT_VAL}/" /etc/nginx/templates/capmp3.template \
     > /etc/nginx/sites-enabled/capmp3
 
-# Validate nginx config before starting anything
+# Validate nginx config
 nginx -t
 
-# Start Streamlit on internal port (localhost only)
+# Start Streamlit in background — nginx doesn't wait for it
+# (nginx answers /healthz directly; Streamlit routes get 502 for a few seconds
+#  until Streamlit finishes booting, then nginx proxies normally)
 streamlit run app.py \
     --server.port=8501 \
     --server.address=127.0.0.1 \
@@ -18,9 +20,5 @@ streamlit run app.py \
     --browser.gatherUsageStats=false \
     --server.enableXsrfProtection=true &
 
-# Give Streamlit time to boot before nginx starts accepting traffic
-# Railway healthcheckTimeout=30 covers this window
-sleep 8
-
-# Start nginx in foreground — container exits if nginx dies
+# Start nginx immediately in foreground — health check works without Streamlit
 exec nginx -g 'daemon off;'
