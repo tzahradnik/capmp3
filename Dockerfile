@@ -21,5 +21,3 @@ COPY nginx.conf /etc/nginx/templates/capmp3.template
 RUN rm -f /etc/nginx/sites-enabled/default
 
 EXPOSE 8080
-
-CMD ["./start.sh"]
