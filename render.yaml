@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: capmp3
+    runtime: docker
+    region: frankfurt
+    plan: starter
+    healthCheckPath: /healthz
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
