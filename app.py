@@ -59,11 +59,27 @@ _request_log: dict = defaultdict(list)
 
 
 def _get_client_ip() -> str:
+    """
+    Return the real client IP from X-Forwarded-For.
+
+    On Render the chain looks like:
+        <attacker-injected>, <real-client-ip>, <render-lb-ip>, <nginx-ip>
+    Our nginx appends its own $remote_addr (a private Render internal IP)
+    and Render's LB prepends the true client IP before that.
+    Walking right-to-left and returning the first PUBLIC IP skips all
+    private/internal hops and ignores any IPs the client injected on the left.
+    Falls back to leftmost entry for local development (all IPs are private).
+    """
     try:
         forwarded = st.context.headers.get("X-Forwarded-For", "")
         if forwarded:
-            # Railway sets the real client IP as the leftmost entry
-            return forwarded.split(",")[0].strip()
+            ips = [ip.strip() for ip in forwarded.split(",") if ip.strip()]
+            # Rightmost non-private IP = real client as seen by trusted proxy
+            for ip in reversed(ips):
+                if not _is_private_ip(ip):
+                    return ip
+            # All private (local dev / loopback) — fall back to leftmost
+            return ips[0]
     except Exception:
         pass
     return "unknown"
@@ -228,6 +244,11 @@ _PRIVATE_IP_PATTERNS: list[re.Pattern] = [
     re.compile(r"^fe80", re.IGNORECASE),  # IPv6 link-local
     re.compile(r"^localhost$", re.IGNORECASE),
 ]
+
+
+def _is_private_ip(ip: str) -> bool:
+    """Return True if ip falls in a private / reserved range."""
+    return any(p.search(ip) for p in _PRIVATE_IP_PATTERNS)
 
 
 def _validate_user_url(url: str) -> None:
@@ -3268,7 +3289,7 @@ if st.session_state.video_meta and (st.session_state.show_gate or st.session_sta
 
     safe_title = html_lib.escape(title)
 
-    if thumb:
+    if thumb and thumb.startswith(("https://", "http://")):
         thumb_html = f'<img src="{html_lib.escape(thumb)}" class="preview-thumb" loading="lazy">'
     else:
         thumb_html = '<div class="preview-thumb-placeholder">🎵</div>'
