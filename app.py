@@ -3419,6 +3419,10 @@ st.markdown(
         cap.so · cap.link · Files deleted immediately after download
         · <a href="?page=terms">Terms of Service</a>
         · <a href="mailto:{CONTACT_EMAIL}">Contact</a>
+        <br style="margin-bottom:12px;">
+        <a href="https://sellwithboost.com" target="_blank" rel="noopener noreferrer">
+            <img src="https://sellwithboost.com/badge/listing-dark.svg" alt="Listed on Sell With Boost" style="height:40px;width:auto;margin-top:12px;opacity:0.85;" />
+        </a>
     </div>
     """,
     unsafe_allow_html=True,
