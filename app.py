@@ -2728,12 +2728,14 @@ def _run_conversion(url: str) -> None:
             )
             return
         except RuntimeError as e:
-            # May contain ffmpeg paths / internal details — log only
-            print(f"[CAPMP3 ERROR] RuntimeError for {url!r}: {e}", flush=True)
+            err_detail = str(e)
+            print(f"[CAPMP3 ERROR] RuntimeError for {url!r}: {err_detail}", flush=True)
             _refund_credit()
+            # DEBUG: show raw error temporarily to diagnose large-file failures
             st.markdown(
-                '<div class="error-box"><strong>Conversion failed.</strong> '
-                "An error occurred during processing. Please try again or contact support.</div>",
+                f'<div class="error-box"><strong>Conversion failed (debug):</strong><br>'
+                f'<pre style="white-space:pre-wrap;font-size:11px;text-align:left;margin:8px 0 0">'
+                f'{html_lib.escape(err_detail[-800:])}</pre></div>',
                 unsafe_allow_html=True,
             )
             return
