@@ -425,10 +425,17 @@ def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
         if elapsed > timeout:
             proc.kill()
             raise RuntimeError("Conversion took too long (> 15 min). Please try again.")
-        # Smooth progress: 0 → 90 % over ~60 s, capped at 90 % until ffmpeg exits
-        pct = min(elapsed / 60.0 * 0.90, 0.90)
-        bar.progress(pct, f"{label}…  {int(elapsed)}s")
-        time.sleep(0.5)
+        # Asymptotic progress: approaches 0.97 but never reaches it.
+        # For large files this keeps the bar visibly moving instead of
+        # freezing at a fixed percentage.
+        # Formula: 0.97 * (1 - e^(-elapsed/120)) → reaches ~0.63 at 2min,
+        # ~0.86 at 5min, ~0.93 at 10min — always moving, never stuck.
+        import math
+        pct = 0.97 * (1.0 - math.exp(-elapsed / 120.0))
+        mins, secs = divmod(int(elapsed), 60)
+        time_str = f"{mins}m {secs}s" if mins else f"{secs}s"
+        bar.progress(pct, f"{label}…  {time_str}")
+        time.sleep(1.0)
 
     _, stderr_bytes = proc.communicate()
     if proc.returncode != 0:
