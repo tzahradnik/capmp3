@@ -17,7 +17,6 @@ import hashlib
 import html as html_lib
 import requests
 import streamlit as st
-import streamlit.components.v1 as _components
 
 # Load .env for local development (no-op in production where env vars are set directly)
 try:
@@ -692,8 +691,8 @@ def _inject_analytics() -> None:
     """
     Inject GA4 + Microsoft Clarity into the PARENT frame (top-level window).
 
-    Streamlit components run inside a same-origin iframe so we can reach
-    window.parent.document and append <script> tags directly to <head>.
+    Injected via st.html() — runs in the Streamlit page context.
+    window.parent === window (top-level), so window.parent manipulation works directly.
     Guards (__ga4_injected / __clarity_injected) prevent duplicate injection
     on Streamlit reruns.
     """
@@ -736,7 +735,7 @@ def _inject_analytics() -> None:
                     }})(p,p.document,'clarity','script','{CLARITY_PROJECT_ID}');
                 }}"""
 
-    _components.html(
+    st.html(
         f"""
         <script>
         (function() {{
@@ -748,7 +747,6 @@ def _inject_analytics() -> None:
         }})();
         </script>
         """,
-        height=0,
     )
 
 
@@ -769,7 +767,7 @@ def _inject_seo_meta() -> None:
     Streamlit doesn't expose head injection natively; we reach it via
     window.parent.document from a same-origin component iframe.
     """
-    _components.html(
+    st.html(
         f"""
         <script>
         (function() {{
@@ -843,7 +841,6 @@ def _inject_seo_meta() -> None:
         }})();
         </script>
         """,
-        height=0,
     )
 
 
@@ -854,7 +851,7 @@ def _inject_effects() -> None:
     Inject aurora blobs + particle canvas into the parent frame.
     Pure visual layer — no functional impact.
     """
-    _components.html(
+    st.html(
         """
         <script>
         (function() {
@@ -927,7 +924,6 @@ def _inject_effects() -> None:
         })();
         </script>
         """,
-        height=0,
     )
 
 
@@ -2318,9 +2314,8 @@ def _render_pricing() -> None:
     # Auto-scroll here when triggered after a successful download
     if st.session_state.get("_scroll_pricing"):
         st.session_state["_scroll_pricing"] = False
-        _components.html(
+        st.html(
             "<script>window.parent.scrollTo({top: window.parent.document.body.scrollHeight, behavior: 'smooth'});</script>",
-            height=0,
         )
 
     st.markdown(
@@ -3074,7 +3069,7 @@ _inject_effects()
 # The iframe runs on the same domain (capmp3.com), so document.cookie applies
 # to capmp3.com and will be sent in the Cookie header on subsequent WS upgrades.
 # Python reads it via st.context.headers → _get_cookie_device_id().
-_components.html(
+st.html(
     """
     <script>
     (function () {
@@ -3094,13 +3089,12 @@ _components.html(
     })();
     </script>
     """,
-    height=0,
 )
 
 # ── Persist email in cookie so it survives the Stripe redirect ────────────────
 _em = st.session_state.get("email", "")
 if _em:
-    _components.html(
+    st.html(
         f"""
         <script>
         (function() {{
@@ -3111,7 +3105,6 @@ if _em:
         }})();
         </script>
         """,
-        height=0,
     )
 
 # ── Page routing ──────────────────────────────────────────────────────────────
