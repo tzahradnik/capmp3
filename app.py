@@ -339,6 +339,7 @@ def get_cap_video_url(page_url: str) -> tuple[str, bool]:
     if not video_id:
         raise ValueError(f"Could not extract a video ID from the URL: {final_url}")
 
+    # 1. Try dedicated small audio endpoints first (< 50 MB → direct download path)
     for vtype in ("audio", "segments-audio"):
         url = _cap_api_redirect(video_id, final_url, vtype)
         if url:
@@ -351,8 +352,30 @@ def get_cap_video_url(page_url: str) -> tuple[str, bool]:
             except Exception:
                 pass
 
+    # 2. Try HLS master playlist — audio and video are in SEPARATE segments so
+    #    ffmpeg only downloads the audio segments (~5–10% of total file size).
+    #    Much faster than streaming the full 1-2 GB MP4.
+    hls_url = _cap_api_redirect(video_id, final_url, "segments-master")
+    if hls_url:
+        try:
+            head = requests.head(hls_url, headers=HEADERS, timeout=10, allow_redirects=True)
+            ct   = head.headers.get("content-type", "")
+            # m3u8 playlists: application/vnd.apple.mpegurl, application/x-mpegURL, or text/plain
+            if any(x in ct.lower() for x in ("mpegurl", "m3u", "apple")):
+                print(f"[CAPMP3] Using HLS segments-master: {hls_url[:80]}", flush=True)
+                return hls_url, False
+            # If it redirects to the same full MP4, don't use it
+            size = int(head.headers.get("content-length", 0))
+            if 0 < size < 300 * 1024 * 1024:  # < 300 MB — worth trying
+                print(f"[CAPMP3] segments-master returned small file ({size//1024//1024} MB)", flush=True)
+                return hls_url, False
+        except Exception:
+            pass
+
+    # 3. Fallback: full video (may be 1+ GB — slow on free tier)
     url = _cap_api_redirect(video_id, final_url, "master")
     if url:
+        print(f"[CAPMP3] Falling back to master video (full file)", flush=True)
         return url, False
 
     raise ValueError("cap.so API did not return a valid URL. The video may be private or unavailable.")
@@ -459,15 +482,11 @@ def convert_url_to_mp3(source_url: str, output_path: str, bar, label: str) -> No
     """
     cmd = [
         FFMPEG, "-y",
-        "-user_agent", HEADERS["User-Agent"],
-        # seekable=1 lets ffmpeg use HTTP byte-range requests for MP4 files:
-        # it fetches the moov atom, then skips video data and downloads only
-        # audio chunks — critical for 1+ GB recordings where downloading the
-        # full file would time out.  Do NOT set -reconnect_streamed here; that
-        # flag forces sequential (non-seekable) reads and defeats range requests.
-        "-seekable", "1",
-        "-reconnect", "1",
-        "-reconnect_delay_max", "5",
+        # Pass User-Agent via -headers (works for both HTTP and HLS requests).
+        "-headers", f"User-Agent: {HEADERS['User-Agent']}\r\n",
+        # Allow HLS playlists (m3u8) and their HTTPS segments.
+        "-allowed_extensions", "ALL",
+        "-protocol_whitelist", "file,http,https,tcp,tls,crypto",
         "-i", source_url,
         "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-ar", "44100",
         output_path,
