@@ -408,10 +408,12 @@ def download_to_file(source_url: str, dest_path: str, bar, label: str) -> None:
     bar.progress(1.0, f"{label} — done.")
 
 
-def _run_ffmpeg_with_progress(cmd: list, output_path: str, bar, label: str) -> None:
+def _run_ffmpeg_with_progress(cmd: list, output_path: str, bar, label: str,
+                              timeout: int = 1800) -> None:
     """
     Run an ffmpeg Popen command and update the Streamlit progress bar while it works.
     Shared by convert_to_mp3() and convert_url_to_mp3().
+    Default timeout is 30 minutes — large files streamed from URL need more time.
     """
     import math
     try:
@@ -419,14 +421,13 @@ def _run_ffmpeg_with_progress(cmd: list, output_path: str, bar, label: str) -> N
     except FileNotFoundError:
         raise RuntimeError("ffmpeg not found. Please install ffmpeg.")
 
-    start   = time.time()
-    timeout = 900  # 15 minutes
+    start = time.time()
 
     while proc.poll() is None:
         elapsed = time.time() - start
         if elapsed > timeout:
             proc.kill()
-            raise RuntimeError("Conversion took too long (> 15 min). Please try again.")
+            raise RuntimeError("Conversion took too long (> 30 min). Please try again.")
         # Asymptotic progress: approaches 0.97 but never reaches it.
         # Formula: 0.97 * (1 - e^(-elapsed/120)) → ~0.63 at 2min, ~0.93 at 10min.
         pct = 0.97 * (1.0 - math.exp(-elapsed / 120.0))
@@ -460,11 +461,14 @@ def convert_url_to_mp3(source_url: str, output_path: str, bar, label: str) -> No
     cmd = [
         FFMPEG, "-y",
         "-user_agent", HEADERS["User-Agent"],
+        "-reconnect", "1",
+        "-reconnect_streamed", "1",
+        "-reconnect_delay_max", "5",
         "-i", source_url,
         "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-ar", "44100",
         output_path,
     ]
-    _run_ffmpeg_with_progress(cmd, output_path, bar, label)
+    _run_ffmpeg_with_progress(cmd, output_path, bar, label, timeout=1800)
 
 
 def check_ffmpeg() -> bool:
