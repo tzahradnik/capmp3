@@ -30,7 +30,7 @@ except ImportError:
 # Config
 # ---------------------------------------------------------------------------
 
-MAX_VIDEO_MB = 1500
+MAX_VIDEO_MB = 2000
 FREE_CREDITS = 1
 
 STRIPE_BASIC_URL = "https://buy.stripe.com/5kQeVdaHV20cd871mvdMI00"
