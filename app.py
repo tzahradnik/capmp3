@@ -482,11 +482,7 @@ def convert_url_to_mp3(source_url: str, output_path: str, bar, label: str) -> No
     """
     cmd = [
         FFMPEG, "-y",
-        # Pass User-Agent via -headers (works for both HTTP and HLS requests).
-        "-headers", f"User-Agent: {HEADERS['User-Agent']}\r\n",
-        # Allow HLS playlists (m3u8) and their HTTPS segments.
-        "-allowed_extensions", "ALL",
-        "-protocol_whitelist", "file,http,https,tcp,tls,crypto",
+        "-user_agent", HEADERS["User-Agent"],
         "-i", source_url,
         "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-ar", "44100",
         output_path,
