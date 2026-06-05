@@ -461,8 +461,13 @@ def convert_url_to_mp3(source_url: str, output_path: str, bar, label: str) -> No
     cmd = [
         FFMPEG, "-y",
         "-user_agent", HEADERS["User-Agent"],
+        # seekable=1 lets ffmpeg use HTTP byte-range requests for MP4 files:
+        # it fetches the moov atom, then skips video data and downloads only
+        # audio chunks — critical for 1+ GB recordings where downloading the
+        # full file would time out.  Do NOT set -reconnect_streamed here; that
+        # flag forces sequential (non-seekable) reads and defeats range requests.
+        "-seekable", "1",
         "-reconnect", "1",
-        "-reconnect_streamed", "1",
         "-reconnect_delay_max", "5",
         "-i", source_url,
         "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-ar", "44100",
