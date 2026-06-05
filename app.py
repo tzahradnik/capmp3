@@ -1224,8 +1224,9 @@ def _inject_css() -> None:
 
         /* ── Credit pill ──────────────────────────────────── */
         .credit-pill {
-            display: inline-flex;
+            display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             background: rgba(124,58,237,.12);
             border: 1px solid rgba(124,58,237,.25);
@@ -1234,7 +1235,9 @@ def _inject_css() -> None:
             font-size: 16px;
             color: #C4B5FD;
             font-weight: 500;
-            margin-bottom: 16px;
+            margin: 0 auto 16px !important;
+            max-width: 720px !important;
+            width: fit-content;
         }
         .credit-pill.empty {
             background: rgba(239,68,68,.10);
@@ -1651,7 +1654,11 @@ def _inject_css() -> None:
             0%   { transform: translateX(-150%); }
             100% { transform: translateX(550%); }
         }
-        .stProgress { margin: 16px 0 4px !important; }
+        .stProgress {
+            margin: 16px auto 4px !important;
+            max-width: 720px !important;
+            display: block !important;
+        }
         .stProgress > div > div > div {
             height: 14px !important;
             border-radius: 999px !important;
