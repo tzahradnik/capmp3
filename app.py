@@ -418,13 +418,13 @@ def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
         raise RuntimeError("ffmpeg not found. Please install ffmpeg.")
 
     start   = time.time()
-    timeout = 300  # 5 minutes
+    timeout = 900  # 15 minutes — large files (1-2 GB) need more time
 
     while proc.poll() is None:
         elapsed = time.time() - start
         if elapsed > timeout:
             proc.kill()
-            raise RuntimeError("Conversion took too long (> 5 min). Please try again.")
+            raise RuntimeError("Conversion took too long (> 15 min). Please try again.")
         # Smooth progress: 0 → 90 % over ~60 s, capped at 90 % until ffmpeg exits
         pct = min(elapsed / 60.0 * 0.90, 0.90)
         bar.progress(pct, f"{label}…  {int(elapsed)}s")
