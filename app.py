@@ -408,17 +408,19 @@ def download_to_file(source_url: str, dest_path: str, bar, label: str) -> None:
     bar.progress(1.0, f"{label} — done.")
 
 
-def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
-    """Convert to MP3 using Popen so we can update the progress bar while ffmpeg runs."""
-    cmd = [FFMPEG, "-y", "-i", input_path, "-vn",
-           "-acodec", "libmp3lame", "-q:a", "2", "-ar", "44100", output_path]
+def _run_ffmpeg_with_progress(cmd: list, output_path: str, bar, label: str) -> None:
+    """
+    Run an ffmpeg Popen command and update the Streamlit progress bar while it works.
+    Shared by convert_to_mp3() and convert_url_to_mp3().
+    """
+    import math
     try:
         proc = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     except FileNotFoundError:
         raise RuntimeError("ffmpeg not found. Please install ffmpeg.")
 
     start   = time.time()
-    timeout = 900  # 15 minutes — large files (1-2 GB) need more time
+    timeout = 900  # 15 minutes
 
     while proc.poll() is None:
         elapsed = time.time() - start
@@ -426,11 +428,7 @@ def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
             proc.kill()
             raise RuntimeError("Conversion took too long (> 15 min). Please try again.")
         # Asymptotic progress: approaches 0.97 but never reaches it.
-        # For large files this keeps the bar visibly moving instead of
-        # freezing at a fixed percentage.
-        # Formula: 0.97 * (1 - e^(-elapsed/120)) → reaches ~0.63 at 2min,
-        # ~0.86 at 5min, ~0.93 at 10min — always moving, never stuck.
-        import math
+        # Formula: 0.97 * (1 - e^(-elapsed/120)) → ~0.63 at 2min, ~0.93 at 10min.
         pct = 0.97 * (1.0 - math.exp(-elapsed / 120.0))
         mins, secs = divmod(int(elapsed), 60)
         time_str = f"{mins}m {secs}s" if mins else f"{secs}s"
@@ -442,6 +440,31 @@ def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
         err = (stderr_bytes or b"").decode("utf-8", errors="replace")
         raise RuntimeError(f"ffmpeg error:\n{err[-600:]}")
     bar.progress(1.0, f"{label} — complete.")
+
+
+def convert_to_mp3(input_path: str, output_path: str, bar, label: str) -> None:
+    """Convert a local file to MP3 via ffmpeg."""
+    cmd = [FFMPEG, "-y", "-i", input_path, "-vn",
+           "-acodec", "libmp3lame", "-q:a", "2", "-ar", "44100", output_path]
+    _run_ffmpeg_with_progress(cmd, output_path, bar, label)
+
+
+def convert_url_to_mp3(source_url: str, output_path: str, bar, label: str) -> None:
+    """
+    Stream a remote URL directly into ffmpeg — no intermediate download file.
+
+    For large video files (e.g. 1-2 GB cap.so recordings) this avoids writing
+    the source to disk entirely, which would exhaust Render's ephemeral storage.
+    ffmpeg handles the HTTP download internally while encoding.
+    """
+    cmd = [
+        FFMPEG, "-y",
+        "-user_agent", HEADERS["User-Agent"],
+        "-i", source_url,
+        "-vn", "-acodec", "libmp3lame", "-q:a", "2", "-ar", "44100",
+        output_path,
+    ]
+    _run_ffmpeg_with_progress(cmd, output_path, bar, label)
 
 
 def check_ffmpeg() -> bool:
@@ -2645,19 +2668,31 @@ def _run_conversion(url: str) -> None:
             bar = st.progress(0, text="Finding audio source…  0%")
 
             video_url, _method, audio_only = find_video_url(url)
-            bar.progress(0.04, text="Downloading…  4%")
 
-            download_to_file(
-                video_url, src_path,
-                _ScaledBar(bar, 0.04, 0.72),
-                "Downloading" if audio_only else "Downloading",
-            )
-
-            convert_to_mp3(
-                src_path, audio_path,
-                _ScaledBar(bar, 0.72, 1.00),
-                "Converting to MP3",
-            )
+            if audio_only:
+                # Small dedicated audio track — download first so we can show
+                # real byte-level progress, then convert the local file.
+                bar.progress(0.04, text="Downloading…  4%")
+                download_to_file(
+                    video_url, src_path,
+                    _ScaledBar(bar, 0.04, 0.72),
+                    "Downloading",
+                )
+                convert_to_mp3(
+                    src_path, audio_path,
+                    _ScaledBar(bar, 0.72, 1.00),
+                    "Converting to MP3",
+                )
+            else:
+                # Full video file (potentially 1-2 GB) — stream the URL directly
+                # into ffmpeg so the source is never written to disk.  This avoids
+                # exhausting Render's ephemeral storage on large recordings.
+                bar.progress(0.04, text="Converting to MP3…  4%")
+                convert_url_to_mp3(
+                    video_url, audio_path,
+                    _ScaledBar(bar, 0.04, 1.00),
+                    "Converting to MP3",
+                )
 
             bar.progress(1.0, text="✓ Complete  100%")
 
